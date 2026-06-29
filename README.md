@@ -1,2 +1,3 @@
-# shiny-ReSCUE
-A Shiny App for the ReSCUE Seabird Flight Height Toolkit
+# ReSCUE-FHD Toolkit
+The ReSCUE Seabird Flight Height Toolkit Shiny App
+
