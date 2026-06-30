@@ -8,17 +8,32 @@ Authors@R: c(
     person("Carl", "Donovan", , "carl@dmpstats.co.uk", role = "ctb"),
     person("Tim", "Kasoar", , "TKAS@niras.com", role = "ctb")
   )
-Description: ReSCUEApp is a Shiny application that provides a user-friendly interface to the ReSCUETools R package, making seabird flight height data and outputs from the ReSCUE project accessible to offshore wind developers, environmental consultants, conservation bodies, NGOs, and academics. It integrates ReSCUETools functionality with UK flight height distribution data developed by the British Trust for Ornithology (BTO), serving as a reference point for collision risk modelling and other analyses. The application includes links to relevant documents and guidance on applying the data to existing assessment tools.
+Description: ReSCUEApp is a Shiny application that provides a
+    user-friendly interface to the ReSCUETools R package, making seabird
+    flight height data and outputs from the ReSCUE project accessible to
+    offshore wind developers, environmental consultants, conservation
+    bodies, NGOs, and academics. It integrates ReSCUETools functionality
+    with UK flight height distribution data developed by the British Trust
+    for Ornithology (BTO), serving as a reference point for collision risk
+    modelling and other analyses. The application includes links to
+    relevant documents and guidance on applying the data to existing
+    assessment tools.
 License: What license is it under?
 Imports: 
+    bsicons,
+    bslib,
     config,
+    DT,
     golem,
+    leaflet,
+    lorem,
     shiny
-Encoding: UTF-8
-LazyData: true
 Suggests: 
+    htmltools,
     spelling,
     testthat (>= 3.0.0)
-Config/testthat/edition: 3
-Language: en-US
 Config/roxygen2/version: 8.0.0
+Config/testthat/edition: 3
+Encoding: UTF-8
+Language: en-US
+LazyData: true
