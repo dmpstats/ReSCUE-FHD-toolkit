@@ -20,19 +20,44 @@
 ##
 golem::fill_desc(
 	pkg_name = "ReSCUEApp", # The name of the golem package containing the app (typically lowercase, no underscore or periods)
-	pkg_title = "PKG_TITLE", # What the Package Does (One Line, Title Case, No Period)
-	pkg_description = "PKG_DESC.", # What the package does (one paragraph).
-	authors = person(
-		given = "AUTHOR_FIRST", # Your First Name
-		family = "AUTHOR_LAST", # Your Last Name
-		email = "AUTHOR@MAIL.COM", # Your email
-		role = c("aut", "cre") # Your role (here author/creator)
+	pkg_title = "ReSCUE Flight Height Distribution Toolkit App", # What the Package Does (One Line, Title Case, No Period)
+	pkg_description = "ReSCUEApp is a Shiny application that provides a user-friendly interface to the ReSCUETools R package, making seabird flight height data and outputs from the ReSCUE project accessible to offshore wind developers, environmental consultants, conservation bodies, NGOs, and academics. It integrates ReSCUETools functionality with UK flight height distribution data developed by the British Trust for Ornithology (BTO), serving as a reference point for collision risk modelling and other analyses. The application includes links to relevant documents and guidance on applying the data to existing assessment tools.", # What the package does (one paragraph).
+	authors = c(
+		person(
+			given = "Bruno", # Your First Name
+			family = "Caneco", # Your Last Name
+			email = "bruno@dmpstats.co.uk", # Your email
+			role = c("aut", "cre") # Your role (here author/creator)
+		),
+		person(
+			given = "Callum", # Your First Name
+			family = "Clarke", # Your Last Name
+			email = "callum@dmpstats.co.uk", # Your email
+			role = c("aut", "cre") # Your role (here author/creator)
+		),
+		person(
+			given = "Grant", # Your First Name
+			family = "Humphries", # Your Last Name
+			email = "grwhumphries@blackbawks.net", # Your email
+			role = c("aut") # Your role (here author/creator)
+		),
+		person(
+			given = "Carl", # Your First Name
+			family = "Donovan", # Your Last Name
+			email = "carl@dmpstats.co.uk", # Your email
+			role = c("ctb") # Your role (here author/creator)
+		),
+		person(
+			given = "Tim", # Your First Name
+			family = "Kasoar", # Your Last Name
+			email = "TKAS@niras.com", # Your email
+			role = c("ctb") # Your role (here author/creator)
+		)
 	),
 	repo_url = NULL, # The URL of the GitHub repo (optional),
-	pkg_version = "0.0.0.9000", # The version of the package containing the app
+	pkg_version = "0.0.0.9000", # The version of the panckage containing the app
 	set_options = TRUE # Set the global golem options
 )
-
 ## Install the required dev dependencies ----
 golem::install_dev_deps()
 
