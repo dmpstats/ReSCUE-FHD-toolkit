@@ -61,23 +61,29 @@ app_ui <- function(request) {
 								class = "d-flex flex-column align-items-center gap-2 my-3",
 								actionButton(
 									"link_guide",
-									"User Guide",
+									label = tagList(
+										bsicons::bs_icon("info-circle"),
+										"User Guide"
+									),
 									class = "arrow-btn-faded",
-									icon = icon("info-circle", class = "arrow-icon"),
 									style = "width:225px"
 								),
 								actionButton(
 									"restore_session",
-									"Restore Session",
+									label = tagList(
+										bsicons::bs_icon("arrow-counterclockwise"),
+										"Restore Session"
+									),
 									class = "arrow-btn-faded",
-									icon = icon("arrow-rotate-left", class = "arrow-icon"),
 									style = "width:225px"
 								),
 								actionButton(
 									"go_data",
-									"Select Data",
+									label = tagList(
+										bsicons::bs_icon("play-circle"),
+										"Select Data"
+									),
 									class = "arrow-btn",
-									icon = icon("play-circle", class = "arrow-icon"),
 									style = "width:260px"
 								)
 							)
@@ -90,15 +96,26 @@ app_ui <- function(request) {
 
 			bslib::nav_panel(
 				"Data Selection",
-				icons = bsicons::bs_icon("map"),
+				icon = bsicons::bs_icon("map"),
 				bslib::page_fillable(
 					bslib::layout_columns(
 						col_widths = c(6, 6),
 						bslib::navset_card_underline(
+							## MAP MODULE WILL REPLACE THIS =========
 							bslib::nav_panel(
 								title = "Map Selection",
-								"Map selection content will go here"
+								leaflet::leafletOutput("source_map", height = "300px"),
+								fluidRow(
+									bslib::layout_columns(
+										col_widths = c(4, 4, 4),
+										textInput("species_id", "Species"),
+										textInput("region", "Region"),
+										textInput("something_else", "Something else")
+									)
+								)
 							),
+							# =============================
+
 							bslib::nav_panel(
 								title = "Table Selection",
 								"Table selection content will go here"
@@ -127,11 +144,75 @@ app_ui <- function(request) {
 
 			bslib::nav_panel(
 				"Analysis",
-				icon = bsicons::bs_icon("bar-chart")
-				# Content will go here
-			),
+				icon = bsicons::bs_icon("bar-chart"),
+				bslib::page_fillable(
+					bslib::layout_columns(
+						col_widths = c(6, 6),
 
-			# Tab 4: Data Sources ============================
+						column(
+							12,
+							# First card: selected data
+							bslib::card(
+								bslib::card_header("Selected Data"),
+								bslib::card_body(DT::DTOutput("dummy_dt"))
+							),
+
+							# Second card: defining turbine parameters
+							bslib::card(
+								bslib::card_header("Turbine Parameters"),
+								bslib::card_body(
+									fluidRow(
+										bslib::layout_columns(
+											col_widths = c(4, 4, 4),
+											numericInput(
+												"hub_height",
+												"Hub Height (m)",
+												value = 100,
+												min = 0
+											),
+											numericInput(
+												"rotor_diameter",
+												"Rotor Diameter (m)",
+												value = 80,
+												min = 0
+											),
+											numericInput(
+												"cut_in_speed",
+												"Cut-in Speed (m/s)",
+												value = 3.5,
+												min = 0
+											)
+										)
+									)
+								)
+							),
+
+							# Third card: analysis results
+							bslib::card(
+								bslib::card_header("Analysis Results"),
+								bslib::card_body("Analysis results content will go here")
+							)
+						),
+
+						# Second column will contain the plot and output distributions
+						column(
+							12,
+							bslib::card(
+								bslib::card_header("Flight Height Distribution"),
+								bslib::card_body("Flight height distribution plot will go here")
+							),
+
+							# Second card will contain download options
+							bslib::card(
+								bslib::card_header("Download Options"),
+								bslib::card_body("Download options content will go here")
+							)
+						)
+					)
+				)
+
+				# Tab 4: Data Sources ============================
+			)
 		)
 	)
 }
@@ -156,7 +237,8 @@ golem_add_external_resources <- function() {
 			path = app_sys("app/www"),
 			app_title = "ReSCUEApp"
 		),
-		tags$style(HTML("
+		tags$style(HTML(
+			"
       .arrow-btn {
         background: var(--bs-primary); color: var(--bs-white); font-weight: bold;
         border: none; padding: 12px 30px 12px 20px; font-size: 1.1rem;
@@ -179,6 +261,7 @@ golem_add_external_resources <- function() {
 			}
 			.arrow-btn-faded:hover { filter: brightness(0.85); }
 			.arrow-icon { position: absolute; right: -10px; top: 50%; transform: translateY(-50%); }
-    "))
+    "
+		))
 	)
 }
