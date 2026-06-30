@@ -19,7 +19,7 @@ Description: ReSCUEApp is a Shiny application that provides a
     relevant documents and guidance on applying the data to existing
     assessment tools.
 License: What license is it under?
-Imports: 
+Imports:
     bsicons,
     bslib,
     config,
@@ -27,8 +27,9 @@ Imports:
     golem,
     leaflet,
     lorem,
+    markdown,
     shiny
-Suggests: 
+Suggests:
     htmltools,
     spelling,
     testthat (>= 3.0.0)

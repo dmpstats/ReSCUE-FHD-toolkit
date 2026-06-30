@@ -39,4 +39,8 @@ app_server <- function(input, output, session) {
 		)
 	})
 
+	# Helper functions
+	mod_help_button_server("dummy_help", help_file = "dummy_help")
+
+
 }
