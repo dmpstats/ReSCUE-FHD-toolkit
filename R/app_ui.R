@@ -46,7 +46,11 @@ app_ui <- function(request) {
 						col_widths = c(6, 6),
 						# LHS: A card containing project information.
 						bslib::card(
-							bslib::card_header("What is ResCUE?"),
+							bslib::card_header("What is ResCUE?",
+
+							# DON'T FORGET TO REMOVE THIS - DUMMY EXAMPLE
+																mod_help_button_ui("dummy_help")
+						),
 							bslib::card_body(
 								lorem::ipsum(paragraphs = 2)
 							)
@@ -261,6 +265,27 @@ golem_add_external_resources <- function() {
 			}
 			.arrow-btn-faded:hover { filter: brightness(0.85); }
 			.arrow-icon { position: absolute; right: -10px; top: 50%; transform: translateY(-50%); }
+
+      /* Help button */
+      .btn.btn-help {
+        background: none !important;
+        border: none !important;
+        box-shadow: none !important;
+        padding: 0 0 0 4px;
+        color: var(--bs-secondary);
+        font-size: 0.9em;
+        line-height: 1;
+        vertical-align: middle;
+        opacity: 0.6;
+        transition: opacity 0.2s, color 0.2s;
+      }
+      .btn.btn-help:hover,
+      .btn.btn-help:focus {
+        background: none !important;
+        box-shadow: none !important;
+        color: var(--bs-primary) !important;
+        opacity: 1;
+      }
     "
 		))
 	)
