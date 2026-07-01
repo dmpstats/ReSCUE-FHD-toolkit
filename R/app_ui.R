@@ -61,8 +61,16 @@ app_ui <- function(request) {
 						column(
 							12,
 							bslib::card(
-								bslib::card_header("Project Partners"),
-								bslib::card_body("Logos")
+								# bslib::card_header("Project Partners"),
+								bslib::card_body(
+									bslib::layout_columns(
+										col_widths = c(3, 3, 3, 3),
+										logolink("dmp"),
+										logolink("bto"),
+										logolink("ne"),
+										logolink("blackbawks")
+									)
+								)
 							),
 							div(
 								class = "d-flex flex-column align-items-center gap-2 my-3",
