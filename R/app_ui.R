@@ -8,6 +8,10 @@
 app_ui <- function(request) {
 	tagList(
 		golem_add_external_resources(),
+		shinybusy::use_busy_spinner(
+			spin = "circles-to-rhombuses",
+			position = "bottom-right"
+		),
 		bslib::page_navbar(
 			title = "ReSCUEApp",
 			id = "main-nav",
