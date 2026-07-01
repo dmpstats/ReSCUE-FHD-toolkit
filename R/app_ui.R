@@ -43,68 +43,7 @@ app_ui <- function(request) {
 			bslib::nav_panel(
 				"Welcome Page",
 				icon = bsicons::bs_icon("house"),
-				bslib::page_fillable(
-					bslib::layout_columns(
-						col_widths = c(6, 6),
-						# LHS: A card containing project information.
-						bslib::card(
-							bslib::card_header(
-								"What is ResCUE?",
-
-								# DON'T FORGET TO REMOVE THIS - DUMMY EXAMPLE
-								mod_help_button_ui("dummy_help")
-							),
-							bslib::card_body(
-								lorem::ipsum(paragraphs = 2)
-							)
-						),
-						column(
-							12,
-							bslib::card(
-								# bslib::card_header("Project Partners"),
-								bslib::card_body(
-									bslib::layout_columns(
-										col_widths = c(3, 3, 3, 3),
-										logolink("dmp"),
-										logolink("bto"),
-										logolink("ne"),
-										logolink("blackbawks")
-									)
-								)
-							),
-							div(
-								class = "d-flex flex-column align-items-center gap-2 my-3",
-								actionButton(
-									"link_guide",
-									label = tagList(
-										bsicons::bs_icon("info-circle"),
-										"User Guide"
-									),
-									class = "arrow-btn-faded",
-									style = "width:225px"
-								),
-								actionButton(
-									"restore_session",
-									label = tagList(
-										bsicons::bs_icon("arrow-counterclockwise"),
-										"Restore Session"
-									),
-									class = "arrow-btn-faded",
-									style = "width:225px"
-								),
-								actionButton(
-									"go_data",
-									label = tagList(
-										bsicons::bs_icon("play-circle"),
-										"Select Data"
-									),
-									class = "arrow-btn",
-									style = "width:260px"
-								)
-							)
-						)
-					)
-				)
+				mod_landing_page_ui("landing_page")
 			),
 
 			# Tab 2: Data Selection =======================

@@ -6,17 +6,11 @@
 #' @noRd
 app_server <- function(input, output, session) {
 
-	# React to next-page buttons --------------
+	# Modules -----------------
 
-	observeEvent(
-		input$go_data,
-		{
-			bslib::nav_select(
-				id = "main-nav",
-				selected = "Data Selection"
-			)
-		}
-	)
+	mod_landing_page_server("landing_page", nav_id = "main-nav", parent_session = session)
+
+	# React to next-page button --------------
 	observeEvent(
 		input$go_analysis,
 		{
