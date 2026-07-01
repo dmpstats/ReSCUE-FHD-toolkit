@@ -30,13 +30,6 @@ app_ui <- function(request) {
 				mod_version_button_ui("app_version")
 			),
 			bslib::nav_spacer(),
-			bslib::nav_item(
-				shiny::actionButton(
-					"dl_session",
-					"Download Session",
-					class = "btn-outline-secondary"
-				)
-			),
 
 			# Tab 1: Welcome ==============================
 
@@ -187,6 +180,50 @@ app_ui <- function(request) {
 					# A .md with the sources will go here
 					bslib::card(
 						shiny::includeMarkdown("inst/app/md/sources.md")
+					)
+				)
+			),
+
+			# Drop-down for save/restore options  =======================
+			
+			bslib::nav_menu(
+				title = NULL,
+				icon = bsicons::bs_icon("gear"),
+				align = "right",
+				bslib::nav_item(
+					shiny::actionLink(
+						"save_session",
+						label = tagList(
+							bsicons::bs_icon("download"),
+							"Save Session"
+						)
+					)
+				),
+				bslib::nav_item(
+					shiny::actionLink(
+						"restore_session",
+						label = tagList(
+							bsicons::bs_icon("upload"),
+							"Restore Session"
+						)
+					)
+				),
+				bslib::nav_item(
+					# Add a link to the GitHub repo to report a bug
+					tags$a(
+						href = "https://github.com", # ADD CORRECT LINK TO ISSUE PAGE ONCE PUBLIC
+						target = "_blank",
+						bsicons::bs_icon("bug"),
+						"Report a Bug"
+					)
+				),
+				bslib::nav_item(
+					shiny::actionLink(
+						"reset_session",
+						label = tagList(
+							bsicons::bs_icon("arrow-counterclockwise"),
+							"Reset Session"
+						)
 					)
 				)
 			)

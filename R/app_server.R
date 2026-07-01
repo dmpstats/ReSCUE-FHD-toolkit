@@ -21,6 +21,14 @@ app_server <- function(input, output, session) {
 		}
 	)
 
+	# React to page-reset button --------------
+	observeEvent(
+		input$reset_app,
+		{
+			session$reload()
+		}
+	)
+
 	# Dummy map: random offshore points around the UK
 	set.seed(3847)
 	n_pts <- 120
