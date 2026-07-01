@@ -18,7 +18,6 @@ app_ui <- function(request) {
 
 			# NAVBAR -----------------
 
-			# Provide a link to the GitHub repository
 			bslib::nav_item(
 				tags$a(
 					href = "https://github.com",
@@ -27,12 +26,15 @@ app_ui <- function(request) {
 					"aria-label" = "GitHub repository"
 				)
 			),
+			bslib::nav_item(
+				mod_version_button_ui("app_version")
+			),
 			bslib::nav_spacer(),
 			bslib::nav_item(
 				shiny::actionButton(
 					"dl_session",
 					"Download Session",
-					class = "btn-outline-primary"
+					class = "btn-outline-secondary"
 				)
 			),
 
