@@ -6,6 +6,27 @@
 #' @noRd
 app_server <- function(input, output, session) {
 
+	# React to next-page buttons --------------
+
+	observeEvent(
+		input$go_data,
+		{
+			bslib::nav_select(
+				id = "main-nav",
+				selected = "Data Selection"
+			)
+		}
+	)
+	observeEvent(
+		input$go_analysis,
+		{
+			bslib::nav_select(
+				id = "main-nav",
+				selected = "Analysis"
+			)
+		}
+	)
+
 	# Dummy map: random offshore points around the UK
 	set.seed(3847)
 	n_pts <- 120

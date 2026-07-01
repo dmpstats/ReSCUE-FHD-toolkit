@@ -139,6 +139,18 @@ app_ui <- function(request) {
 							bslib::card(
 								bslib::card_header("Flight Height Preview"),
 								bslib::card_body("Flight height preview content will go here")
+							),
+							div(
+								class = "d-flex flex-column align-items-center gap-2 my-3",
+								actionButton(
+									"go_analysis",
+									label = tagList(
+										bsicons::bs_icon("play-circle"),
+										"Start Analysis"
+									),
+									class = "arrow-btn",
+									style = "width:260px"
+								)
 							)
 						)
 					)
