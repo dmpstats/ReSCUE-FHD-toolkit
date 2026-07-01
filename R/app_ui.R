@@ -46,11 +46,12 @@ app_ui <- function(request) {
 						col_widths = c(6, 6),
 						# LHS: A card containing project information.
 						bslib::card(
-							bslib::card_header("What is ResCUE?",
+							bslib::card_header(
+								"What is ResCUE?",
 
-							# DON'T FORGET TO REMOVE THIS - DUMMY EXAMPLE
-																mod_help_button_ui("dummy_help")
-						),
+								# DON'T FORGET TO REMOVE THIS - DUMMY EXAMPLE
+								mod_help_button_ui("dummy_help")
+							),
 							bslib::card_body(
 								lorem::ipsum(paragraphs = 2)
 							)
@@ -214,8 +215,19 @@ app_ui <- function(request) {
 						)
 					)
 				)
+			),
 
-				# Tab 4: Data Sources ============================
+			# Tab 4: Data Sources ============================
+
+			bslib::nav_panel(
+				"Data Sources",
+				icon = bsicons::bs_icon("database"),
+				bslib::page_fillable(
+					# A .md with the sources will go here
+					bslib::card(
+						shiny::includeMarkdown("inst/app/md/sources.md")
+					)
+				)
 			)
 		)
 	)
