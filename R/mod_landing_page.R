@@ -79,6 +79,7 @@ mod_landing_page_ui <- function(id) {
 #'
 #' @param id Module ID
 #' @param nav_id The ID of the parent navigation bar (e.g., "main-nav"). This is required to allow the module to control navigation between tabs.
+#' @param parent_session The session object of the parent Shiny app. This is required to allow the module to control navigation between tabs.
 #'
 #' @noRd 
 mod_landing_page_server <- function(id, nav_id = "main-nav", parent_session){

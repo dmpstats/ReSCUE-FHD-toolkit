@@ -56,71 +56,7 @@ app_ui <- function(request) {
 			bslib::nav_panel(
 				"Analysis",
 				icon = bsicons::bs_icon("bar-chart"),
-				bslib::page_fillable(
-					bslib::layout_columns(
-						col_widths = c(6, 6),
-
-						column(
-							12,
-							# First card: selected data
-							bslib::card(
-								bslib::card_header("Selected Data"),
-								bslib::card_body(DT::DTOutput("dummy_dt"))
-							),
-
-							# Second card: defining turbine parameters
-							bslib::card(
-								bslib::card_header("Turbine Parameters"),
-								bslib::card_body(
-									fluidRow(
-										bslib::layout_columns(
-											col_widths = c(4, 4, 4),
-											numericInput(
-												"hub_height",
-												"Hub Height (m)",
-												value = 100,
-												min = 0
-											),
-											numericInput(
-												"rotor_diameter",
-												"Rotor Diameter (m)",
-												value = 80,
-												min = 0
-											),
-											numericInput(
-												"cut_in_speed",
-												"Cut-in Speed (m/s)",
-												value = 3.5,
-												min = 0
-											)
-										)
-									)
-								)
-							),
-
-							# Third card: analysis results
-							bslib::card(
-								bslib::card_header("Analysis Results"),
-								bslib::card_body("Analysis results content will go here")
-							)
-						),
-
-						# Second column will contain the plot and output distributions
-						column(
-							12,
-							bslib::card(
-								bslib::card_header("Flight Height Distribution"),
-								bslib::card_body("Flight height distribution plot will go here")
-							),
-
-							# Second card will contain download options
-							bslib::card(
-								bslib::card_header("Download Options"),
-								bslib::card_body("Download options content will go here")
-							)
-						)
-					)
-				)
+				mod_data_analysis_ui("data_analysis")
 			),
 
 			# Tab 4: Data Sources ============================

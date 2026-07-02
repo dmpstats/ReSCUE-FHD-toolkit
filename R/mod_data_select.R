@@ -1,6 +1,6 @@
 #' data_select UI Function
 #'
-#' @description A shiny Module.
+#' @description A shiny Module allowing users to select flight-height datasets for analysis and comparison
 #'
 #' @param id,input,output,session Internal parameters for {shiny}.
 #'
@@ -17,7 +17,7 @@ mod_data_select_ui <- function(id) {
 					## MAP MODULE WILL REPLACE THIS =========
 					bslib::nav_panel(
 						title = "Map Selection",
-						leaflet::leafletOutput("source_map", height = "300px"),
+						leaflet::leafletOutput(ns("source_map"), height = "300px"),
 						fluidRow(
 							bslib::layout_columns(
 								col_widths = c(4, 4, 4),
@@ -68,6 +68,10 @@ mod_data_select_ui <- function(id) {
 
 #' data_select Server Functions
 #'
+#' @param id Module ID
+#' @param nav_id The ID of the parent navigation bar (e.g., "main-nav"). This is required to allow the module to control navigation between tabs.
+#' @param parent_session The session object of the parent Shiny app. This is required to allow the module to control navigation between tabs.
+#' 
 #' @noRd
 mod_data_select_server <- function(id, nav_id = "main-nav", parent_session) {
 	moduleServer(id, function(input, output, session) {
@@ -84,5 +88,28 @@ mod_data_select_server <- function(id, nav_id = "main-nav", parent_session) {
 				)
 			}
 		)
+
+			# Dummy map: random offshore points around the UK
+	set.seed(3847)
+	n_pts <- 120
+	dummy_pts <- data.frame(
+		lat = runif(n_pts, 49.5, 61.5),
+		lon = runif(n_pts, -8.5, 2.5)
+	)
+
+	output$source_map <- leaflet::renderLeaflet({
+		leaflet::leaflet(dummy_pts) |>
+			leaflet::addProviderTiles(leaflet::providers$CartoDB.DarkMatter) |>
+			leaflet::setView(lng = -3.5, lat = 56, zoom = 5) |>
+			leaflet::addCircleMarkers(
+				lng         = ~lon,
+				lat         = ~lat,
+				radius      = 9,
+				color       = "#cccccc",
+				weight      = 1,
+				fillColor   = "#c8c8c8",
+				fillOpacity = 0.75
+			)
+	})
 	})
 }
