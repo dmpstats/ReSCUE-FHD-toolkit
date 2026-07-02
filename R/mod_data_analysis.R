@@ -86,13 +86,19 @@ mod_data_analysis_ui <- function(id) {
 #' 
 #' 
 #' @noRd 
-mod_data_analysis_server <- function(id, nav_id = "main-nav", parent_session, selected_data){
+mod_data_analysis_server <- function(id, nav_id = "main-nav", parent_session, selected_data, reset_trigger = NULL){
   moduleServer(id, function(input, output, session){
     ns <- session$ns
 
     # Render the dummy data passed from the previous
     output$dummy_dt <- DT::renderDataTable({
       selected_data()
+    })
+
+    # Listen for reset trigger from parent app
+    observeEvent(reset_trigger(), {
+      # Any module-level state should be reset here
+      # This example just re-renders the table, which updates when selected_data changes
     })
     
   })

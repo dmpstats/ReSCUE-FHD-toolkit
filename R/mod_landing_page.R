@@ -19,7 +19,7 @@ mod_landing_page_ui <- function(id) {
 								"What is ResCUE?",
 
 								# DON'T FORGET TO REMOVE THIS - DUMMY EXAMPLE
-								mod_help_button_ui("dummy_help")
+								mod_help_button_ui(ns("dummy_help"))
 							),
 							bslib::card_body(
 								lorem::ipsum(paragraphs = 2)
@@ -84,6 +84,9 @@ mod_landing_page_ui <- function(id) {
 #' @noRd 
 mod_landing_page_server <- function(id, nav_id = "main-nav", parent_session){
   moduleServer(id, function(input, output, session){
+
+		# Helpfile submodules -----
+			mod_help_button_server("dummy_help", help_file = "dummy_help")
 
     # React to next-page button --------------
     observeEvent(

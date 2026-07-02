@@ -34,6 +34,9 @@ app_ui <- function(request) {
 				mod_version_button_ui("app_version")
 			),
 			bslib::nav_spacer(),
+			bslib::nav_item(
+				shiny::uiOutput("current_mode")
+			),
 
 			# Tab 1: Welcome ==============================
 
@@ -73,7 +76,7 @@ app_ui <- function(request) {
 			),
 
 			# Drop-down for save/restore options  =======================
-			
+
 			bslib::nav_menu(
 				title = NULL,
 				icon = bsicons::bs_icon("gear"),
@@ -96,6 +99,15 @@ app_ui <- function(request) {
 						)
 					)
 				),
+				# bslib::nav_item(
+				# 	shiny::actionLink(
+				# 		"switch_mode",
+				# 		label = tagList(
+				# 			bsicons::bs_icon("tsunami"),
+				# 			"Switch to Tidal"
+				# 		)
+				# 	)
+				# ),
 				bslib::nav_item(
 					# Add a link to the GitHub repo to report a bug
 					tags$a(

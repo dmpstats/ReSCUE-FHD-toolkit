@@ -28,7 +28,8 @@ Imports:
     leaflet,
     lorem,
     markdown,
-    shiny
+    shiny,
+    shinyWidgets
 Suggests:
     htmltools,
     spelling,
