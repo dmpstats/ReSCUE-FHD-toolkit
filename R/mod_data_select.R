@@ -13,41 +13,49 @@ mod_data_select_ui <- function(id) {
 		bslib::page_fillable(
 			bslib::layout_columns(
 				col_widths = c(6, 6),
+				class = "h-100",
 				bslib::navset_card_underline(
-					## MAP MODULE WILL REPLACE THIS =========
+					# Map selection tab ----------
 					bslib::nav_panel(
 						title = "Map Selection",
 						mod_map_picker_ui(ns("map_picker_1"))
 					),
-					# =============================
 
+					# Table selection tab ----------
 					bslib::nav_panel(
 						title = "Table Selection",
 						mod_table_picker_ui(ns("table_picker_1"))
 					),
+
+					# User upload tab ----------
 					bslib::nav_panel(
 						title = "Data Upload",
 						mod_user_upload_ui(ns("data_upload_1"))
 					)
 				),
-				bslib::card(
-					bslib::card_header("Selected Data"),
-					bslib::card_body(DT::DTOutput(ns("show_dt")))
-				),
-				bslib::card(
-					bslib::card_header("Flight Height Preview"),
-					bslib::card_body("Flight height preview content will go here")
-				),
-				div(
-					class = "d-flex flex-column align-items-center gap-2 my-3",
-					actionButton(
-						ns("go_analysis"),
-						label = tagList(
-							bsicons::bs_icon("play-circle"),
-							"Start Analysis"
-						),
-						class = "arrow-btn",
-						style = "width:260px"
+
+				# Right-hand side: show selected data and go to analysis button
+				column(
+					12,
+					bslib::card(
+						bslib::card_header("Selected Data"),
+						bslib::card_body(DT::DTOutput(ns("show_dt")))
+					),
+					bslib::card(
+						bslib::card_header("Flight Height Preview"),
+						bslib::card_body("Flight height preview content will go here")
+					),
+					div(
+						class = "d-flex flex-column align-items-center gap-2 my-3",
+						actionButton(
+							ns("go_analysis"),
+							label = tagList(
+								bsicons::bs_icon("play-circle"),
+								"Start Analysis"
+							),
+							class = "arrow-btn",
+							style = "width:260px"
+						)
 					)
 				)
 			)
@@ -60,7 +68,7 @@ mod_data_select_ui <- function(id) {
 #' @param id Module ID
 #' @param nav_id The ID of the parent navigation bar (e.g., "main-nav"). This is required to allow the module to control navigation between tabs.
 #' @param parent_session The session object of the parent Shiny app. This is required to allow the module to control navigation between tabs.
-#' 
+#'
 #' @noRd
 mod_data_select_server <- function(id, nav_id = "main-nav", parent_session) {
 	moduleServer(id, function(input, output, session) {
@@ -78,7 +86,12 @@ mod_data_select_server <- function(id, nav_id = "main-nav", parent_session) {
 				map_data(),
 				table_data(),
 				user_data()
-			)
+			) |>
+				dplyr::select(
+					dplyr::any_of(
+						c("species_id", "method", "region", "season")
+					)
+				)
 		})
 		output$show_dt <- DT::renderDataTable({
 			selected_data()
