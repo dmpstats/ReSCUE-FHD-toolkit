@@ -34,9 +34,7 @@ app_ui <- function(request) {
 				mod_version_button_ui("app_version")
 			),
 			bslib::nav_spacer(),
-			bslib::nav_item(
-				shiny::uiOutput("current_mode")
-			),
+
 
 			# Tab 1: Welcome ==============================
 

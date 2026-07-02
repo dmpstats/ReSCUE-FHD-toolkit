@@ -73,7 +73,7 @@ mod_data_select_ui <- function(id) {
 #' @param parent_session The session object of the parent Shiny app. This is required to allow the module to control navigation between tabs.
 #'
 #' @noRd
-mod_data_select_server <- function(id, nav_id = "main-nav", parent_session, reset_trigger = NULL) {
+mod_data_select_server <- function(id, nav_id = "main-nav", parent_session) {
 	moduleServer(id, function(input, output, session) {
 		ns <- session$ns
 
@@ -82,13 +82,6 @@ mod_data_select_server <- function(id, nav_id = "main-nav", parent_session, rese
 		map_data <- mod_map_picker_server("map_picker_1")
 		table_data <- mod_table_picker_server("table_picker_1")
 		user_data <- mod_user_upload_server("data_upload_1")
-
-		# Listen for reset trigger from parent app
-		observeEvent(reset_trigger(), {
-			map_data(list())
-			table_data(list())
-			user_data(list())
-		})
 
 		# Helpfile modules
 		mod_help_button_server("select_data", help_file = "select_data", size = "l")
