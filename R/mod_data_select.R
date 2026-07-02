@@ -17,48 +17,37 @@ mod_data_select_ui <- function(id) {
 					## MAP MODULE WILL REPLACE THIS =========
 					bslib::nav_panel(
 						title = "Map Selection",
-						leaflet::leafletOutput(ns("source_map"), height = "300px"),
-						fluidRow(
-							bslib::layout_columns(
-								col_widths = c(4, 4, 4),
-								textInput("species_id", "Species"),
-								textInput("region", "Region"),
-								textInput("something_else", "Something else")
-							)
-						)
+						mod_map_picker_ui(ns("map_picker_1"))
 					),
 					# =============================
 
 					bslib::nav_panel(
 						title = "Table Selection",
-						"Table selection content will go here"
+						mod_table_picker_ui(ns("table_picker_1"))
 					),
 					bslib::nav_panel(
 						title = "Data Upload",
-						"Data upload content will go here"
+						mod_user_upload_ui(ns("data_upload_1"))
 					)
 				),
-				column(
-					12,
-					bslib::card(
-						bslib::card_header("Selected Data"),
-						bslib::card_body("Selected data content will go here")
-					),
-					bslib::card(
-						bslib::card_header("Flight Height Preview"),
-						bslib::card_body("Flight height preview content will go here")
-					),
-					div(
-						class = "d-flex flex-column align-items-center gap-2 my-3",
-						actionButton(
-							ns("go_analysis"),
-							label = tagList(
-								bsicons::bs_icon("play-circle"),
-								"Start Analysis"
-							),
-							class = "arrow-btn",
-							style = "width:260px"
-						)
+				bslib::card(
+					bslib::card_header("Selected Data"),
+					bslib::card_body(DT::DTOutput(ns("show_dt")))
+				),
+				bslib::card(
+					bslib::card_header("Flight Height Preview"),
+					bslib::card_body("Flight height preview content will go here")
+				),
+				div(
+					class = "d-flex flex-column align-items-center gap-2 my-3",
+					actionButton(
+						ns("go_analysis"),
+						label = tagList(
+							bsicons::bs_icon("play-circle"),
+							"Start Analysis"
+						),
+						class = "arrow-btn",
+						style = "width:260px"
 					)
 				)
 			)
@@ -77,6 +66,24 @@ mod_data_select_server <- function(id, nav_id = "main-nav", parent_session) {
 	moduleServer(id, function(input, output, session) {
 		ns <- session$ns
 
+		# Data selection sub-modules  ------------
+		# We receive the reactive inputs from each one:
+		map_data <- mod_map_picker_server("map_picker_1")
+		table_data <- mod_table_picker_server("table_picker_1")
+		user_data <- mod_user_upload_server("data_upload_1")
+
+		# Stack these and render them on the RHS
+		selected_data <- reactive({
+			dplyr::bind_rows(
+				map_data(),
+				table_data(),
+				user_data()
+			)
+		})
+		output$show_dt <- DT::renderDataTable({
+			selected_data()
+		})
+
 		# React to next-page button --------------
 		observeEvent(
 			input$go_analysis,
@@ -89,27 +96,7 @@ mod_data_select_server <- function(id, nav_id = "main-nav", parent_session) {
 			}
 		)
 
-			# Dummy map: random offshore points around the UK
-	set.seed(3847)
-	n_pts <- 120
-	dummy_pts <- data.frame(
-		lat = runif(n_pts, 49.5, 61.5),
-		lon = runif(n_pts, -8.5, 2.5)
-	)
-
-	output$source_map <- leaflet::renderLeaflet({
-		leaflet::leaflet(dummy_pts) |>
-			leaflet::addProviderTiles(leaflet::providers$CartoDB.DarkMatter) |>
-			leaflet::setView(lng = -3.5, lat = 56, zoom = 5) |>
-			leaflet::addCircleMarkers(
-				lng         = ~lon,
-				lat         = ~lat,
-				radius      = 9,
-				color       = "#cccccc",
-				weight      = 1,
-				fillColor   = "#c8c8c8",
-				fillOpacity = 0.75
-			)
-	})
+		# Return the selected data as a reactive --------
+		return(selected_data)
 	})
 }

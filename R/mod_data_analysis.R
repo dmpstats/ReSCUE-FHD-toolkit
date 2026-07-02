@@ -86,20 +86,14 @@ mod_data_analysis_ui <- function(id) {
 #' 
 #' 
 #' @noRd 
-mod_data_analysis_server <- function(id, nav_id = "main-nav", parent_session){
+mod_data_analysis_server <- function(id, nav_id = "main-nav", parent_session, selected_data){
   moduleServer(id, function(input, output, session){
     ns <- session$ns
 
-    
-	# Dummy: data table of selected data
-	output$dummy_dt <- DT::renderDataTable({
-		data.frame(
-			Species = c("Puffin", "Guillemot", "Bald Eagle"),
-			ID = "P1", "G1", "BE1",
-			Dataset = c("Jonson et al.", "Jonson et al.", "Smith et al."),
-			`Plotting Options` = "Miscellaneous"
-		)
-	})
+    # Render the dummy data passed from the previous
+    output$dummy_dt <- DT::renderDataTable({
+      selected_data()
+    })
     
   })
 }
