@@ -9,17 +9,8 @@ app_server <- function(input, output, session) {
 	# Modules -----------------
 
 	mod_landing_page_server("landing_page", nav_id = "main-nav", parent_session = session)
+	mod_data_select_server("data_select", nav_id = "main-nav", parent_session = session)
 
-	# React to next-page button --------------
-	observeEvent(
-		input$go_analysis,
-		{
-			bslib::nav_select(
-				id = "main-nav",
-				selected = "Analysis"
-			)
-		}
-	)
 
 	# React to page-reset button --------------
 	observeEvent(

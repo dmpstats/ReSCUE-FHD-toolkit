@@ -113,9 +113,3 @@ mod_landing_page_server <- function(id, nav_id = "main-nav", parent_session){
 
   })
 }
-    
-## To be copied in the UI
-# mod_landing_page_ui("landing_page_1")
-    
-## To be copied in the server
-# mod_landing_page_server("landing_page_1")
