@@ -34,19 +34,24 @@ mod_data_select_ui <- function(id) {
 					),
 					bslib::nav_item(
 						mod_help_button_ui(ns("select_data"))
-					)
+					),
+					height = "90%"
 				),
 
 				# Right-hand side: show selected data and go to analysis button
-				column(
-					12,
+				tagList(
+					# 12,
 					bslib::card(
 						bslib::card_header("Selected Data"),
-						bslib::card_body(DT::DTOutput(ns("show_dt")))
+						bslib::card_body(DT::DTOutput(ns("show_dt"))),
+						style = "max-height: 450vh; overflow-y: auto;"
 					),
 					bslib::card(
 						bslib::card_header("Flight Height Preview"),
-						bslib::card_body("Flight height preview content will go here")
+						bslib::card_body(
+							plotly::plotlyOutput(ns("dummy_plot"))
+						),#
+						style = "max-height: 450vh; overflow-y: auto;"
 					),
 					div(
 						class = "d-flex flex-column align-items-center gap-2 my-3",
@@ -101,6 +106,19 @@ mod_data_select_server <- function(id, nav_id = "main-nav", parent_session) {
 		})
 		output$show_dt <- DT::renderDataTable({
 			selected_data()
+		},
+		options = list(
+			paging = FALSE,
+			searching = FALSE,
+			info = FALSE,
+			scrollY = "200px",
+			scrollCollapse = TRUE
+		))
+
+		# For now, plot a dummy flight-height preview
+		output$dummy_plot <- plotly::renderPlotly({
+			dumdat <- dummy_fheight_dists(max_height = 100, seed = 123, n = 1)
+			dummy_fheight_plot(dumdat, risk_min = NULL, risk_max = NULL)
 		})
 
 		# React to next-page button --------------

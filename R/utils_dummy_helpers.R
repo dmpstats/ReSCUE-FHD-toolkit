@@ -40,14 +40,29 @@ dummy_fheight_dists <- function(max_height = 100, seed = 123, n = 3) {
     f_id = rep(seq_len(n), each = length(height_steps)),
     height = rep(height_steps, n),
     prob = unlist(dists)
-  )
+  ) |>
+    dplyr::mutate(
+      lc_prob = pmax(0, prob - 0.001),
+      hc_prob = pmin(1, prob + 0.001)
+    )
   
   return(df)
 }
 
 dummy_fheight_plot <- function(df, risk_min = 50, risk_max = 70) {
   # Create a plotly plot of the distributions
-  p1 <- plotly::plot_ly() %>%
+  p1 <- plotly::plot_ly() |>
+    plotly::add_ribbons(
+      data = df,
+      x = ~height,
+      ymin = ~lc_prob,
+      ymax = ~hc_prob,
+      color = ~as.factor(f_id),
+      opacity = 0.2,
+      name = "Confidence Interval",
+      # Not in legend
+      showlegend = FALSE
+    ) |>
     plotly::add_trace(
       data = df,
       x = ~height,
@@ -56,14 +71,15 @@ dummy_fheight_plot <- function(df, risk_min = 50, risk_max = 70) {
       type = 'scatter',
       mode = 'lines',
       line = list(width = 2)
-    ) %>%
+    ) |>
     plotly::layout(title = "Dummy Flight Height Distributions",
                    xaxis = list(title = "Height"),
                    yaxis = list(title = "Probability"))
-  
-  # If risk_min and risk_max are not NA, add a rectangular bar between them
-  if (!is.na(risk_min) && !is.na(risk_max)) {
-    p1 <- p1 %>%
+                     
+
+  # If risk_min and risk_max are not NA and not NULL, add a rectangular bar between them
+  if (!is.null(risk_min) && !is.null(risk_max) && !is.na(risk_min) && !is.na(risk_max)) {
+    p1 <- p1 |>
       plotly::add_trace(
         x = c(risk_min, risk_max, risk_max, risk_min, risk_min),
         y = c(0, 0, max(df$prob), max(df$prob), 0),
@@ -78,4 +94,6 @@ dummy_fheight_plot <- function(df, risk_min = 50, risk_max = 70) {
 
   p1
 }
+
+test <- dummy_fheight_dists(max_height = 100, seed = 123, n = 3)
 dummy_fheight_plot(test)
