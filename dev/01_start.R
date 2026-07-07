@@ -33,7 +33,7 @@ golem::fill_desc(
 			given = "Callum", # Your First Name
 			family = "Clarke", # Your Last Name
 			email = "callum@dmpstats.co.uk", # Your email
-			role = c("aut", "cre") # Your role (here author/creator)
+			role = c("aut") # Your role (here author/creator)
 		),
 		person(
 			given = "Grant", # Your First Name

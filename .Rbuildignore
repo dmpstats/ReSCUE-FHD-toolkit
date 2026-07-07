@@ -7,3 +7,6 @@ $run_dev.*
 ^.here$
 ^\.claude$
 ^CLAUDE\.md$
+^app\.R$
+^rsconnect$
+^\.rscignore$

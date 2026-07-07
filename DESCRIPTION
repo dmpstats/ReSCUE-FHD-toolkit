@@ -3,35 +3,29 @@ Title: ReSCUE Flight Height Distribution Toolkit App
 Version: 0.0.0.9000
 Authors@R: c(
     person("Bruno", "Caneco", , "bruno@dmpstats.co.uk", role = c("aut", "cre")),
-    person("Callum", "Clarke", , "callum@dmpstats.co.uk", role = c("aut", "cre")),
+    person("Callum", "Clarke", , "callum@dmpstats.co.uk", role = "aut"),
     person("Grant", "Humphries", , "grwhumphries@blackbawks.net", role = "aut"),
     person("Carl", "Donovan", , "carl@dmpstats.co.uk", role = "ctb"),
     person("Tim", "Kasoar", , "TKAS@niras.com", role = "ctb")
   )
-Description: ReSCUEApp is a Shiny application that provides a
-    user-friendly interface to the ReSCUETools R package, making seabird
-    flight height data and outputs from the ReSCUE project accessible to
-    offshore wind developers, environmental consultants, conservation
-    bodies, NGOs, and academics. It integrates ReSCUETools functionality
-    with UK flight height distribution data developed by the British Trust
-    for Ornithology (BTO), serving as a reference point for collision risk
-    modelling and other analyses. The application includes links to
-    relevant documents and guidance on applying the data to existing
-    assessment tools.
+Description: ReSCUEApp is a Shiny application that provides a user-friendly interface to the ReSCUETools R package, making seabird flight height data and outputs from the ReSCUE project accessible to offshore wind developers, environmental consultants, conservation bodies, NGOs, and academics. It integrates ReSCUETools functionality with UK flight height distribution data developed by the British Trust for Ornithology (BTO), serving as a reference point for collision risk modelling and other analyses. The application includes links to relevant documents and guidance on applying the data to existing assessment tools.
 License: What license is it under?
 Imports:
     bsicons,
     bslib,
     config,
+    dplyr,
     DT,
     golem,
+    htmltools,
     leaflet,
     lorem,
-    markdown,
+    pkgload,
+    plotly,
     shiny,
-    shinyWidgets
+    shinybusy,
+    shinyjs
 Suggests:
-    htmltools,
     spelling,
     testthat (>= 3.0.0)
 Config/roxygen2/version: 8.0.0
