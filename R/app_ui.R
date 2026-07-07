@@ -3,10 +3,12 @@
 #' @param request Internal parameter for `{shiny}`.
 #'     DO NOT REMOVE.
 #' @import bslib
+#' @import cicerone
 #' @noRd
 app_ui <- function(request) {
 	tagList(
 		golem_add_external_resources(),
+		use_cicerone(),
 		shinybusy::use_busy_spinner(
 			spin = "circles-to-rhombuses",
 			position = "bottom-right"
@@ -17,6 +19,9 @@ app_ui <- function(request) {
 			theme = bslib::bs_theme(
 				version = 5,
 				preset = "flatly"
+			),
+			navbar_options = bslib::navbar_options(
+				position = "fixed-bottom"
 			),
 
 			# NAVBAR -----------------
@@ -30,7 +35,10 @@ app_ui <- function(request) {
 				)
 			),
 			bslib::nav_item(
-				mod_version_button_ui("app_version")
+				div(
+					id = "app-version-container",
+					mod_version_button_ui("app_version")
+				)
 			),
 			bslib::nav_spacer(),
 
@@ -184,7 +192,7 @@ golem_add_external_resources <- function() {
         line-height: 1;
         vertical-align: middle;
         opacity: 0.6;
-        transition: opacity 0.2s, color 0.2s;
+        transition: opacity 0.2s, color 0.2s;#
       }
       .btn.btn-help:hover,
       .btn.btn-help:focus {
