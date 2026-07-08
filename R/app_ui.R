@@ -20,6 +20,7 @@ app_ui <- function(request) {
 				version = 5,
 				preset = "flatly"
 			),
+			padding = c("1.5rem", "1.5rem", "100px", "1.5rem"),
 			navbar_options = bslib::navbar_options(
 				position = "fixed-bottom"
 			),
