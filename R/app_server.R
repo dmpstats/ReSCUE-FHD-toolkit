@@ -7,11 +7,8 @@
 app_server <- function(input, output, session) {
 	# Track Mode and switch when required
 	mode <- reactiveVal("flight")
-
-	# Cicerone logic ----
 	guide <- get_app_guide()
-	guide$init()$start()
-	
+
 	# Modules -----------------
 
 	start_tutorial <- mod_landing_page_server(
@@ -20,10 +17,6 @@ app_server <- function(input, output, session) {
 		parent_session = session
 	)
 
-	observeEvent(start_tutorial(), {
-		cli::cli_inform("Starting tutorial...")
-		# guide$start()
-	})
 	selected_data <- mod_data_select_server(
 		"data_select",
 		nav_id = "main-nav",
@@ -44,8 +37,11 @@ app_server <- function(input, output, session) {
 		}
 	)
 
+	observeEvent(start_tutorial(), {
+		cli::cli_inform("Starting tutorial...")
+		guide$init()$start()
+	})
 
 	# Helper functions
 	mod_version_button_server("app_version")
 }
- 

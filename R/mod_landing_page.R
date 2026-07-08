@@ -72,14 +72,17 @@ mod_landing_page_ui <- function(id) {
 								class = "arrow-btn-faded",
 								style = "width:225px"
 							),
-							actionButton(
-								ns("go_data"),
-								label = tagList(
-									bsicons::bs_icon("play-circle"),
-									"Select Data"
-								),
-								class = "arrow-btn",
-								style = "width:260px"
+							div(
+								id = "tutorial_selectdata", # no ns() here, because this is a cicerone step
+								actionButton(
+									ns("go_data"),
+									label = tagList(
+										bsicons::bs_icon("play-circle"),
+										"Select Data"
+									),
+									class = "arrow-btn",
+									style = "width:260px"
+								)
 							)
 						)
 					)
@@ -127,7 +130,6 @@ mod_landing_page_server <- function(id, nav_id = "main-nav", parent_session) {
 				))
 			}
 		)
-
 
 		# Pass tutorial trigger to parent server
 		reactive(input$start_tutorial)
