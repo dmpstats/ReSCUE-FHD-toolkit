@@ -22,7 +22,7 @@ app_ui <- function(request) {
 			),
 			padding = c("1.5rem", "1.5rem", "100px", "1.5rem"),
 			navbar_options = bslib::navbar_options(
-				class = "py-0",
+				style = "height: 3.5rem;",
 				position = "fixed-bottom",
 				underline = FALSE
 			),
@@ -49,7 +49,10 @@ app_ui <- function(request) {
 
 			bslib::nav_panel(
 				title = "",
-				icon = bsicons::bs_icon("house"),
+				icon = bsicons::bs_icon(
+					"house-fill",
+					size = "1.5em"
+				),
 				mod_landing_page_ui("landing_page")
 			),
 
@@ -57,16 +60,15 @@ app_ui <- function(request) {
 
 			bslib::nav_panel(
 				title = "", #"Data Selection",
-				icon = bsicons::bs_icon("map"),
+				icon = bsicons::bs_icon("funnel-fill", size = "1.5em"),
 				value = "nav-data-select",
 				mod_data_select_ui("data_select")
 			),
-
 			# Tab 3: Analysis =============================
 
 			bslib::nav_panel(
 				"", #"Analysis",
-				icon = bsicons::bs_icon("bar-chart"),
+				icon = bsicons::bs_icon("bar-chart-fill", size = "1.5em"),
 				mod_data_analysis_ui("data_analysis")
 			),
 
@@ -74,7 +76,7 @@ app_ui <- function(request) {
 
 			bslib::nav_panel(
 				"", #"Data Sources",
-				icon = bsicons::bs_icon("database"),
+				icon = bsicons::bs_icon("database-fill", size = "1.5em"),
 				bslib::page_fillable(
 					# A .md with the sources will go here
 					bslib::card(
@@ -87,7 +89,7 @@ app_ui <- function(request) {
 
 			bslib::nav_menu(
 				title = NULL,
-				icon = bsicons::bs_icon("gear"),
+				icon = bsicons::bs_icon("gear-fill", size = "1.5em"),
 				align = "right",
 				bslib::nav_item(
 					shiny::actionLink(
@@ -121,7 +123,7 @@ app_ui <- function(request) {
 					tags$a(
 						href = "https://github.com", # ADD CORRECT LINK TO ISSUE PAGE ONCE PUBLIC
 						target = "_blank",
-						bsicons::bs_icon("bug"),
+						bsicons::bs_icon("bug-fill"),
 						"Report a Bug"
 					)
 				),
@@ -204,6 +206,11 @@ golem_add_external_resources <- function() {
         color: var(--bs-primary) !important;
         opacity: 1;
       }
+
+	  .navbar .nav-item:has(.nav-link) {
+		   margin-right: 0.4rem;
+			 margin-top: 0.5rem;
+			 }
     "
 		))
 	)
