@@ -31,6 +31,7 @@ Imports:
     htmltools,
     leaflet,
     lorem,
+    markdown,
     plotly,
     shiny,
     shinybusy,
