@@ -51,7 +51,8 @@ app_ui <- function(request) {
 				title = "",
 				icon = bsicons::bs_icon(
 					"house-fill",
-					size = "1.5em"
+					size = "1.5em",
+					title = "Welcome Page"
 				),
 				mod_landing_page_ui("landing_page")
 			),
@@ -60,7 +61,11 @@ app_ui <- function(request) {
 
 			bslib::nav_panel(
 				title = "", #"Data Selection",
-				icon = bsicons::bs_icon("funnel-fill", size = "1.5em"),
+				icon = bsicons::bs_icon(
+					"funnel-fill",
+					size = "1.5em",
+					title = "Data Selection"
+				),
 				value = "nav-data-select",
 				mod_data_select_ui("data_select")
 			),
@@ -68,7 +73,11 @@ app_ui <- function(request) {
 
 			bslib::nav_panel(
 				"", #"Analysis",
-				icon = bsicons::bs_icon("bar-chart-fill", size = "1.5em"),
+				icon = bsicons::bs_icon(
+					"bar-chart-fill",
+					size = "1.5em",
+					title = "Analysis"
+				),
 				mod_data_analysis_ui("data_analysis")
 			),
 
@@ -76,7 +85,11 @@ app_ui <- function(request) {
 
 			bslib::nav_panel(
 				"", #"Data Sources",
-				icon = bsicons::bs_icon("database-fill", size = "1.5em"),
+				icon = bsicons::bs_icon(
+					"database-fill",
+					size = "1.5em",
+					title = "Data Sources"
+				),
 				bslib::page_fillable(
 					# A .md with the sources will go here
 					bslib::card(
@@ -89,7 +102,11 @@ app_ui <- function(request) {
 
 			bslib::nav_menu(
 				title = NULL,
-				icon = bsicons::bs_icon("gear-fill", size = "1.5em"),
+				icon = bsicons::bs_icon(
+					"gear-fill",
+					size = "1.5em",
+					title = "Settings"
+				),
 				align = "right",
 				bslib::nav_item(
 					shiny::actionLink(
