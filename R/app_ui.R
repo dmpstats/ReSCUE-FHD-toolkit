@@ -22,7 +22,9 @@ app_ui <- function(request) {
 			),
 			padding = c("1.5rem", "1.5rem", "100px", "1.5rem"),
 			navbar_options = bslib::navbar_options(
-				position = "fixed-bottom"
+				class = "py-0",
+				position = "fixed-bottom",
+				underline = FALSE
 			),
 
 			# NAVBAR -----------------
@@ -46,7 +48,7 @@ app_ui <- function(request) {
 			# Tab 1: Welcome ==============================
 
 			bslib::nav_panel(
-				"Welcome Page",
+				title = "",
 				icon = bsicons::bs_icon("house"),
 				mod_landing_page_ui("landing_page")
 			),
@@ -54,15 +56,16 @@ app_ui <- function(request) {
 			# Tab 2: Data Selection =======================
 
 			bslib::nav_panel(
-				"Data Selection",
+				title = "", #"Data Selection",
 				icon = bsicons::bs_icon("map"),
+				value = "nav-data-select",
 				mod_data_select_ui("data_select")
 			),
 
 			# Tab 3: Analysis =============================
 
 			bslib::nav_panel(
-				"Analysis",
+				"", #"Analysis",
 				icon = bsicons::bs_icon("bar-chart"),
 				mod_data_analysis_ui("data_analysis")
 			),
@@ -70,7 +73,7 @@ app_ui <- function(request) {
 			# Tab 4: Data Sources ============================
 
 			bslib::nav_panel(
-				"Data Sources",
+				"", #"Data Sources",
 				icon = bsicons::bs_icon("database"),
 				bslib::page_fillable(
 					# A .md with the sources will go here

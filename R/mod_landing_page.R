@@ -110,7 +110,7 @@ mod_landing_page_server <- function(id, nav_id = "main-nav", parent_session) {
 			{
 				bslib::nav_select(
 					id = nav_id,
-					selected = "Data Selection",
+					selected = "nav-data-select",
 					session = parent_session
 				)
 			}
