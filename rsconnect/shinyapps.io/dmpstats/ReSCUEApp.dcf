@@ -1,0 +1,10 @@
+name: ReSCUEApp
+title: ReSCUEApp
+username: dmpstats
+account: dmpstats
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 17589519
+bundleId: 12243743
+url: https://dmpstats.shinyapps.io/ReSCUEApp/
+version: 1
