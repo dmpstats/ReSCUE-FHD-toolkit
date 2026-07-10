@@ -17,9 +17,13 @@ mod_version_button_ui <- function(id) {
   shiny::actionButton(
     ns("version"),
     label = paste("v", golem::get_golem_version()),
-    class = "btn-outline-secondary btn-sm",
+    class = "btn-outline-light btn-sm",
     style = "font-size: 0.85rem; padding: 0.1rem 0.25rem;"
-  )
+  ) |>
+    bslib::tooltip(
+      placement = "bottom",
+      "See Version History"
+    )
 }
 
 

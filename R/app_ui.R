@@ -14,17 +14,23 @@ app_ui <- function(request) {
 			position = "bottom-right"
 		),
 		bslib::page_navbar(
-			title = "ReSCUEApp",
+			title = span("ReSCUEApp", style = "color: #ffffff;"),
 			id = "main-nav",
 			theme = bslib::bs_theme(
 				version = 5,
-				preset = "flatly"
-			),
-			#padding = c("1.5rem", "1.5rem", "100px", "1.5rem"),
+				preset = "flatly",
+				primary = "#002e40",
+				secondary = "#b5cbca",
+				success = "#ffa134",
+				bg = "#113d4e",
+				fg = "#ffffff"
+			) |>
+				bslib::bs_add_variables(
+					"border-radius" = "1rem"
+				),
 			navbar_options = bslib::navbar_options(
-				style = "height: 3.5rem;",
-				#position = "fixed-bottom",
-				underline = FALSE
+				# theme = "auto",
+				underline = FALSE,
 			),
 
 			# NAVBAR -----------------
@@ -33,7 +39,11 @@ app_ui <- function(request) {
 				tags$a(
 					href = "https://github.com",
 					target = "_blank",
-					bsicons::bs_icon("github", size = "2em"),
+					bsicons::bs_icon("github", size = "2em") |>
+						bslib::tooltip(
+							placement = "bottom",
+							"Go to GitHub Repository"
+						),
 					"aria-label" = "GitHub repository"
 				)
 			),
@@ -51,9 +61,12 @@ app_ui <- function(request) {
 				title = "",
 				icon = bsicons::bs_icon(
 					"house-fill",
-					size = "1.5em",
-					title = "Welcome Page"
-				),
+					size = "1.5em"
+				) |>
+					bslib::tooltip(
+						placement = "bottom",
+						"Welcome Page"
+					),
 				mod_landing_page_ui("landing_page")
 			),
 
@@ -63,9 +76,12 @@ app_ui <- function(request) {
 				title = "", #"Data Selection",
 				icon = bsicons::bs_icon(
 					"funnel-fill",
-					size = "1.5em",
-					title = "Data Selection"
-				),
+					size = "1.5em"
+				) |>
+					bslib::tooltip(
+						placement = "bottom",
+						"Data Selection"
+					),
 				value = "nav-data-select",
 				mod_data_select_ui("data_select")
 			),
@@ -75,9 +91,12 @@ app_ui <- function(request) {
 				"", #"Analysis",
 				icon = bsicons::bs_icon(
 					"bar-chart-fill",
-					size = "1.5em",
-					title = "Analysis"
-				),
+					size = "1.5em"
+				) |>
+					bslib::tooltip(
+						placement = "bottom",
+						"Analysis"
+					),
 				mod_data_analysis_ui("data_analysis")
 			),
 
@@ -87,9 +106,12 @@ app_ui <- function(request) {
 				"", #"Data Sources",
 				icon = bsicons::bs_icon(
 					"database-fill",
-					size = "1.5em",
-					title = "Data Sources"
-				),
+					size = "1.5em"
+				) |>
+					bslib::tooltip(
+						placement = "bottom",
+						"Data Sources"
+					),
 				bslib::page_fillable(
 					# A .md with the sources will go here
 					bslib::card(
@@ -106,7 +128,11 @@ app_ui <- function(request) {
 					"gear-fill",
 					size = "1.5em",
 					title = "Settings"
-				),
+				) |>
+					bslib::tooltip(
+						placement = "bottom",
+						"Settings"
+					),
 				align = "right",
 				bslib::nav_item(
 					shiny::actionLink(
@@ -180,8 +206,20 @@ golem_add_external_resources <- function() {
 		),
 		tags$style(HTML(
 			"
+			.rounded-box {
+        border-radius: 15px;
+				overflow: hidden;
+      }
+			.accordion-button {
+        background-color: var(--bs-primary);
+        color: white;
+      }
+      .accordion-button:not(.collapsed) {
+        background-color: var(--bs-success);
+        color: var(--bs-primary]);
+      }
       .arrow-btn {
-        background: var(--bs-primary); color: var(--bs-white); font-weight: bold;
+        background: var(--bs-success); color: var(--bs-white); font-weight: bold;
         border: none; padding: 12px 30px 12px 20px; font-size: 1.1rem;
         clip-path: polygon(0 0, 85% 0, 100% 50%, 85% 100%, 0 100%);
         overflow: visible;
@@ -194,7 +232,7 @@ golem_add_external_resources <- function() {
         cursor: pointer;
       }
 			.arrow-btn-faded {
-							background: var(--bs-light); color: var(--bs-dark); font-weight: bold;
+							background: var(--bs-dark); color: var(--bs-light); font-weight: bold;
 				border: none; padding: 12px 30px 12px 20px; font-size: 1.1rem;
 				clip-path: polygon(0 0, 85% 0, 100% 50%, 85% 100%, 0 100%);
 				overflow: visible;
@@ -209,7 +247,7 @@ golem_add_external_resources <- function() {
         border: none !important;
         box-shadow: none !important;
         padding: 0 0 0 4px;
-        color: var(--bs-secondary);
+        color: var(--bs-success);
         font-size: 0.9em;
         line-height: 1;
         vertical-align: middle;
@@ -223,11 +261,14 @@ golem_add_external_resources <- function() {
         color: var(--bs-primary) !important;
         opacity: 1;
       }
-
-	  .navbar .nav-item:has(.nav-link) {
-		   margin-right: 0.4rem;
-			 margin-top: 0.5rem;
-			 }
+			.navbar {
+				--bs-navbar-padding-y: 0.25rem;
+				--bs-navbar-color: white;
+			}
+			.navbar-brand {
+				padding-top: 0;
+				padding-bottom: 0;
+			}
     "
 		))
 	)
