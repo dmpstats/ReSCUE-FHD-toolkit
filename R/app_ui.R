@@ -115,7 +115,8 @@ app_ui <- function(request) {
 				bslib::page_fillable(
 					# A .md with the sources will go here
 					bslib::card(
-						shiny::includeMarkdown("inst/app/md/sources.md")
+						shiny::includeMarkdown("inst/app/md/sources.md"),
+						class = "card border-primary mb-3 bg-light"
 					)
 				)
 			),

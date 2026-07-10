@@ -34,7 +34,8 @@ mod_data_analysis_ui <- function(id) {
 								bslib::toolbar_input_select(
 									id = ns("use_turb"),
 									label = "Use Turbine Parameters",
-									choices = c("On", "Off")
+									choices = c("On", "Off"),
+									class = "bg-light text-primary"
 								)
 							)
 						),
@@ -63,9 +64,9 @@ mod_data_analysis_ui <- function(id) {
 
 					# Third card: analysis results
 					bslib::card(
-						bslib::card_header("Analysis Results", class = "text-bg-primary"),
+						bslib::card_header("Analysis Results", class = "text-bg-success"),
 						bslib::card_body("Analysis results content will go here"),
-						class = "card border-primary mb-3 bg-light"
+						class = "card border-success mb-3 bg-light"
 					)
 				),
 
