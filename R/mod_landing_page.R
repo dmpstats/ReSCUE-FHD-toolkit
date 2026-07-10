@@ -14,21 +14,47 @@ mod_landing_page_ui <- function(id) {
 			bslib::layout_columns(
 				col_widths = c(6, 6),
 				# LHS: A card containing project information.
-				bslib::card(
-					bslib::card_header(
-						"What is ResCUE?",
-
+				# bslib::card(
+					# bslib::card_header(
+						# "What is ResCUE?",
 						# DON'T FORGET TO REMOVE THIS - DUMMY EXAMPLE
-						mod_help_button_ui(ns("dummy_help"))
-					),
-					bslib::card_body(
-						lorem::ipsum(paragraphs = 2)
-					)
-				),
+						# mod_help_button_ui(ns("dummy_help")),
+						# class = "text-bg-primary d-flex justify-content-end"
+					# ),
+					# bslib::card_body(
+						bslib::accordion(
+							multiple = FALSE,
+							class = "card border-primary mb-3 bg-light",
+							height = "90%",
+							bslib::accordion_panel(
+								title = "Project Overview",
+								icon = bsicons::bs_icon("info-circle"),
+								lorem::ipsum(paragraphs = 2),
+								class = "bg-light"
+							),
+							bslib::accordion_panel(
+								title = "Other Stuff",
+								icon = bsicons::bs_icon("question-circle"),
+								p("We can nest some other stuff in here too."),
+								class = "bg-light"
+							),
+							bslib::accordion_panel(
+								title = "Contacts",
+								icon = bsicons::bs_icon("envelope-fill"),
+								p("Maybe some email contacts too."),
+								class = "bg-light"
+							)
+						),
+						# class = "card border-primary mb-3 bg-light"
+					# )
+				# ),
 				column(
 					12,
 					bslib::card(
-						# bslib::card_header("Project Partners"),
+						bslib::card_header("Project Partners",
+						
+						class = "text bg-primary"
+					),
 						bslib::card_body(
 							bslib::layout_columns(
 								col_widths = c(3, 3, 3, 3),
@@ -37,7 +63,8 @@ mod_landing_page_ui <- function(id) {
 								logolink("ne"),
 								logolink("blackbawks")
 							)
-						)
+						),
+						class = "card border-primary mb-3 bg-light" 
 					),
 					bslib::layout_columns(
 						div(
@@ -49,7 +76,7 @@ mod_landing_page_ui <- function(id) {
 									"User Guide"
 								),
 								class = "arrow-btn-faded",
-								style = "width:225px"
+								style = "width:20vw"
 							),
 							actionButton(
 								ns("restore_session"),
@@ -58,7 +85,7 @@ mod_landing_page_ui <- function(id) {
 									"Restore Session"
 								),
 								class = "arrow-btn-faded",
-								style = "width:225px"
+								style = "width:20vw"
 							),
 						),
 						div(
@@ -70,7 +97,7 @@ mod_landing_page_ui <- function(id) {
 									"Start Tutorial"
 								),
 								class = "arrow-btn-faded",
-								style = "width:225px"
+								style = "width:20vw"
 							),
 							div(
 								id = "tutorial_selectdata", # no ns() here, because this is a cicerone step
@@ -81,7 +108,7 @@ mod_landing_page_ui <- function(id) {
 										"Select Data"
 									),
 									class = "arrow-btn",
-									style = "width:260px"
+									style = "width:20vw"
 								)
 							)
 						)

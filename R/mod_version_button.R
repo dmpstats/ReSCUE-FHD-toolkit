@@ -19,7 +19,11 @@ mod_version_button_ui <- function(id) {
     label = paste("v", golem::get_golem_version()),
     class = "btn-outline-secondary btn-sm",
     style = "font-size: 0.85rem; padding: 0.1rem 0.25rem;"
-  )
+  ) |>
+    bslib::tooltip(
+      placement = "bottom",
+      "See Version History"
+    )
 }
 
 

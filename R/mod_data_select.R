@@ -14,44 +14,57 @@ mod_data_select_ui <- function(id) {
 			bslib::layout_columns(
 				col_widths = c(6, 6),
 				class = "h-100",
-				bslib::navset_card_underline(
+				bslib::accordion(
+					multiple = FALSE,
+					class = "card border-primary mb-3 bg-light h-80",
 					# Map selection tab ----------
-					bslib::nav_panel(
+					bslib::accordion_panel(
 						title = "Map Selection",
-						mod_map_picker_ui(ns("map_picker_1"))
+						# add some whitespace
+						br(),
+						mod_map_picker_ui(ns("map_picker_1")),
+						class = "bg-light"
 					),
 
 					# Table selection tab ----------
-					bslib::nav_panel(
+					bslib::accordion_panel(
 						title = "Table Selection",
-						mod_table_picker_ui(ns("table_picker_1"))
+						br(),
+						mod_table_picker_ui(ns("table_picker_1")),
+						class = "bg-light"
 					),
 
 					# User upload tab ----------
-					bslib::nav_panel(
+					bslib::accordion_panel(
 						title = "Data Upload",
-						mod_user_upload_ui(ns("data_upload_1"))
+						br(),
+						mod_user_upload_ui(ns("data_upload_1")),
+						class = "bg-light"
 					),
-					bslib::nav_item(
-						mod_help_button_ui(ns("select_data"))
-					),
-					height = "90%"
+					# bslib::nav_item(
+					# 	mod_help_button_ui(ns("select_data"))
+					# ),
 				),
 
 				# Right-hand side: show selected data and go to analysis button
 				tagList(
 					# 12,
 					bslib::card(
-						bslib::card_header("Selected Data"),
+						bslib::card_header("Selected Data", 
+						class = "text-bg-primary"
+					),
 						bslib::card_body(DT::DTOutput(ns("show_dt"))),
-						style = "max-height: 450vh; overflow-y: auto;"
+						class = "card border-primary mb-3 bg-light"
 					),
 					bslib::card(
-						bslib::card_header("Flight Height Preview"),
+						bslib::card_header
+						("Flight Height Preview",
+						class = "text-bg-primary"
+					),
 						bslib::card_body(
 							plotly::plotlyOutput(ns("dummy_plot"))
 						),#
-						style = "max-height: 450vh; overflow-y: auto;"
+						class = "card border-primary mb-3 bg-light"
 					),
 					div(
 						class = "d-flex flex-column align-items-center gap-2 my-3",
