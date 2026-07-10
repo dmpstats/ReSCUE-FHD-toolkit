@@ -57,7 +57,8 @@ mod_data_select_ui <- function(id) {
 					),
 						bslib::card_body(DT::DTOutput(ns("show_dt"))),
 						class = "card border-primary mb-3 bg-light",
-						full_screen = TRUE
+						full_screen = TRUE,
+						height = "30vh"
 					),
 					bslib::card(
 						bslib::card_header
@@ -65,8 +66,11 @@ mod_data_select_ui <- function(id) {
 						class = "text-bg-primary"
 					),
 						bslib::card_body(
-							plotly::plotlyOutput(ns("dummy_plot"))
-						),#
+							div(
+								plotly::plotlyOutput(ns("dummy_plot"), height = "35vh"),
+								class = "rounded-box"
+							)
+						),
 						class = "card border-primary mb-3 bg-light"
 					),
 					div(

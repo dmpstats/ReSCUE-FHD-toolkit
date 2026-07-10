@@ -206,10 +206,9 @@ golem_add_external_resources <- function() {
 		),
 		tags$style(HTML(
 			"
-			.rounded-map {
+			.rounded-box {
         border-radius: 15px;
-				height: 50vh;
-        overflow: hidden;
+				overflow: hidden;
       }
 			.accordion-button {
         background-color: var(--bs-primary);

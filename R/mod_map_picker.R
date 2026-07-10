@@ -14,7 +14,7 @@ mod_map_picker_ui <- function(id) {
     leaflet::leafletOutput(ns("source_map"), 
     height = "50vh"
   ),
-  class = "rounded-map"
+  class = "rounded-box"
   ),
   br(),
   bslib::layout_columns(
