@@ -20,7 +20,6 @@ mod_data_select_ui <- function(id) {
 					# Map selection tab ----------
 					bslib::accordion_panel(
 						title = "Map Selection",
-						# add some whitespace
 						br(),
 						mod_map_picker_ui(ns("map_picker_1")),
 						class = "bg-light"
@@ -51,10 +50,14 @@ mod_data_select_ui <- function(id) {
 					# 12,
 					bslib::card(
 						bslib::card_header("Selected Data", 
-						class = "text-bg-primary"
+						class = "text-bg-primary",
+						bslib::toolbar(
+							mod_help_button_ui(ns("select_data"), type = "toolbar")
+						)
 					),
 						bslib::card_body(DT::DTOutput(ns("show_dt"))),
-						class = "card border-primary mb-3 bg-light"
+						class = "card border-primary mb-3 bg-light",
+						full_screen = TRUE
 					),
 					bslib::card(
 						bslib::card_header
@@ -74,8 +77,8 @@ mod_data_select_ui <- function(id) {
 								bsicons::bs_icon("play-circle"),
 								"Start Analysis"
 							),
-							class = "arrow-btn",
-							style = "width:260px"
+							full_screen = TRUE,
+							class = "arrow-btn"
 						)
 					)
 				)

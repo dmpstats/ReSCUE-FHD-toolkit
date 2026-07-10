@@ -16,15 +16,56 @@
 #' )
 #'
 #' @noRd
-mod_help_button_ui <- function(id) {
+mod_help_button_ui <- function(id, type = c("button-only", "button-text", "toolbar")) {
   ns <- NS(id)
-  actionButton(
-    ns("help"),
-    label        = NULL,
-    icon         = bsicons::bs_icon("info-circle"),
-    class        = "btn-help",
-    `aria-label` = "Help"
-  )
+
+  if (type == "button-only") {
+    return(
+      actionButton(
+        ns("help"),
+        label        = NULL,
+        icon         = bsicons::bs_icon("info-circle"),
+        class        = "btn-help",
+        `aria-label` = "Help"
+      )
+    )
+  }
+
+  if (type == "button-text") {
+    return(
+      actionButton(
+        ns("help"),
+        label        = "Help",
+        icon         = bsicons::bs_icon("info-circle"),
+        class        = "btn-help",
+        `aria-label` = "Help"
+      )
+    )
+  }
+
+  if (type == "toolbar") {
+    return(
+      bslib::toolbar_input_button(
+        ns("help"),
+        label = "Help",
+        icon = bsicons::bs_icon("info-circle"),
+        `aria-label` = "Help"
+      )
+    )
+  }
+
+  # bslib::toolbar_input_button(
+  #   ns("help"),
+  #   icon = bsicons::bs_icon("info-circle"),
+  #   `aria-label` = "Help"
+  # )
+  # actionButton(
+  #   ns("help"),
+  #   label        = NULL,
+  #   icon         = bsicons::bs_icon("info-circle"),
+  #   class        = "btn-help",
+  #   `aria-label` = "Help"
+  # )
 }
 
 

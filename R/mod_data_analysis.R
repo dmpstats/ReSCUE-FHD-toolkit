@@ -18,15 +18,17 @@ mod_data_analysis_ui <- function(id) {
 					# 12,
 					# First card: selected data
 					bslib::card(
-						bslib::card_header("Selected Data"),
+						bslib::card_header("Selected Data", class = "text-bg-primary"),
 						bslib::card_body(DT::DTOutput(ns("dummy_dt"))),
 						# Ensure this card doesn't cover more than 30% of the page height
-						style = "max-height: 30vh; overflow-y: auto;"
+						style = "max-height: 30vh; overflow-y: auto;",
+						class = "card border-primary mb-3 bg-light"
 					),
 					# Second card: defining turbine parameters
 					bslib::card(
 						bslib::card_header(
 							style = "display:flex; align-items:center; justify-content:space-between;",
+							class = "text-bg-primary",
 							htmltools::span("Turbine Parameters"),
 							bslib::toolbar(
 								bslib::toolbar_input_select(
@@ -55,13 +57,15 @@ mod_data_analysis_ui <- function(id) {
 								)
 							)
 						),
+						class = "card border-primary mb-3 bg-light",
 						style = "max-height: 16vh; overflow-y: auto;"
 					),
 
 					# Third card: analysis results
 					bslib::card(
-						bslib::card_header("Analysis Results"),
-						bslib::card_body("Analysis results content will go here")
+						bslib::card_header("Analysis Results", class = "text-bg-primary"),
+						bslib::card_body("Analysis results content will go here"),
+						class = "card border-primary mb-3 bg-light"
 					)
 				),
 
@@ -70,18 +74,21 @@ mod_data_analysis_ui <- function(id) {
 					# 12,
 					bslib::card(
 						bslib::card_header(
-							"Flight Height Distribution"
+							"Flight Height Distribution", 
+							class = "text-bg-primary"
 						),
 						bslib::card_body(
 							plotly::plotlyOutput(ns("dummy_plot")),
 							uiOutput(ns("debug"))
-						)
+						),
+						class = "card border-primary mb-3 bg-light"
 					),
 
 					# Second card will contain download options
 					bslib::card(
-						bslib::card_header("Download Options"),
-						bslib::card_body("Download options content will go here")
+						bslib::card_header("Download Options", class = "text-bg-primary"),
+						bslib::card_body("Download options content will go here"),
+						class = "card border-primary mb-3 bg-light"
 					)
 				)
 			)

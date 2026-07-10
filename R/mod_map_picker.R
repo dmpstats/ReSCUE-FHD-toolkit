@@ -10,8 +10,11 @@
 mod_map_picker_ui <- function(id) {
   ns <- NS(id)
   tagList(
+    div(
     leaflet::leafletOutput(ns("source_map"), 
     height = "50vh"
+  ),
+  class = "rounded-map"
   ),
   br(),
   bslib::layout_columns(
