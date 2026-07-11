@@ -208,11 +208,6 @@ golem_add_external_resources <- function() {
         color: var(--bs-primary) !important;
         opacity: 1;
       }
-
-	  .navbar .nav-item:has(.nav-link) {
-		   margin-right: 0.4rem;
-			 margin-top: 0.5rem;
-			 }
     "
 		))
 	)
