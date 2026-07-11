@@ -28,12 +28,9 @@ app_ui <- function(request) {
 				bslib::bs_add_variables(
 					"border-radius" = "1rem"
 				),
-			navbar_options = bslib::navbar_options(
-				style = "height: 3rem;"
-			),
 			# padding = c("1.5rem", "1.5rem", "100px", "1.5rem"),
 			navbar_options = bslib::navbar_options(
-				style = "height: 3.5rem;",
+				style = "height: 3rem;",
 				#	position = "fixed-bottom",
 				underline = FALSE
 			),
@@ -103,7 +100,6 @@ app_ui <- function(request) {
 						placement = "bottom",
 						"Analysis"
 					),
-				icon = bsicons::bs_icon("bar-chart-fill", size = "1.5em"),
 				value = "nav-analysis",
 				mod_data_analysis_ui("data_analysis")
 			),
