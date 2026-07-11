@@ -63,17 +63,10 @@ mod_landing_page_ui <- function(id) {
 						),
 						div(
 							class = "d-flex flex-column align-items-center gap-2 my-3",
-							actionButton(
-								ns("start_tutorial"),
-								label = tagList(
-									bsicons::bs_icon("play-circle"),
-									"Start Tutorial"
-								),
-								class = "arrow-btn-faded",
-								style = "width:225px"
-							),
+							# tour guide module
+							mod_app_tour_ui(ns("app_tour")),
 							div(
-								id = "tutorial_selectdata", # no ns() here, because this is a cicerone step
+								id = ns("tutorial_selectdata"),
 								actionButton(
 									ns("go_data"),
 									label = tagList(
@@ -99,7 +92,11 @@ mod_landing_page_ui <- function(id) {
 #' @param parent_session The session object of the parent Shiny app. This is required to allow the module to control navigation between tabs.
 #'
 #' @noRd
-mod_landing_page_server <- function(id, nav_id = "main-nav", parent_session) {
+mod_landing_page_server <- function(
+	id,
+	nav_id = "main-nav",
+	parent_session
+) {
 	moduleServer(id, function(input, output, session) {
 		# Helpfile submodules -----
 		mod_help_button_server("dummy_help", help_file = "dummy_help")
@@ -123,7 +120,11 @@ mod_landing_page_server <- function(id, nav_id = "main-nav", parent_session) {
 				# For now, we'll just open inst/app/md/userguide.md in a modal
 				showModal(modalDialog(
 					title = NULL,
-					shiny::includeMarkdown(app_sys("app", "md", "userguide.md")),
+					shiny::includeMarkdown(app_sys(
+						"app",
+						"md",
+						"userguide.md"
+					)),
 					easyClose = TRUE,
 					footer = modalButton("Close"),
 					size = "xl"
@@ -131,7 +132,8 @@ mod_landing_page_server <- function(id, nav_id = "main-nav", parent_session) {
 			}
 		)
 
-		# Pass tutorial trigger to parent server
-		reactive(input$start_tutorial)
+		# Tour guide module  -------------------
+		## Storing conductor object to tweak options or add response events later
+		guide <- mod_app_tour_server("app_tour")
 	})
 }

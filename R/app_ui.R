@@ -3,12 +3,11 @@
 #' @param request Internal parameter for `{shiny}`.
 #'     DO NOT REMOVE.
 #' @import bslib
-#' @import cicerone
+#' @import conductor
 #' @noRd
 app_ui <- function(request) {
 	tagList(
 		golem_add_external_resources(),
-		use_cicerone(),
 		shinybusy::use_busy_spinner(
 			spin = "circles-to-rhombuses",
 			position = "bottom-right"
@@ -20,10 +19,10 @@ app_ui <- function(request) {
 				version = 5,
 				preset = "flatly"
 			),
-			padding = c("1.5rem", "1.5rem", "100px", "1.5rem"),
+			# padding = c("1.5rem", "1.5rem", "100px", "1.5rem"),
 			navbar_options = bslib::navbar_options(
 				style = "height: 3.5rem;",
-				position = "fixed-bottom",
+				#	position = "fixed-bottom",
 				underline = FALSE
 			),
 
@@ -53,6 +52,7 @@ app_ui <- function(request) {
 					"house-fill",
 					size = "1.5em"
 				),
+				value = "nav-home",
 				mod_landing_page_ui("landing_page")
 			),
 
@@ -69,6 +69,7 @@ app_ui <- function(request) {
 			bslib::nav_panel(
 				"", #"Analysis",
 				icon = bsicons::bs_icon("bar-chart-fill", size = "1.5em"),
+				value = "nav-analysis",
 				mod_data_analysis_ui("data_analysis")
 			),
 
@@ -157,6 +158,7 @@ golem_add_external_resources <- function() {
 
 	tags$head(
 		favicon(ext = "png"),
+		useConductor(),
 		bundle_resources(
 			path = app_sys("app/www"),
 			app_title = "ReSCUEApp"

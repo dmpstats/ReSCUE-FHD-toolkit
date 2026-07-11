@@ -1,0 +1,17 @@
+
+/* navbar items */
+.navbar .nav-item:has(.nav-link) {
+    margin-right: 0.4rem;
+	margin-top: 0.5rem;
+}
+
+
+.shepherd-title {
+    font-size: 13px;
+    font-weight: bold;
+  /* color: white */
+}
+.shepherd-text {
+    font-size: 12px;
+  /* color: white */
+}

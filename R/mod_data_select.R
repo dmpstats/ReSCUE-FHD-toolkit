@@ -15,6 +15,7 @@ mod_data_select_ui <- function(id) {
 				col_widths = c(6, 6),
 				class = "h-100",
 				bslib::navset_card_underline(
+					id = ns("card_data_select"),
 					# Map selection tab ----------
 					bslib::nav_panel(
 						title = "Map Selection",
@@ -50,7 +51,7 @@ mod_data_select_ui <- function(id) {
 						bslib::card_header("Flight Height Preview"),
 						bslib::card_body(
 							plotly::plotlyOutput(ns("dummy_plot"))
-						),#
+						), #
 						style = "max-height: 450vh; overflow-y: auto;"
 					),
 					div(
@@ -104,16 +105,18 @@ mod_data_select_server <- function(id, nav_id = "main-nav", parent_session) {
 					)
 				)
 		})
-		output$show_dt <- DT::renderDataTable({
-			selected_data()
-		},
-		options = list(
-			paging = FALSE,
-			searching = FALSE,
-			info = FALSE,
-			scrollY = "200px",
-			scrollCollapse = TRUE
-		))
+		output$show_dt <- DT::renderDataTable(
+			{
+				selected_data()
+			},
+			options = list(
+				paging = FALSE,
+				searching = FALSE,
+				info = FALSE,
+				scrollY = "200px",
+				scrollCollapse = TRUE
+			)
+		)
 
 		# For now, plot a dummy flight-height preview
 		output$dummy_plot <- plotly::renderPlotly({
@@ -125,7 +128,6 @@ mod_data_select_server <- function(id, nav_id = "main-nav", parent_session) {
 		observeEvent(
 			input$go_analysis,
 			{
-
 				# If the user has not selected any data, show a modal warning
 				if (is.null(selected_data()) | nrow(selected_data()) == 0) {
 					shiny::showNotification(
