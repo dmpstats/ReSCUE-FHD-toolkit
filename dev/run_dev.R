@@ -8,7 +8,7 @@ options(shiny.port = httpuv::randomPort())
 golem::detach_all_attached()
 # rm(list=ls(all.names = TRUE))
 
-# Documeant and reload your package
+# Document and reload your package
 golem::document_and_reload()
 
 # Run the application

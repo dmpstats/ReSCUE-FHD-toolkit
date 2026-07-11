@@ -28,7 +28,7 @@ app_ui <- function(request) {
 					"border-radius" = "1rem"
 				),
 			navbar_options = bslib::navbar_options(
-				style = "height: 3.5rem;",
+				style = "height: 3rem;",
 				underline = FALSE
 			),
 
@@ -264,14 +264,6 @@ golem_add_external_resources <- function() {
         color: var(--bs-primary) !important;
         opacity: 1;
       }
-			.navbar {
-				--bs-navbar-padding-y: 0.25rem;
-				--bs-navbar-color: white;
-			}
-			.navbar-brand {
-				padding-top: 0;
-				padding-bottom: 0;
-			}
     "
 		))
 	)

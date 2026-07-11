@@ -1,12 +1,24 @@
 
 /* navbar items */
+
 .navbar .nav-item:has(.nav-link) {
-    margin-right: 0.4rem;
+  margin-right: 0.4rem;
 	margin-top: 0.5rem;
+}
+
+.navbar {
+	--bs-navbar-padding-y: 0.25rem;
+	--bs-navbar-color: white;
+}
+
+.navbar-brand {
+	padding-top: 0;
+	padding-bottom: 0;
 }
 
 
 /* Conductor tour popover */
+
 /* .shepherd-header {
   background-color: white !important;
 } */
