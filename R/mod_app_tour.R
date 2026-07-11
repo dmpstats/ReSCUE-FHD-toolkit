@@ -57,7 +57,7 @@ mod_app_tour_server <- function(id) {
       el = "#app-version-container",
       title = "App Version",
       text = "The app version is displayed here.",
-      position = "top-start"
+      position = "bottom-start"
     )$step(
       el = "[data-value='nav-home']", # using data-value as selector
       title = "Navigation Bar",
@@ -67,7 +67,9 @@ mod_app_tour_server <- function(id) {
       title = "Select Data",
       text = "Click this button to go to the Data Selection tab, where you can choose the data you want to analyze. This is the first step in using the app.",
       canClickTarget = FALSE,
-      position = "bottom-start"
+      position = "left-start",
+      tabId = "main-nav",
+      tab = "nav-home"
     )$step(
       el = paste0("#", data_tab_ns("card_data_select")),
       title = "Data Selection",
