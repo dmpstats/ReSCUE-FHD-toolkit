@@ -26,6 +26,15 @@
   background-color: white;
 } */
 
+/* Conductor tour popover */
+.shepherd-header {
+  background-color: white !important;
+}
+.shepherd-element {
+  background-color: white;
+  /* Increase spacing between popover and target */
+  /* margin: 10px !important; */
+}
 .shepherd-title {
     font-size: 17px;
     font-weight: bold;
