@@ -4,6 +4,7 @@
 #'     DO NOT REMOVE.
 #' @import bslib
 #' @import conductor
+#' @import conductor
 #' @noRd
 app_ui <- function(request) {
 	tagList(
@@ -28,7 +29,12 @@ app_ui <- function(request) {
 					"border-radius" = "1rem"
 				),
 			navbar_options = bslib::navbar_options(
-				style = "height: 3rem;",
+				style = "height: 3rem;"
+			),
+			# padding = c("1.5rem", "1.5rem", "100px", "1.5rem"),
+			navbar_options = bslib::navbar_options(
+				style = "height: 3.5rem;",
+				#	position = "fixed-bottom",
 				underline = FALSE
 			),
 
@@ -97,6 +103,7 @@ app_ui <- function(request) {
 						placement = "bottom",
 						"Analysis"
 					),
+				icon = bsicons::bs_icon("bar-chart-fill", size = "1.5em"),
 				value = "nav-analysis",
 				mod_data_analysis_ui("data_analysis")
 			),
@@ -202,6 +209,7 @@ golem_add_external_resources <- function() {
 
 	tags$head(
 		favicon(ext = "png"),
+		useConductor(),
 		useConductor(),
 		bundle_resources(
 			path = app_sys("app/www"),
