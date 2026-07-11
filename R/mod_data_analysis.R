@@ -74,6 +74,7 @@ mod_data_analysis_ui <- function(id) {
 				tagList(
 					# 12,
 					bslib::card(
+						id = ns("card_fhdplot"),
 						bslib::card_header(
 							"Flight Height Distribution", 
 							class = "text-bg-primary"
@@ -115,16 +116,18 @@ mod_data_analysis_server <- function(
 		ns <- session$ns
 
 		# Render the dummy data passed from the previous
-		output$dummy_dt <- DT::renderDataTable({
-			selected_data()
-		},
-		options = list(
-			paging = FALSE,
-			searching = FALSE,
-			info = FALSE,
-			scrollY = "200px",
-			scrollCollapse = TRUE
-		))
+		output$dummy_dt <- DT::renderDataTable(
+			{
+				selected_data()
+			},
+			options = list(
+				paging = FALSE,
+				searching = FALSE,
+				info = FALSE,
+				scrollY = "200px",
+				scrollCollapse = TRUE
+			)
+		)
 
 		# Simulate some dummy data
 		dummy_data <- reactive({
@@ -148,6 +151,5 @@ mod_data_analysis_server <- function(
 				risk_max = input$rotor_max
 			)
 		})
-
 	})
 }

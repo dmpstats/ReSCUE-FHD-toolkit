@@ -1,0 +1,105 @@
+
+/* navbar items */
+
+.navbar .nav-item:has(.nav-link) {
+  margin-right: 0.4rem;
+	margin-top: 0.5rem;
+}
+
+.navbar {
+	--bs-navbar-padding-y: 0.25rem;
+	--bs-navbar-color: white;
+}
+
+.navbar-brand {
+	padding-top: 0;
+	padding-bottom: 0;
+}
+
+
+/* Conductor guide tour tooltip */
+
+.shepherd-element {
+  background-color: #00293ef5 !important;
+  border: 2.5px solid #ffffff;
+  border-radius: 10px;
+}
+
+.shepherd-header {
+  background-color: #00293ef5 !important;
+}
+
+
+.shepherd-title {
+  font-size: 17px;
+  font-weight: bold;
+  color: white
+}
+.shepherd-text {
+  font-size: 14px;
+  color: white
+}
+
+.shepherd-arrow:before {
+  background-color: white !important;
+}
+
+.shepherd-arrow:after {
+  background-color: #00293ef5 !important;
+}
+
+/* ajdust popover space to target, for each placing */
+.shepherd-element[data-popper-placement^='top'] {
+  margin-bottom: 14px !important;
+}
+
+.shepherd-element[data-popper-placement^='bottom'] {
+  margin-top: 14px !important;
+}
+
+.shepherd-element[data-popper-placement^='left'] {
+  transform: translateX(-14px) !important;
+}
+
+.shepherd-element[data-popper-placement^='right'] {
+  transform: translateX(14px) !important;
+}
+
+
+
+.shepherd-button {
+  font-size: 14px;
+  background: none;
+  border: none;
+  text-shadow: none;
+  color: rgb(158, 152, 152) !important;
+  /* color: #ffa21f !important; */
+  padding: 4px 8px !important;
+  margin: 0 2px !important;
+}
+
+.shepherd-button:hover {
+  background: none !important;
+  color: #ffa21f !important;
+}
+
+.shepherd-button-secondary {
+  font-size: 14px;
+  background: none !important;
+  border: none;
+  text-shadow: none;
+  color: rgb(158, 152, 152) !important;
+}
+
+.shepherd-button-secondary:hover {
+  background: none !important;
+  color: #ffa21f !important;
+}
+
+/* .shepherd-cancel-icon > span {
+  border-radius: 50%;
+  background-color: #bfbfbf;
+  opacity: 0.8;
+  display: block;
+  width: 2.8rem !important;
+} */
