@@ -52,8 +52,13 @@ mod_app_tour_server <- function(id) {
     data_tab_ns <- NS("data_select")
     analysis_tab_ns <- NS("data_analysis")
 
-    # Define guide steps
-    guide <- Conductor$new()$step(
+    # construt guid
+    guide <- Conductor$new(
+      #progress = TRUE
+    )
+
+    # Add guide steps
+    guide <- guide$step(
       el = "#app-version-container",
       title = "App Version",
       text = "The app version is displayed here.",
