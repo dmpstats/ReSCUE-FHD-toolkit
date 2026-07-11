@@ -1,0 +1,58 @@
+
+/* navbar items */
+.navbar .nav-item:has(.nav-link) {
+    margin-right: 0.4rem;
+	margin-top: 0.5rem;
+}
+
+
+/* Conductor tour popover */
+/* .shepherd-header {
+  background-color: white !important;
+} */
+/* .shepherd-element {
+  background-color: white;
+} */
+
+.shepherd-title {
+    font-size: 17px;
+    font-weight: bold;
+  /* color: white */
+}
+.shepherd-text {
+    font-size: 14px;
+  /* color: white */
+}
+
+.shepherd-arrow:before {
+  background-color: white !important;
+}
+
+/* ajdust popover space to target, for each placing */
+.shepherd-element[data-popper-placement^='top'] {
+  margin-bottom: 14px !important;
+}
+
+.shepherd-element[data-popper-placement^='bottom'] {
+  margin-top: 14px !important;
+}
+
+.shepherd-element[data-popper-placement^='left'] {
+  transform: translateX(-14px) !important;
+}
+
+.shepherd-element[data-popper-placement^='right'] {
+  transform: translateX(14px) !important;
+}
+
+
+
+/* .shepherd-button {
+  font-size: 16px;
+  background-color: red
+} */
+
+/* .shepherd-button-secondary {
+  font-size: 16px;
+  background-color: green !important;
+} */

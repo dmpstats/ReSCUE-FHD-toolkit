@@ -3,12 +3,11 @@
 #' @param request Internal parameter for `{shiny}`.
 #'     DO NOT REMOVE.
 #' @import bslib
-#' @import cicerone
+#' @import conductor
 #' @noRd
 app_ui <- function(request) {
 	tagList(
 		golem_add_external_resources(),
-		use_cicerone(),
 		shinybusy::use_busy_spinner(
 			spin = "circles-to-rhombuses",
 			position = "bottom-right"
@@ -29,8 +28,8 @@ app_ui <- function(request) {
 					"border-radius" = "1rem"
 				),
 			navbar_options = bslib::navbar_options(
-				# theme = "auto",
-				underline = FALSE,
+				style = "height: 3.5rem;",
+				underline = FALSE
 			),
 
 			# NAVBAR -----------------
@@ -67,13 +66,14 @@ app_ui <- function(request) {
 						placement = "bottom",
 						"Welcome Page"
 					),
+				value = "nav-home",
 				mod_landing_page_ui("landing_page")
 			),
 
 			# Tab 2: Data Selection =======================
 
 			bslib::nav_panel(
-				title = "", #"Data Selection",
+				title = "",
 				icon = bsicons::bs_icon(
 					"funnel-fill",
 					size = "1.5em"
@@ -88,7 +88,7 @@ app_ui <- function(request) {
 			# Tab 3: Analysis =============================
 
 			bslib::nav_panel(
-				"", #"Analysis",
+				title = "",
 				icon = bsicons::bs_icon(
 					"bar-chart-fill",
 					size = "1.5em"
@@ -97,13 +97,14 @@ app_ui <- function(request) {
 						placement = "bottom",
 						"Analysis"
 					),
+				value = "nav-analysis",
 				mod_data_analysis_ui("data_analysis")
 			),
 
 			# Tab 4: Data Sources ============================
 
 			bslib::nav_panel(
-				"", #"Data Sources",
+				title = "",
 				icon = bsicons::bs_icon(
 					"database-fill",
 					size = "1.5em"
@@ -201,6 +202,7 @@ golem_add_external_resources <- function() {
 
 	tags$head(
 		favicon(ext = "png"),
+		useConductor(),
 		bundle_resources(
 			path = app_sys("app/www"),
 			app_title = "ReSCUEApp"

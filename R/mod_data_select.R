@@ -17,6 +17,7 @@ mod_data_select_ui <- function(id) {
 				bslib::accordion(
 					multiple = FALSE,
 					class = "card border-primary mb-3 bg-light h-80",
+					id = ns("card_data_select"),
 					# Map selection tab ----------
 					bslib::accordion_panel(
 						title = "Map Selection",
@@ -49,22 +50,23 @@ mod_data_select_ui <- function(id) {
 				tagList(
 					# 12,
 					bslib::card(
-						bslib::card_header("Selected Data", 
-						class = "text-bg-primary",
-						bslib::toolbar(
-							mod_help_button_ui(ns("select_data"), type = "toolbar")
-						)
-					),
+						bslib::card_header(
+							"Selected Data",
+							class = "text-bg-primary",
+							bslib::toolbar(
+								mod_help_button_ui(ns("select_data"), type = "toolbar")
+							)
+						),
 						bslib::card_body(DT::DTOutput(ns("show_dt"))),
 						class = "card border-primary mb-3 bg-light",
 						full_screen = TRUE,
 						height = "30vh"
 					),
 					bslib::card(
-						bslib::card_header
-						("Flight Height Preview",
-						class = "text-bg-primary"
-					),
+						bslib::card_header(
+							"Flight Height Preview",
+							class = "text-bg-primary"
+						),
 						bslib::card_body(
 							div(
 								plotly::plotlyOutput(ns("dummy_plot"), height = "35vh"),
@@ -124,16 +126,18 @@ mod_data_select_server <- function(id, nav_id = "main-nav", parent_session) {
 					)
 				)
 		})
-		output$show_dt <- DT::renderDataTable({
-			selected_data()
-		},
-		options = list(
-			paging = FALSE,
-			searching = FALSE,
-			info = FALSE,
-			scrollY = "200px",
-			scrollCollapse = TRUE
-		))
+		output$show_dt <- DT::renderDataTable(
+			{
+				selected_data()
+			},
+			options = list(
+				paging = FALSE,
+				searching = FALSE,
+				info = FALSE,
+				scrollY = "200px",
+				scrollCollapse = TRUE
+			)
+		)
 
 		# For now, plot a dummy flight-height preview
 		output$dummy_plot <- plotly::renderPlotly({
@@ -145,7 +149,6 @@ mod_data_select_server <- function(id, nav_id = "main-nav", parent_session) {
 		observeEvent(
 			input$go_analysis,
 			{
-
 				# If the user has not selected any data, show a modal warning
 				if (is.null(selected_data()) | nrow(selected_data()) == 0) {
 					shiny::showNotification(
