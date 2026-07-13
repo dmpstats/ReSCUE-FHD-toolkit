@@ -7,7 +7,7 @@
 #' @noRd
 #'
 #' @importFrom shiny NS tagList tags fluidRow actionButton
-mod_app_tour_ui <- function(id) {
+mod_app_tour_ui <- function(id, style = "width:18vw; height: 5vh;") {
   ns <- NS(id)
   tagList(
     actionButton(
@@ -17,7 +17,7 @@ mod_app_tour_ui <- function(id) {
         "Start Tutorial"
       ),
       class = "arrow-btn-faded",
-      style = "width:225px"
+      style = style
     )
 
     # tags$details(

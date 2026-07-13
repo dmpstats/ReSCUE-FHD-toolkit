@@ -35,7 +35,7 @@ mod_data_analysis_ui <- function(id) {
 									id = ns("use_turb"),
 									label = "Use Turbine Parameters",
 									choices = c("On", "Off"),
-									class = "bg-light text-primary"
+									class = "bg-secondary text-primary"
 								)
 							)
 						),
@@ -63,11 +63,20 @@ mod_data_analysis_ui <- function(id) {
 					),
 
 					# Third card: analysis results
-					bslib::card(
-						bslib::card_header("Analysis Results", class = "text-bg-success"),
-						bslib::card_body("Analysis results content will go here"),
-						class = "card border-success mb-3 bg-light"
-					)
+					bslib::navset_card_underline(
+						title = "Analysis",
+						bslib::nav_spacer(),
+						bslib::nav_panel(
+							title = "Risk Height"
+						),
+						bslib::nav_panel(
+							title = "Compare Distributions"
+						),
+						full_screen = TRUE
+					) |>
+						htmltools::tagAppendAttributes(
+							class = "border-success mb-3 bg-light header-primary"
+						)
 				),
 
 				# Second column will contain the plot and output distributions
@@ -76,7 +85,7 @@ mod_data_analysis_ui <- function(id) {
 					bslib::card(
 						id = ns("card_fhdplot"),
 						bslib::card_header(
-							"Flight Height Distribution", 
+							"Flight Height Distribution",
 							class = "text-bg-primary"
 						),
 						bslib::card_body(

@@ -26,7 +26,9 @@ app_ui <- function(request) {
 				fg = "#ffffff"
 			) |>
 				bslib::bs_add_variables(
-					"border-radius" = "1rem"
+					"border-radius" = "1rem",
+					# Set the tooltip colour to Success
+					"tooltip-bg" = "var(--bs-success)"
 				),
 			# padding = c("1.5rem", "1.5rem", "100px", "1.5rem"),
 			navbar_options = bslib::navbar_options(
@@ -119,6 +121,10 @@ app_ui <- function(request) {
 				bslib::page_fillable(
 					# A .md with the sources will go here
 					bslib::card(
+						bslib::card_header(
+							h2("Data Sources"),
+							class = "text-bg-primary"
+						),
 						shiny::includeMarkdown("inst/app/md/sources.md"),
 						class = "card border-primary mb-3 bg-light"
 					)
