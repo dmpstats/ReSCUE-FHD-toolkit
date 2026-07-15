@@ -16,7 +16,7 @@ mod_app_tour_ui <- function(id, style = "width:18vw; height: 5vh;") {
         bsicons::bs_icon("play-circle"),
         "Start Tutorial"
       ),
-      class = "arrow-btn-faded",
+      class = "not-arrow-btn",
       style = style
     )
 

@@ -29,19 +29,64 @@ mod_landing_page_ui <- function(id) {
 					bslib::accordion_panel(
 						title = "Project Overview",
 						icon = bsicons::bs_icon("info-circle"),
-						lorem::ipsum(paragraphs = 2),
+						shiny::includeMarkdown(app_sys(
+							"app",
+							"md",
+							"landingpage",
+							"project_overview.md"
+						)),
 						class = "bg-light"
 					),
 					bslib::accordion_panel(
-						title = "Other Stuff",
+						title = "About This App",
+						icon = bsicons::bs_icon("app-indicator"),
+						shiny::includeMarkdown(app_sys(
+							"app",
+							"md",
+							"landingpage",
+							"about_this_app.md"
+						)),
+					),
+					bslib::accordion_panel(
+						title = "What This App Does",
 						icon = bsicons::bs_icon("question-circle"),
-						p("We can nest some other stuff in here too."),
+						shiny::includeMarkdown(app_sys(
+							"app",
+							"md",
+							"landingpage",
+							"what_this_app_does.md"
+						)),
+						class = "bg-light"
+					),
+					bslib::accordion_panel(
+						title = "What This App Doesn't Do",
+						icon = bsicons::bs_icon("file-x"),
+						shiny::includeMarkdown(app_sys(
+							"app",
+							"md",
+							"landingpage",
+							"what_app_doesnt_do.md"
+						)),
 						class = "bg-light"
 					),
 					bslib::accordion_panel(
 						title = "Contacts",
 						icon = bsicons::bs_icon("envelope-fill"),
-						p("Maybe some email contacts too."),
+
+						# CONTACTS -----------------
+						bslib::value_box(
+							title = "Developer",
+							value = "Dummy Name",
+							# Add a link to an email
+							tags$a(
+								href = "mailto:dummy@dmpstats.co.uk",
+								"dummy@dmpstats.co.uk"
+							),
+							showcase = tags$a(
+								href = "mailto:dummy@dmpstats.co.uk",
+								bsicons::bs_icon("envelope-fill", class = "text-secondary")
+							)
+						),
 						class = "bg-light"
 					)
 				),
@@ -79,7 +124,8 @@ mod_landing_page_ui <- function(id) {
 									bsicons::bs_icon("info-circle"),
 									"User Guide"
 								),
-								class = "arrow-btn-faded",
+								# Make font bold
+								class = "not-arrow-btn",
 								style = "width:18vw; height: 5vh;"
 							),
 							actionButton(
@@ -88,7 +134,7 @@ mod_landing_page_ui <- function(id) {
 									bsicons::bs_icon("arrow-counterclockwise"),
 									"Restore Session"
 								),
-								class = "arrow-btn-faded",
+								class = "not-arrow-btn",
 								style = "width:18vw; height: 5vh;"
 							),
 						),

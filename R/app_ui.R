@@ -231,6 +231,12 @@ golem_add_external_resources <- function() {
         background-color: var(--bs-success);
         color: var(--bs-primary]);
       }
+			.not-arrow-btn {
+				background: var(--bs-dark); color: var(--bs-light); font-weight: bold;
+				border: none; padding: 12px 30px 12px 20px; font-size: 1.1rem;
+				overflow: visible;
+				cursor: pointer; margin: 4px;
+			}
       .arrow-btn {
         background: var(--bs-success); color: var(--bs-white); font-weight: bold;
         border: none; padding: 12px 30px 12px 20px; font-size: 1.1rem;
