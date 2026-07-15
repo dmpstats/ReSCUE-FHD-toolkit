@@ -20,24 +20,24 @@
 /* Conductor guide tour tooltip */
 
 .shepherd-element {
-  background-color: #00293ef5 !important;
+  background-color: var(--bs-primary);
   border: 2.5px solid #ffffff;
   border-radius: 8px;
 }
 
 .shepherd-header {
-  background-color: #00293ef5 !important;
+  background-color: var(--bs-primary) !important;
 }
 
 .shepherd-title {
   font-size: 17px;
   font-weight: bold;
-  color: white
+  color: #ffffff;
 }
 
 .shepherd-text {
   font-size: 14px;
-  color: white
+  color: #ffffff;
 }
 
 .shepherd-modal-overlay-container {
@@ -84,7 +84,7 @@
 
 .shepherd-button:hover {
   background: none !important;
-  color: #ffa21f !important;
+  color: var(--bs-success) !important;
 }
 
 .shepherd-button-secondary {
@@ -97,7 +97,7 @@
 
 .shepherd-button-secondary:hover {
   background: none !important;
-  color: #ffa21f !important;
+  color: var(--bs-success) !important;
 }
 
 /* .shepherd-cancel-icon > span {
