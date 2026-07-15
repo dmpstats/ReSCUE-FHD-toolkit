@@ -52,8 +52,11 @@ mod_app_tour_server <- function(id) {
     data_tab_ns <- NS("data_select")
     analysis_tab_ns <- NS("data_analysis")
 
-    # construt guid
+    # construt guide
     guide <- Conductor$new(
+      defaultStepOptions = list(
+        floatingUIOptions = list()
+      ) #,
       #progress = TRUE
     )
 
@@ -74,17 +77,27 @@ mod_app_tour_server <- function(id) {
       canClickTarget = FALSE,
       position = "left-start",
       tabId = "main-nav",
-      tab = "nav-home"
+      tab = "nav-home",
+      #cancelIcon = list(enabled = TRUE, label = "Close")
     )$step(
       el = paste0("#", data_tab_ns("card_data_select")),
       title = "Data Selection",
       text = "This is the Data Selection tab. Here, you can select the data you want to analyze.",
+      position = "left",
+      tabId = "main-nav",
+      tab = "nav-data-select"
+    )$step(
+      el = paste0("#", data_tab_ns("go_analysis")),
+      title = "Go to Analysis",
+      text = "Once you have selected your data, click this button to go to the Data Analysis tab, where you can visualize and analyze the selected data.",
+      position = "left-start",
       tabId = "main-nav",
       tab = "nav-data-select"
     )$step(
       el = paste0("#", analysis_tab_ns("card_fhdplot")),
       title = "Selected FHDs",
       text = "Here you can vizualise the selected flight height distributions (FHDs) based on your data selection.",
+      position = "right-start",
       tabId = "main-nav",
       tab = "nav-analysis"
     )

@@ -17,18 +17,18 @@
 }
 
 
+
 /* Conductor guide tour tooltip */
 
 .shepherd-element {
   background-color: #00293ef5 !important;
   border: 2.5px solid #ffffff;
-  border-radius: 10px;
+  border-radius: 8px;
 }
 
 .shepherd-header {
   background-color: #00293ef5 !important;
 }
-
 
 .shepherd-title {
   font-size: 17px;
@@ -40,7 +40,12 @@
   color: white
 }
 
+.shepherd-modal-overlay-container {
+  opacity: 0.80 !important;
+}
+
 .shepherd-arrow:before {
+  /* display: none !important; */
   background-color: white !important;
 }
 
@@ -48,7 +53,7 @@
   background-color: #00293ef5 !important;
 }
 
-/* ajdust popover space to target, for each placing */
+/* ajdust popover space to target, for each relative placing */
 .shepherd-element[data-popper-placement^='top'] {
   margin-bottom: 14px !important;
 }
@@ -65,8 +70,7 @@
   transform: translateX(14px) !important;
 }
 
-
-
+/* Next/Previous buttons properties*/
 .shepherd-button {
   font-size: 14px;
   background: none;
@@ -95,11 +99,3 @@
   background: none !important;
   color: #ffa21f !important;
 }
-
-/* .shepherd-cancel-icon > span {
-  border-radius: 50%;
-  background-color: #bfbfbf;
-  opacity: 0.8;
-  display: block;
-  width: 2.8rem !important;
-} */
