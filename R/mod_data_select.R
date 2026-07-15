@@ -161,7 +161,7 @@ mod_data_select_server <- function(id, nav_id = "main-nav", parent_session) {
 
 				bslib::nav_select(
 					id = nav_id,
-					selected = "Analysis",
+					selected = "nav-analysis",
 					session = parent_session
 				)
 			}
