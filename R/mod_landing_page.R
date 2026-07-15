@@ -46,6 +46,7 @@ mod_landing_page_ui <- function(id) {
 							"landingpage",
 							"about_this_app.md"
 						)),
+						class = "bg-light"
 					),
 					bslib::accordion_panel(
 						title = "What This App Does",
