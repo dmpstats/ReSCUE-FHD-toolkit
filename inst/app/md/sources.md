@@ -1,5 +1,3 @@
-## Sources Documentation
-
 This markdown file (inst/app/md/sources.md) will later contain source details. It auto-renders into the 'Data Sources' tab, meaning that edits to this .md will auto-populate the correct field. 
 
 For now, I'll just add some rambling text to fill the card.

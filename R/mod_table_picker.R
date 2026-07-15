@@ -12,30 +12,30 @@ mod_table_picker_ui <- function(id) {
   tagList(
     p("Select rows with checkboxes to add entries:"),
     DT::DTOutput(ns("source_table")),
-    bslib::card_footer(
-      bslib::layout_columns(
-        col_widths = c(6, 6),
-        div(
-          class = "d-flex justify-content-center",
-          actionButton(
-            ns("clear_selection"),
-            label = tagList(
-              bsicons::bs_icon("x-circle"),
-              "Clear Selection"
-            ),
-            class = "btn-light"
-          )
-        ),
-        div(
-          class = "d-flex justify-content-center",
-          actionButton(
-            ns("add_to_selection"),
-            label = tagList(
-              bsicons::bs_icon("plus-circle"),
-              "Add Selected Datasets"
-            ),
-            class = "btn-primary"
-          )
+    bslib::layout_columns(
+      col_widths = c(6, 6),
+      div(
+        class = "d-flex justify-content-center",
+        actionButton(
+          ns("clear_selection"),
+          label = tagList(
+            bsicons::bs_icon("x-circle"),
+            "Clear Selection"
+          ),
+          class = "btn-secondary",
+          style = "width:20vw"
+        )
+      ),
+      div(
+        class = "d-flex justify-content-center",
+        actionButton(
+          ns("add_to_selection"),
+          label = tagList(
+            bsicons::bs_icon("plus-circle"),
+            "Add Selected Datasets"
+          ),
+          class = "btn-primary",
+          style = "width:20vw"
         )
       )
     )
@@ -85,7 +85,10 @@ mod_table_picker_server <- function(id) {
           pageLength = 10,
           autoWidth = FALSE,
           columnDefs = list(
-            list(targets = "_all", render = DT::JS("function(data, type) { return data; }"))
+            list(
+              targets = "_all",
+              render = DT::JS("function(data, type) { return data; }")
+            )
           )
         ),
         rownames = FALSE
@@ -100,7 +103,9 @@ mod_table_picker_server <- function(id) {
         current_data <- outdata()
         # Convert each selected row to a list entry
         for (i in seq_len(nrow(selected_data))) {
-          current_data[[length(current_data) + 1]] <- as.list(selected_data[i, ])
+          current_data[[length(current_data) + 1]] <- as.list(selected_data[
+            i,
+          ])
         }
         outdata(current_data)
       }

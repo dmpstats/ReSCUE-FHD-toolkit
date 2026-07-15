@@ -25,32 +25,30 @@ mod_user_upload_ui <- function(id) {
         choices = c("North", "South", "East", "West")
       )
     ),
-    bslib::card_footer(
-      bslib::layout_columns(
-        col_widths = c(6, 6),
-        div(
-          class = "d-flex justify-content-center",
-          actionButton(
-            ns("clear_selection"),
-            label = tagList(
-              bsicons::bs_icon("x-circle"),
-              "Clear User Uploads"
-            ),
-            class = "btn-light"
-            # style = "width:75"
-          )
-        ),
-        div(
-          class = "d-flex justify-content-center",
-          actionButton(
-            ns("add_to_selection"),
-            label = tagList(
-              bsicons::bs_icon("plus-circle"),
-              "Add to Selection"
-            ),
-            class = "btn-primary"
-            # style = "width:220px"
-          )
+    bslib::layout_columns(
+      col_widths = c(6, 6),
+      div(
+        class = "d-flex justify-content-center",
+        actionButton(
+          ns("clear_selection"),
+          label = tagList(
+            bsicons::bs_icon("x-circle"),
+            "Clear User Uploads"
+          ),
+          class = "btn-secondary",
+          style = "width:20vw"
+        )
+      ),
+      div(
+        class = "d-flex justify-content-center",
+        actionButton(
+          ns("add_to_selection"),
+          label = tagList(
+            bsicons::bs_icon("plus-circle"),
+            "Add to Selection"
+          ),
+          class = "btn-primary",
+          style = "width:20vw"
         )
       )
     )
@@ -84,7 +82,6 @@ mod_user_upload_server <- function(id) {
     observeEvent(input$clear_selection, {
       outdata(list())
     })
-
 
     return(outdata)
   })

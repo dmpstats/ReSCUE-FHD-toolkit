@@ -12,7 +12,7 @@ mod_landing_page_ui <- function(id) {
 	tagList(
 		bslib::page_fillable(
 			bslib::layout_columns(
-				col_widths = c(6, 6),
+				col_widths = c(7, 5),
 				# LHS: A card containing project information.
 				# bslib::card(
 				# bslib::card_header(
@@ -53,19 +53,22 @@ mod_landing_page_ui <- function(id) {
 					bslib::card(
 						bslib::card_header(
 							"Project Partners",
-
 							class = "text bg-primary"
 						),
 						bslib::card_body(
 							bslib::layout_columns(
-								col_widths = c(3, 3, 3, 3),
+								col_widths = c(4, 4, 4),
 								logolink("dmp"),
 								logolink("bto"),
-								logolink("ne"),
-								logolink("blackbawks")
+								logolink("ne")
+							),
+							bslib::layout_columns(
+								col_widths = c(6, 6),
+								logolink("blackbawks"),
+								logolink("niras")
 							)
 						),
-						class = "card border-primary mb-3 bg-light"
+						class = "card border-primary mb-3 bg-secondary"
 					),
 					bslib::layout_columns(
 						div(
@@ -77,7 +80,7 @@ mod_landing_page_ui <- function(id) {
 									"User Guide"
 								),
 								class = "arrow-btn-faded",
-								style = "width:20vw"
+								style = "width:18vw; height: 5vh;"
 							),
 							actionButton(
 								ns("restore_session"),
@@ -86,13 +89,16 @@ mod_landing_page_ui <- function(id) {
 									"Restore Session"
 								),
 								class = "arrow-btn-faded",
-								style = "width:20vw"
+								style = "width:18vw; height: 5vh;"
 							),
 						),
 						div(
 							class = "d-flex flex-column align-items-center gap-2 my-3",
 							# tour guide module
-							mod_app_tour_ui(ns("app_tour")),
+							mod_app_tour_ui(
+								ns("app_tour"),
+								style = "width:18vw; height: 5vh;"
+							),
 							div(
 								id = ns("tutorial_selectdata"),
 								actionButton(
@@ -102,7 +108,7 @@ mod_landing_page_ui <- function(id) {
 										"Select Data"
 									),
 									class = "arrow-btn",
-									style = "width:20vw"
+									style = "width:18vw; height: 5vh;"
 								)
 							)
 						)

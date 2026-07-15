@@ -6,5 +6,6 @@ dmp.png
 ne.png
 bto.png
 blackbawks.png
+niras.png
 
 If you wish to add another partner, refer to utils_ui_helpers.R, where the function logolink() can be modified to add another partner.

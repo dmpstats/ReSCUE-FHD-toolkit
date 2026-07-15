@@ -11,39 +11,37 @@ mod_map_picker_ui <- function(id) {
   ns <- NS(id)
   tagList(
     div(
-    leaflet::leafletOutput(ns("source_map"), 
-    height = "50vh"
-  ),
-  class = "rounded-box"
-  ),
-  br(),
-  bslib::layout_columns(
-    col_widths = c(6, 6),
-    div(
-      class = "d-flex justify-content-center",
-      actionButton(
-        ns("clear_selection"),
-        label = tagList(
-          bsicons::bs_icon("x-circle"),
-          "Clear Selected Data"
-        ),
-        class = "btn-light"
-        # style = "width:75"
+      leaflet::leafletOutput(ns("source_map"), height = "50vh"),
+      class = "rounded-box"
+    ),
+    br(),
+    bslib::layout_columns(
+      col_widths = c(6, 6),
+      div(
+        class = "d-flex justify-content-center",
+        actionButton(
+          ns("clear_selection"),
+          label = tagList(
+            bsicons::bs_icon("x-circle"),
+            "Clear Selected Data"
+          ),
+          class = "btn-secondary",
+          style = "width:20vw"
+        )
+      ),
+      div(
+        class = "d-flex justify-content-center",
+        actionButton(
+          ns("does_nothing"),
+          label = tagList(
+            bsicons::bs_icon("plus-circle"),
+            "Does Nothing"
+          ),
+          class = "btn-primary",
+          style = "width:20vw"
+        )
       )
     ),
-    div(
-      class = "d-flex justify-content-center",
-      actionButton(
-        ns("does_nothing"),
-        label = tagList(
-          bsicons::bs_icon("plus-circle"),
-          "Does Nothing"
-        ),
-        class = "btn-primary"
-        # style = "width:220px"
-      )
-    )
-  ),
     shinyjs::useShinyjs(),
     # Hidden input to track which marker was clicked
     shinyjs::hidden(shiny::numericInput(ns("clicked_marker"), "", value = NULL))
