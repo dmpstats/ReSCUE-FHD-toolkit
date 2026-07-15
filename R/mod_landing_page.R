@@ -76,15 +76,41 @@ mod_landing_page_ui <- function(id) {
 
 						# CONTACTS -----------------
 						bslib::value_box(
-							title = "Developer",
+							title = "ReSCUE Project Lead",
 							value = "Dummy Name",
 							# Add a link to an email
 							tags$a(
-								href = "mailto:dummy@dmpstats.co.uk",
-								"dummy@dmpstats.co.uk"
+								href = "mailto:dummy@something.co.uk",
+								"dummy@something.co.uk"
 							),
 							showcase = tags$a(
-								href = "mailto:dummy@dmpstats.co.uk",
+								href = "mailto:dummy@something.co.uk",
+								bsicons::bs_icon("envelope-fill", class = "text-secondary")
+							)
+						),
+						bslib::value_box(
+							title = "Developer",
+							value = "Bruno Caneco",
+							# Add a link to an email
+							tags$a(
+								href = "mailto:bruno@dmpstats.co.uk",
+								"bruno@dmpstats.co.uk"
+							),
+							showcase = tags$a(
+								href = "mailto:bruno@dmpstats.co.uk",
+								bsicons::bs_icon("envelope-fill", class = "text-secondary")
+							)
+						),
+						bslib::value_box(
+							title = "Developer",
+							value = "Callum Clarke",
+							# Add a link to an email
+							tags$a(
+								href = "mailto:callum@dmpstats.co.uk",
+								"callum@dmpstats.co.uk"
+							),
+							showcase = tags$a(
+								href = "mailto:callum@dmpstats.co.uk",
 								bsicons::bs_icon("envelope-fill", class = "text-secondary")
 							)
 						),
