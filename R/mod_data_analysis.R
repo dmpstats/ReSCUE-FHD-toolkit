@@ -102,6 +102,18 @@ mod_data_analysis_ui <- function(id) {
 						class = "card border-primary mb-3 bg-light"
 					)
 				)
+			),
+			div(
+				class = "d-flex flex-column align-items-start gap-2 my-3",
+				actionButton(
+					ns("go_data_selection"),
+					label = tagList(
+						bsicons::bs_icon("play-circle"),
+						"Data Selection"
+					),
+					full_screen = TRUE,
+					class = "left-arrow-btn"
+				)
 			)
 		)
 	)
@@ -160,5 +172,17 @@ mod_data_analysis_server <- function(
 				risk_max = input$rotor_max
 			)
 		})
+
+		# React to go to data selection tab --------------
+		observeEvent(
+			input$go_data_selection,
+			{
+				bslib::nav_select(
+					id = nav_id,
+					selected = "nav-data-select",
+					session = parent_session
+				)
+			}
+		)
 	})
 }

@@ -238,7 +238,14 @@ golem_add_external_resources <- function() {
         overflow: visible;
         cursor: pointer; margin: 4px;
       }
-      .arrow-btn:hover { filter: brightness(0.85); }
+			.left-arrow-btn {
+			  background: var(--bs-success); color: var(--bs-white); font-weight: bold;
+				border: none; padding: 12px 20px 12px 30px; font-size: 1.1rem;
+				clip-path: polygon(100% 0, 15% 0, 0 50%, 15% 100%, 100% 100%);
+			  overflow: visible;
+			  cursor: pointer; margin: 4px;
+			}
+      .arrow-btn:hover, .left-arrow-btn:hover { filter: brightness(0.85); }
       .arrow-btn-red {
         background: var(--bs-danger); color: var(--bs-white); font-weight: bold;
         border: none; padding: 6px 14px; font-size: 0.85rem;
