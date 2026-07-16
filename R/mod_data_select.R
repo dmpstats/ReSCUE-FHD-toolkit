@@ -100,13 +100,21 @@ mod_data_select_ui <- function(id) {
 #' @param parent_session The session object of the parent Shiny app. This is required to allow the module to control navigation between tabs.
 #'
 #' @noRd
-mod_data_select_server <- function(id, nav_id = "main-nav", parent_session) {
+mod_data_select_server <- function(
+	id,
+	nav_id = "main-nav",
+	parent_session,
+	restore_payload = NULL
+) {
 	moduleServer(id, function(input, output, session) {
 		ns <- session$ns
 
 		# Data selection sub-modules  ------------
 		# We receive the reactive inputs from each one:
-		map_data <- mod_map_picker_server("map_picker_1")
+		map_data <- mod_map_picker_server(
+			"map_picker_1",
+			restore_payload = restore_payload
+		)
 		table_data <- mod_table_picker_server("table_picker_1")
 		user_data <- mod_user_upload_server("data_upload_1")
 
@@ -168,6 +176,13 @@ mod_data_select_server <- function(id, nav_id = "main-nav", parent_session) {
 		)
 
 		# Return the selected data as a reactive --------
-		return(selected_data)
+		return(
+			list(
+				selected_data = selected_data,
+				map_data = map_data,
+				table_data = table_data,
+				user_data = user_data
+			)
+		)
 	})
 }
