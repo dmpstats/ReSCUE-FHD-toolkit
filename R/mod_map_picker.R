@@ -50,12 +50,23 @@ mod_map_picker_ui <- function(id) {
 
 #' map_picker Server Functions
 #' @noRd
-mod_map_picker_server <- function(id) {
+mod_map_picker_server <- function(id, restore_payload = NULL) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
 
     # Initially, create an empty output reactive
     outdata <- reactiveVal(list())
+
+    # Restore payload if available
+    if (!is.null(restore_payload)) {
+      observeEvent(
+        restore_payload(),
+        {
+          req(restore_payload()$map_data)
+          outdata(restore_payload()$map_data)
+        }
+      )
+    }
 
     # Dummy map: random offshore points around the UK
     set.seed(3847)
