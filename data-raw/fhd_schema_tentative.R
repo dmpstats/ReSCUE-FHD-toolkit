@@ -7,7 +7,11 @@ library(data.tree)
 if (1) {
   fhd_schema <- Node$new("FHD_entry")
 
-  fhd_schema$AddChild("fhd_id", class = "<character>", descr = "Unique ID for the FHD entry")
+  fhd_schema$AddChild(
+    "fhd_id",
+    class = "<character>",
+    descr = "Unique ID for the FHD entry"
+  )
 
   fhd_schema$AddChild("fhd", class = "<list>")
 
@@ -19,6 +23,12 @@ if (1) {
   )
 
   fhd_schema$fhd$AddChild(
+    "covariates",
+    class = "<list>",
+    descr = "Covariates associated with the FHD draws"
+  )
+
+  fhd_schema$fhd$AddChild(
     "summaries",
     class = "<data.frame>",
     descr = "Estimated FHD summary",
@@ -26,7 +36,7 @@ if (1) {
   )
 
   fhd_schema$AddChild("metadata", class = "<list>")
-  
+
   fhd_schema$metadata$AddChild(
     "fhd_id",
     class = "<character>",
