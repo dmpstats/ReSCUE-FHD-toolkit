@@ -14,37 +14,87 @@ mod_data_select_ui <- function(id) {
 			bslib::layout_columns(
 				col_widths = c(6, 6),
 				class = "h-100",
-				bslib::accordion(
-					multiple = FALSE,
-					class = "card border-primary mb-3 bg-light h-80",
-					id = ns("card_data_select"),
-					# Map selection tab ----------
-					bslib::accordion_panel(
-						title = "Map Selection",
-						br(),
-						mod_map_picker_ui(ns("map_picker_1")),
-						class = "bg-light"
+				bslib::card(
+					bslib::card_header(
+						"Select Data",
+						class = "text-bg-primary",
+						bslib::toolbar(
+							bslib::popover(
+								actionButton(
+									ns("advanced_filters"),
+									label = tagList(
+										bsicons::bs_icon("gear"),
+										"Advanced Filters"
+									),
+									# Make this secondary and small
+									class = "btn-outline-secondary btn-sm"
+								),
+								title = "Advanced Filters",
+								"Coming soon: advanced filtering options for selecting datasets.",
+							),
+							mod_help_button_ui(ns("select_data"), type = "toolbar")
+						)
 					),
-
-					# Table selection tab ----------
-					bslib::accordion_panel(
-						title = "Table Selection",
-						br(),
-						mod_table_picker_ui(ns("table_picker_1")),
-						class = "bg-light"
-					),
-
-					# User upload tab ----------
-					bslib::accordion_panel(
-						title = "Data Upload",
-						br(),
-						mod_user_upload_ui(ns("data_upload_1")),
-						class = "bg-light"
-					),
-					# bslib::nav_item(
-					# 	mod_help_button_ui(ns("select_data"))
-					# ),
+					bslib::card_body(
+						bslib::layout_columns(
+							col_widths = c(6, 6),
+							selectizeInput(
+								ns("Species"),
+								label = "Species",
+								choices = c(
+									"All Species" = "all",
+									"Species A" = "species_a",
+									"Species B" = "species_b",
+									"Species C" = "species_c"
+								)
+							),
+							selectizeInput(
+								ns("Season"),
+								label = "Season",
+								choices = c(
+									"All Seasons" = "all",
+									"Spring" = "spring",
+									"Summer" = "summer",
+									"Autumn" = "autumn",
+									"Winter" = "winter"
+								)
+							),
+							row_heights = "50px"
+						),
+						mod_map_picker_ui(ns("map_picker_1"))
+					)
 				),
+				# bslib::accordion(
+				# 	multiple = FALSE,
+				# 	class = "card border-primary mb-3 bg-light h-80",
+				# 	id = ns("card_data_select"),
+				# 	# Map selection tab ----------
+				# 	bslib::accordion_panel(
+				# 		title = "Map Selection",
+				# 		br(),
+				# 		mod_map_picker_ui(ns("map_picker_1")),
+				# 		class = "bg-light"
+				# 	),
+
+				# 	# Table selection tab ----------
+				# 	bslib::accordion_panel(
+				# 		title = "Table Selection",
+				# 		br(),
+				# 		mod_table_picker_ui(ns("table_picker_1")),
+				# 		class = "bg-light"
+				# 	),
+
+				# 	# User upload tab ----------
+				# 	bslib::accordion_panel(
+				# 		title = "Data Upload",
+				# 		br(),
+				# 		mod_user_upload_ui(ns("data_upload_1")),
+				# 		class = "bg-light"
+				# 	),
+				# 	# bslib::nav_item(
+				# 	# 	mod_help_button_ui(ns("select_data"))
+				# 	# ),
+				# ),
 
 				# Right-hand side: show selected data and go to analysis button
 				tagList(
@@ -59,22 +109,21 @@ mod_data_select_ui <- function(id) {
 						),
 						bslib::card_body(DT::DTOutput(ns("show_dt"))),
 						class = "card border-primary mb-3 bg-light",
-						full_screen = TRUE,
-						height = "30vh"
+						full_screen = TRUE
 					),
-					bslib::card(
-						bslib::card_header(
-							"Flight Height Preview",
-							class = "text-bg-primary"
-						),
-						bslib::card_body(
-							div(
-								plotly::plotlyOutput(ns("dummy_plot"), height = "35vh"),
-								class = "rounded-box"
-							)
-						),
-						class = "card border-primary mb-3 bg-light"
-					),
+					# bslib::card(
+					# 	bslib::card_header(
+					# 		"Flight Height Preview",
+					# 		class = "text-bg-primary"
+					# 	),
+					# 	bslib::card_body(
+					# 		div(
+					# 			plotly::plotlyOutput(ns("dummy_plot"), height = "35vh"),
+					# 			class = "rounded-box"
+					# 		)
+					# 	),
+					# 	class = "card border-primary mb-3 bg-light"
+					# ),
 					div(
 						class = "d-flex flex-column align-items-center gap-2 my-3",
 						actionButton(
