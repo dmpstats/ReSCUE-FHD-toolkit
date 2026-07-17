@@ -257,7 +257,9 @@ generate_dummy_data <- function(n_datasets = 10, dir = "data-dummy") {
           region = region,
           site = site,
           sea_area = sea_area,
-          crm_recommended = crm_recommended
+          crm_recommended = crm_recommended,
+          lon = lon,
+          lat = lat
         )
       )
   }
@@ -266,4 +268,8 @@ generate_dummy_data <- function(n_datasets = 10, dir = "data-dummy") {
 }
 
 outdf <- generate_dummy_data(n_datasets = 10, dir = "data-dummy")
+# Delete the previous metadata.csv if it exists
+if (file.exists("data-dummy/metadata.csv")) {
+  file.remove("data-dummy/metadata.csv")
+}
 write.csv(outdf, file = "data-dummy/metadata.csv", row.names = FALSE)
