@@ -7,6 +7,8 @@ library(data.tree)
 if (1) {
   fhd_schema <- Node$new("FHD_entry")
 
+  fhd_schema$AddChild("fhd_id", class = "<character>", descr = "Unique ID for the FHD entry")
+
   fhd_schema$AddChild("fhd", class = "<list>")
 
   fhd_schema$fhd$AddChild(
@@ -24,6 +26,12 @@ if (1) {
   )
 
   fhd_schema$AddChild("metadata", class = "<list>")
+  
+  fhd_schema$metadata$AddChild(
+    "fhd_id",
+    class = "<character>",
+    descr = "Unique ID for the FHD entry"
+  )
 
   fhd_schema$metadata$AddChild(
     "data_source",
