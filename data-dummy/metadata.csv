@@ -1,0 +1,11 @@
+"fhd_id","species_id","name_common","name_scientific","group","method","spatial_scale","temporal_scale","month","season","year","country","region","site","sea_area","crm_recommended"
+"Shag_England_I_Isle.rds","species_shag","Shag","Alcidae_cristata","diver","Altimeter","regional","seasonal",1,"nonbreeding, breeding",2006,"UK","England","I Isle","IVa",FALSE
+"Guillemot_Scotland_U_Isle.rds","species_guillemot","Guillemot","Aves_guillemot","auk","GPS","regional","seasonal",7,"breeding",2012,"UK","Scotland","U Isle","VIa",TRUE
+"Guillemot_Scotland_L_Point.rds","species_guillemot","Guillemot","Fratercula_arctica","gull","LiDAR-DAS","national","monthly",3,"nonbreeding",2012,"UK","Scotland","L Point","IVc",TRUE
+"Shag_England_N_Bay.rds","species_shag","Shag","Uria_arctica","diver","GPS","national","monthly",3,"breeding",2020,"UK","England","N Bay","IVb",TRUE
+"Puffin_Northern_Ireland_J_Isle.rds","species_puffin","Puffin","Cepphus_arctica","seaduck","Altimeter","site-specific","annual",8,"nonbreeding",2011,"UK","Northern Ireland","J Isle","IVc",FALSE
+"Shag_England_X_Isle.rds","species_shag","Shag","Alcidae_alca","seaduck","LiDAR-DAS","national","monthly",6,"nonbreeding",2017,"UK","England","X Isle","VIa",FALSE
+"Guillemot_Northern_Ireland_F_Head.rds","species_guillemot","Guillemot","Fratercula_arctica","seaduck","GPS","national","seasonal",9,"nonbreeding, breeding",2006,"UK","Northern Ireland","F Head","IVa",FALSE
+"Great Northern Diver_Wales_F_Head.rds","species_great_northern_diver","Great Northern Diver","Uria_guillemot","gull","Altimeter","national","monthly",8,"breeding",2013,"UK","Wales","F Head","IVa",FALSE
+"Puffin_UK_K_Head.rds","species_puffin","Puffin","Aves_cristata","tern","GPS","site-specific","annual",10,"nonbreeding, breeding",2015,"UK","UK","K Head","IVc",TRUE
+"Great Northern Diver_Northern_Ireland_C_Bay.rds","species_great_northern_diver","Great Northern Diver","Cepphus_alca","auk","Altimeter","regional","seasonal",2,"breeding, nonbreeding",2014,"UK","Northern Ireland","C Bay","IVb",FALSE

@@ -17,6 +17,8 @@ generate_dummy_data <- function(n_datasets = 10, dir = "data-dummy") {
     }
   }
 
+  metadata_df <- data.frame()
+
   for (i in 1:n_datasets) {
     # We will generate a random FHD entry following the structure of the schema defined in fhd_schema_tentative.R.
     # First, we'll randomly sample a species:
@@ -236,9 +238,32 @@ generate_dummy_data <- function(n_datasets = 10, dir = "data-dummy") {
         paste0(fhd_uuid, ".rds")
       )
     )
+
+    metadata_df <- metadata_df |>
+      dplyr::bind_rows(
+        data.frame(
+          fhd_id = fhd_uuid,
+          species_id = species_id,
+          name_common = name_common,
+          name_scientific = name_scientific,
+          group = group,
+          method = method,
+          spatial_scale = spatial_scale,
+          temporal_scale = temporal_scale,
+          month = month,
+          season = paste(seasons, collapse = ", "),
+          year = year,
+          country = "UK",
+          region = region,
+          site = site,
+          sea_area = sea_area,
+          crm_recommended = crm_recommended
+        )
+      )
   }
 
-  invisible(NULL)
+  return(metadata_df)
 }
 
-generate_dummy_data(n_datasets = 10, dir = "data-dummy")
+outdf <- generate_dummy_data(n_datasets = 10, dir = "data-dummy")
+write.csv(outdf, file = "data-dummy/metadata.csv", row.names = FALSE)
