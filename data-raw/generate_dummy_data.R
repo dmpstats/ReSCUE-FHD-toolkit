@@ -34,9 +34,6 @@ generate_dummy_data <- function(n_datasets = 10, dir = "data-dummy") {
     )
     species_id <- paste0("species_", gsub(" ", "_", tolower(species)))
 
-    # And generate a unique ID for this FHD:
-    fhd_uuid <- paste0("fhd_", uuid::UUIDgenerate())
-
     # Capitalise the name for name_common
     name_common <- tools::toTitleCase(species)
 
@@ -84,7 +81,7 @@ generate_dummy_data <- function(n_datasets = 10, dir = "data-dummy") {
     sea_area <- sample(c("IVa", "IVb", "IVc", "VIa", "VIIe"), 1)
     site <- paste(
       sample(LETTERS, 1),
-      sample(c("Point", "Head", "Isle", "Bay")),
+      sample(c("Point", "Head", "Isle", "Bay"), 1),
       sep = " "
     )
 
@@ -102,6 +99,16 @@ generate_dummy_data <- function(n_datasets = 10, dir = "data-dummy") {
       ),
       # We might have one or none
       sample(c(0, 1, 1), 1)
+    )
+
+    # And generate a unique ID for this FHD:
+    fhd_uuid <- paste0(
+      species,
+      "_",
+      stringr::str_replace_all(region, " ", "_"),
+      "_",
+      stringr::str_replace_all(site, " ", "_"),
+      ".rds"
     )
 
     # Now, we'll randomly generate a number of draws/iterations for the FHD, somewhere between 100 and 1000:
@@ -222,7 +229,13 @@ generate_dummy_data <- function(n_datasets = 10, dir = "data-dummy") {
       )
     )
 
-    saveRDS(fhd_entry, file = file.path(dir, paste0(fhd_uuid, ".rds")))
+    saveRDS(
+      fhd_entry,
+      file = file.path(
+        dir,
+        paste0(fhd_uuid, ".rds")
+      )
+    )
   }
 
   invisible(NULL)
