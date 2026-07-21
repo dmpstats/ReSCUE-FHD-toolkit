@@ -10,7 +10,11 @@
 library(tools)
 library(sf)
 
-generate_dummy_data <- function(n_datasets = 10, dir = "data-dummy") {
+generate_dummy_data <- function(
+  n_datasets = 10,
+  dir = "data-dummy",
+  seed = 1234
+) {
   draws_dir <- file.path(dir, "draws")
   metadata_dir <- file.path(dir, "metadata")
 
@@ -22,6 +26,43 @@ generate_dummy_data <- function(n_datasets = 10, dir = "data-dummy") {
       if (length(rds_files) > 0) file.remove(rds_files)
     }
   }
+
+  # define list of (strictly-categorical) covariates with pre-defined levels (i.e. do not
+  # vary over simulations)
+  covar_list <- list(
+    wind_speed = list(
+      label = "Wind Speed",
+      type = "factor",
+      levels = c("low", "medium", "high"),
+      blurb = "Simulated wind speed covariate"
+    ),
+    wind_direction = list(
+      label = "Wind Direction",
+      type = "factor",
+      levels = c("north", "south", "east", "west"),
+      blurb = "Simulated wind direction covariate"
+    ),
+    temperature = list(
+      label = "Temperature",
+      type = "factor",
+      levels = c("hot", "mild", "freezing"),
+      blurb = "Simulated temperature covariate"
+    ),
+    daytime = list(
+      label = "Daytime",
+      type = "logical",
+      levels = c(TRUE, FALSE),
+      blurb = "Simulated daytime covariate"
+    ),
+    precipitation = list(
+      label = "Precipitation",
+      type = "factor",
+      levels = c("rain", "snow", "none"),
+      blurb = "Simulated precipitation covariate"
+    )
+  )
+
+  set.seed(seed)
 
   for (i in seq_len(n_datasets)) {
     # ------------------------------------------------------------------
@@ -78,34 +119,17 @@ generate_dummy_data <- function(n_datasets = 10, dir = "data-dummy") {
     # ------------------------------------------------------------------
     # Covariates (nested; kept outside flat structure by design)
     # ------------------------------------------------------------------
-    cov_names <- sample(
-      c(
-        "wind_speed",
-        "wind_direction",
-        "temperature",
-        "humidity",
-        "precipitation"
-      ),
-      sample(c(0, 1, 1), 1)
-    )
+
+    # sample which covariates to include from pre-defined list
+    covar_idx <- sample(1:length(covar_list), sample(0:3, 1))
 
     # Use NULL (not list()) when there are no covariates: bind_rows treats
     # NULL list-column entries as NA and keeps the row, whereas list() causes
     # silent row-dropping when mixed with non-empty covariate lists.
-    covariates <- if (length(cov_names) == 0) {
+    covariates <- if (length(covar_idx) == 0) {
       NULL
     } else {
-      setNames(
-        lapply(cov_names, function(cov) {
-          list(
-            label = cov,
-            type = "numeric",
-            levels = NULL,
-            blurb = paste("Simulated", cov, "covariate")
-          )
-        }),
-        cov_names
-      )
+      covar_list[covar_idx]
     }
 
     # ------------------------------------------------------------------
@@ -122,16 +146,21 @@ generate_dummy_data <- function(n_datasets = 10, dir = "data-dummy") {
     # ------------------------------------------------------------------
     # Build draws data frame
     # ------------------------------------------------------------------
-    n_iter <- sample(100:1000, 1)
-    max_height <- sample(50:200, 1)
+    n_iter <- sample(100:500, 1)
+    max_height <- sample(50:300, 1)
 
     grid_list <- list(
       draw_id = 1:n_iter,
       height = seq(0, max_height, length.out = 100) + 0.5
     )
-    for (cov in cov_names) {
-      cov_max <- sample(0:100, 1)
-      grid_list[[cov]] <- seq(0, cov_max, by = 1)
+
+    # for (cov in cov_names) {
+    #   cov_max <- sample(0:100, 1)
+    #   grid_list[[cov]] <- seq(0, cov_max, by = 1)
+    # }
+
+    for (cov in names(covariates)) {
+      grid_list[[cov]] <- covariates[[cov]]$levels
     }
 
     draws <- do.call(
@@ -152,6 +181,11 @@ generate_dummy_data <- function(n_datasets = 10, dir = "data-dummy") {
     )
     draws$meanlog <- NULL
     draws$sdlog <- NULL
+
+    # order by height, for each draw_it and covariates combination (if any)
+    draws <- draws[
+      do.call(order, draws[c(names(covariates), "draw_id", "height")]),
+    ]
 
     # ------------------------------------------------------------------
     # Flat metadata list  (covariates remain nested)
@@ -208,6 +242,20 @@ metadata_files <- list.files(
   pattern = "\\.rds$",
   full.names = TRUE
 )
+
 metadata_list <- lapply(metadata_files, readRDS)
-metadata_df <- dplyr::bind_rows(metadata_list)
-metadata_df
+
+# below is slightly hacky, but needed to ensure that covariates are always a list (even
+# if NULL) so that row-binding works. there should be 1-row per fhd entry
+metadata_tbl <- metadata_list |>
+  # need to nest covariates list into a higher-level list so that list-columns are
+  # preserved
+  purrr::map(
+    function(x) {
+      #browser()
+      x$covariates <- list(x$covariates %||% NULL)
+      x
+    }
+  ) |>
+  purrr::map(tibble::as_tibble_row) |>
+  purrr::list_rbind()
