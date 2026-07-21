@@ -14,36 +14,60 @@ mod_data_select_ui <- function(id) {
 			bslib::layout_columns(
 				col_widths = c(6, 6),
 				class = "h-100",
-				bslib::accordion(
-					multiple = FALSE,
-					class = "card border-primary mb-3 bg-light h-80",
-					id = ns("card_data_select"),
-					# Map selection tab ----------
-					bslib::accordion_panel(
-						title = "Map Selection",
-						br(),
-						mod_map_picker_ui(ns("map_picker_1")),
-						class = "bg-light"
-					),
 
-					# Table selection tab ----------
-					bslib::accordion_panel(
-						title = "Table Selection",
-						br(),
-						mod_table_picker_ui(ns("table_picker_1")),
-						class = "bg-light"
+				bslib::card(
+					bslib::card_header(
+						"Data Selection",
+						class = "text-bg-primary",
+						bslib::toolbar(
+							bslib::popover(
+								actionButton(
+									ns("advanced_filters"),
+									label = tagList(
+										bsicons::bs_icon("funnel"),
+										"Advanced Filters"
+									),
+									class = "btn btn-light btn-sm"
+								),
+								p("We will import extended filters here.")
+							),
+							mod_help_button_ui(ns("select_data"), type = "toolbar")
+						)
 					),
-
-					# User upload tab ----------
-					bslib::accordion_panel(
-						title = "Data Upload",
-						br(),
-						mod_user_upload_ui(ns("data_upload_1")),
-						class = "bg-light"
+					bslib::card_body(
+						fluidRow(
+							selectizeInput(
+								ns("species"),
+								label = "Species",
+								choices = c("Dummy", "Dummy2"),
+								width = "33%"
+							),
+							selectizeInput(
+								ns("method"),
+								label = "Method",
+								choices = c("Dummy", "Dummy2"),
+								multiple = TRUE,
+								width = "33%"
+							),
+							selectizeInput(
+								ns("season"),
+								label = "Season",
+								choices = c(
+									"Breeding" = "breeding",
+									"Non-breeding" = "non_breeding",
+									"Both" = "both"
+								),
+								selected = "both",
+								width = "33%"
+							)
+						 
+						),
+						div(
+							leaflet::leafletOutput(ns("source_map"), height = "60vh"),
+							class = "rounded-box"
+						),
 					),
-					# bslib::nav_item(
-					# 	mod_help_button_ui(ns("select_data"))
-					# ),
+					class = "card border-primary mb-3 bg-light",
 				),
 
 				# Right-hand side: show selected data and go to analysis button
@@ -62,21 +86,17 @@ mod_data_select_ui <- function(id) {
 						full_screen = TRUE,
 						height = "30vh"
 					),
-					bslib::card(
-						bslib::card_header(
-							"Flight Height Preview",
-							class = "text-bg-primary"
-						),
-						bslib::card_body(
-							div(
-								plotly::plotlyOutput(ns("dummy_plot"), height = "35vh"),
-								class = "rounded-box"
-							)
-						),
-						class = "card border-primary mb-3 bg-light"
-					),
-					div(
-						class = "d-flex flex-column align-items-center gap-2 my-3",
+					bslib::layout_columns(
+						col_widths = c(6, 6),
+						actionButton(
+							ns("Upload Data"),
+							label = tagList(
+								bsicons::bs_icon("cloud-upload"),
+								"Upload Data"
+							),
+							class = "not-arrow-btn"
+						) |>
+							bslib::tooltip("Upload your own flight-height dataset of a suitable format."),
 						actionButton(
 							ns("go_analysis"),
 							label = tagList(
@@ -104,68 +124,83 @@ mod_data_select_server <- function(
 	id,
 	nav_id = "main-nav",
 	parent_session,
+	metadata_tbl,
 	restore_payload = NULL
 ) {
 	moduleServer(id, function(input, output, session) {
 		ns <- session$ns
 
 		# Data selection sub-modules  ------------
-		# We receive the reactive inputs from each one:
-		map_data <- mod_map_picker_server(
-			"map_picker_1",
-			restore_payload = restore_payload
-		)
-		table_data <- mod_table_picker_server("table_picker_1")
-		user_data <- mod_user_upload_server("data_upload_1")
 
-		# Helpfile modules
-		mod_help_button_server("select_data", help_file = "select_data", size = "l")
+		## Adjusting filters to input data
+		observe({
+			# Species filter
+			updateSelectizeInput(
+				session = session,
+				inputId = "species",
+				choices = unique(metadata_tbl$Species),
+				selected = unique(metadata_tbl$Species)[1],
+				server = TRUE
+			)
+			# Method filter
+			updateSelectizeInput(
+				session = session,
+				inputId = "method",
+				choices = unique(metadata_tbl$method),
+				selected = unique(metadata_tbl$method)[1],
+				server = TRUE
+			)
+		})
 
-		# Stack these and render them on the RHS
-		selected_data <- reactive({
-			dplyr::bind_rows(
-				map_data(),
-				table_data(),
-				user_data()
+		## Generate map 
+		output$source_map <- leaflet::renderLeaflet({
+      map <- leaflet::leaflet(
+				options = leaflet::leafletOptions(
+					attributionControl=FALSE,
+					zoomControl = FALSE,
+					minZoom = 3
+				)
 			) |>
-				dplyr::select(
-					dplyr::any_of(
-						c("species_id", "method", "region", "season")
+        leaflet::addProviderTiles(leaflet::providers$CartoDB.DarkMatter) |>
+        leaflet::setView(lng = -3.5, lat = 56, zoom = 5) |>
+				# Add markers for the metadata coords
+				leaflet::addCircleMarkers(
+					data = metadata_tbl,
+					lng = ~lon,
+					lat = ~lat,
+					layerId = ~fhd_id,
+					radius = 10,
+					color = "black",
+					fillColor = "grey",
+					fillOpacity = 0.8,
+					weight = 1,
+					label = ~ paste0(
+						"<div style='width: 200px;'>",
+						"<strong>",
+						species_id,
+						"</strong><br/>",
+						"Season: ",
+						season,
+						"<br/>",
+						"<button class='map-add-btn' data-row='",
+						i,
+						"' type='button' class='btn btn-sm btn-primary' style='margin-top: 8px; width: 100%;'>Add Entry</button>",
+						"</div>"
 					)
 				)
+			
 		})
-		output$show_dt <- DT::renderDataTable(
-			{
-				selected_data()
-			},
-			options = list(
-				paging = FALSE,
-				searching = FALSE,
-				info = FALSE,
-				scrollY = "200px",
-				scrollCollapse = TRUE
-			)
-		)
 
-		# For now, plot a dummy flight-height preview
-		output$dummy_plot <- plotly::renderPlotly({
-			dumdat <- dummy_fheight_dists(max_height = 100, seed = 123, n = 1)
-			dummy_fheight_plot(dumdat, risk_min = NULL, risk_max = NULL)
-		})
+		# Dynamically add circleMarkers 
+		
 
 		# React to next-page button --------------
 		observeEvent(
 			input$go_analysis,
 			{
 				# If the user has not selected any data, show a modal warning
-				if (is.null(selected_data()) | nrow(selected_data()) == 0) {
-					shiny::showNotification(
-						"No data selected!",
-						type = "error",
-						duration = 3
-					)
-					return()
-				}
+				
+				# ADD THIS LATER
 
 				bslib::nav_select(
 					id = nav_id,
@@ -178,10 +213,7 @@ mod_data_select_server <- function(
 		# Return the selected data as a reactive --------
 		return(
 			list(
-				selected_data = selected_data,
-				map_data = map_data,
-				table_data = table_data,
-				user_data = user_data
+				
 			)
 		)
 	})

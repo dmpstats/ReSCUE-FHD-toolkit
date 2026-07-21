@@ -13,6 +13,12 @@ app_server <- function(input, output, session) {
 		readRDS(input$restore_file$datapath)
 	})
 
+	# Call the top-level metadata
+	metadata <- read.csv(
+		"data-dummy/metadata.csv", # placeholder dataset
+		stringsAsFactors = FALSE
+	)
+
 	# Modules -----------------
 
 	mod_landing_page_server(
@@ -25,6 +31,7 @@ app_server <- function(input, output, session) {
 		"data_select",
 		nav_id = "main-nav",
 		parent_session = session,
+		metadata_tbl = metadata,
 		restore_payload = restore_payload
 	)
 
