@@ -80,7 +80,7 @@ mod_data_select_ui <- function(id) {
 								mod_help_button_ui(ns("select_data"), type = "toolbar")
 							)
 						),
-						bslib::card_body(DT::DTOutput(ns("show_dt"))),
+						bslib::card_body(DT::DTOutput(ns("show_selected"))),
 						class = "card border-primary mb-3 bg-light",
 						full_screen = TRUE,
 						height = "30vh"
@@ -170,28 +170,56 @@ mod_data_select_server <- function(
 					lng = ~lon,
 					lat = ~lat,
 					layerId = ~fhd_id,
-					radius = 10,
-					color = "black",
-					fillColor = "grey",
-					fillOpacity = 0.8,
-					weight = 1
-					# label = ~ paste0(
-					# 	"<div style='width: 200px;'>",
-					# 	"<strong>",
-					# 	species_id,
-					# 	"</strong><br/>",
-					# 	"Season: ",
-					# 	season,
-					# 	"<br/>",
-					# 	"<button class='map-add-btn' data-row='",
-					# 	i,
-					# 	"' type='button' class='btn btn-sm btn-primary' style='margin-top: 8px; width: 100%;'>Add Entry</button>",
-					# 	"</div>"
-					# )
+					popup = ~ paste0(
+						"<div style='width:200px;'>",
+						"<strong>",
+						species_id,
+						"</strong><br/>",
+						"Season: ",
+						season,
+						"<br/>",
+						"<button ",
+						"onclick=\"Shiny.setInputValue('",
+						ns("map_add_btn"),
+						"', '",
+						fhd_id,
+						"', {priority:'event'})\" ",
+						"class='btn btn-sm btn-primary' ",
+						"style='margin-top:8px;width:100%;'>",
+						"Add Entry",
+						"</button>",
+						"</div>"
+					)
 				)
 		})
 
-		# Dynamically add circleMarkers
+		selected_ids <- reactiveVal(character(0))
+
+		observeEvent(input$map_add_btn, {
+			clicked <- input$map_add_btn
+			current <- selected_ids()
+			if (clicked %in% current) {
+				selected_ids(setdiff(current, clicked)) # deselect
+			} else {
+				selected_ids(c(current, clicked)) # select
+			}
+		})
+
+		# Render a table of the selected data ------
+
+		output$show_selected <- DT::renderDT({
+			selected_data <- metadata_tbl[metadata_tbl$fhd_id %in% selected_ids(), ]
+			DT::datatable(
+				selected_data,
+				options = list(
+					pageLength = 5,
+					lengthChange = FALSE,
+					searching = FALSE,
+					info = FALSE
+				),
+				rownames = FALSE
+			)
+		})
 
 		# React to next-page button --------------
 		observeEvent(
@@ -211,7 +239,12 @@ mod_data_select_server <- function(
 
 		# Return the selected data as a reactive --------
 		return(
-			list()
+			list(
+				selected_data = reactive({
+					metadata_tbl[metadata_tbl$fhd_id %in% selected_ids(), ]
+				}),
+				uploaded_data = NULL
+			)
 		)
 	})
 }
