@@ -3,6 +3,7 @@
 export(run_app)
 import(bslib)
 import(conductor)
+import(sf)
 import(shiny)
 importFrom(conductor,Conductor)
 importFrom(golem,activate_js)

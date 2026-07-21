@@ -3,6 +3,7 @@
 #' @param input,output,session Internal parameters for {shiny}.
 #'     DO NOT REMOVE.
 #' @import conductor
+#' @import sf
 #' @noRd
 app_server <- function(input, output, session) {
 	# Track Mode and switch when required
@@ -14,10 +15,13 @@ app_server <- function(input, output, session) {
 	})
 
 	# Call the top-level metadata
-	metadata <- read.csv(
-		"data-dummy/metadata.csv", # placeholder dataset
-		stringsAsFactors = FALSE
-	)
+	metadata <- list.files(
+		"data-dummy/metadata",
+		pattern = "\\.rds$",
+		full.names = TRUE
+	) |>
+		lapply(readRDS) |>
+		dplyr::bind_rows()
 
 	# Modules -----------------
 

@@ -60,7 +60,6 @@ mod_data_select_ui <- function(id) {
 								selected = "both",
 								width = "33%"
 							)
-						 
 						),
 						div(
 							leaflet::leafletOutput(ns("source_map"), height = "60vh"),
@@ -96,7 +95,9 @@ mod_data_select_ui <- function(id) {
 							),
 							class = "not-arrow-btn"
 						) |>
-							bslib::tooltip("Upload your own flight-height dataset of a suitable format."),
+							bslib::tooltip(
+								"Upload your own flight-height dataset of a suitable format."
+							),
 						actionButton(
 							ns("go_analysis"),
 							label = tagList(
@@ -152,17 +153,17 @@ mod_data_select_server <- function(
 			)
 		})
 
-		## Generate map 
+		## Generate map
 		output$source_map <- leaflet::renderLeaflet({
-      map <- leaflet::leaflet(
+			map <- leaflet::leaflet(
 				options = leaflet::leafletOptions(
-					attributionControl=FALSE,
+					attributionControl = FALSE,
 					zoomControl = FALSE,
 					minZoom = 3
 				)
 			) |>
-        leaflet::addProviderTiles(leaflet::providers$CartoDB.DarkMatter) |>
-        leaflet::setView(lng = -3.5, lat = 56, zoom = 5) |>
+				leaflet::addProviderTiles(leaflet::providers$CartoDB.DarkMatter) |>
+				leaflet::setView(lng = -3.5, lat = 56, zoom = 5) |>
 				# Add markers for the metadata coords
 				leaflet::addCircleMarkers(
 					data = metadata_tbl,
@@ -173,33 +174,31 @@ mod_data_select_server <- function(
 					color = "black",
 					fillColor = "grey",
 					fillOpacity = 0.8,
-					weight = 1,
-					label = ~ paste0(
-						"<div style='width: 200px;'>",
-						"<strong>",
-						species_id,
-						"</strong><br/>",
-						"Season: ",
-						season,
-						"<br/>",
-						"<button class='map-add-btn' data-row='",
-						i,
-						"' type='button' class='btn btn-sm btn-primary' style='margin-top: 8px; width: 100%;'>Add Entry</button>",
-						"</div>"
-					)
+					weight = 1
+					# label = ~ paste0(
+					# 	"<div style='width: 200px;'>",
+					# 	"<strong>",
+					# 	species_id,
+					# 	"</strong><br/>",
+					# 	"Season: ",
+					# 	season,
+					# 	"<br/>",
+					# 	"<button class='map-add-btn' data-row='",
+					# 	i,
+					# 	"' type='button' class='btn btn-sm btn-primary' style='margin-top: 8px; width: 100%;'>Add Entry</button>",
+					# 	"</div>"
+					# )
 				)
-			
 		})
 
-		# Dynamically add circleMarkers 
-		
+		# Dynamically add circleMarkers
 
 		# React to next-page button --------------
 		observeEvent(
 			input$go_analysis,
 			{
 				# If the user has not selected any data, show a modal warning
-				
+
 				# ADD THIS LATER
 
 				bslib::nav_select(
@@ -212,9 +211,7 @@ mod_data_select_server <- function(
 
 		# Return the selected data as a reactive --------
 		return(
-			list(
-				
-			)
+			list()
 		)
 	})
 }
