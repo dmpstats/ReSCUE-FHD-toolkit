@@ -71,8 +71,7 @@ mod_data_select_ui <- function(id) {
 									label = "Season",
 									choices = c(
 										"Breeding" = "breeding",
-										"Non-breeding" = "non_breeding",
-										"Both" = "both"
+										"Non-breeding" = "non_breeding"
 									),
 									multiple = TRUE
 								)
@@ -113,7 +112,7 @@ mod_data_select_ui <- function(id) {
 						height = "30vh"
 					),
 					bslib::layout_columns(
-						col_widths = c(6, 6),
+						col_widths = c(4, 4, 4),
 						actionButton(
 							ns("Upload Data"),
 							label = tagList(
@@ -124,6 +123,17 @@ mod_data_select_ui <- function(id) {
 						) |>
 							bslib::tooltip(
 								"Upload your own flight-height dataset of a suitable format."
+							),
+						actionButton(
+							ns("download_data"),
+							label = tagList(
+								bsicons::bs_icon("cloud-download"),
+								"Download Data"
+							),
+							class = "not-arrow-btn"
+						) |>
+							bslib::tooltip(
+								"Download the selected flight-height datasets before analysis."
 							),
 						actionButton(
 							ns("go_analysis"),
