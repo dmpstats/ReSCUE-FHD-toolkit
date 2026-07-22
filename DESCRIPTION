@@ -26,6 +26,8 @@ Imports:
     cli,
     config,
     dplyr,
+    purrr,
+    tibble,
     DT,
     golem,
     htmltools,

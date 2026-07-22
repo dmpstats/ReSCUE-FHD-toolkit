@@ -127,7 +127,6 @@ mod_data_analysis_ui <- function(id) {
 #' @param nav_id The ID of the parent navigation bar (e.g., "main-nav"). This is required to allow the module to control navigation between tabs.
 #' @param parent_session The session object of the parent Shiny app. This is required to allow the module to control navigation between tabs.
 #'
-#'
 #' @noRd
 mod_data_analysis_server <- function(
 	id,
@@ -143,7 +142,19 @@ mod_data_analysis_server <- function(
 		# Render the dummy data passed from the previous
 		output$dummy_dt <- DT::renderDataTable(
 			{
-				selected_data$metadata
+				selected_data$metadata |>
+					dplyr::select(
+						name_common,
+						method,
+						spatial_scale,
+						temporal_scale,
+						season,
+						year,
+						region,
+						site,
+						group,
+						input_type
+					)
 			},
 			options = list(
 				paging = FALSE,
