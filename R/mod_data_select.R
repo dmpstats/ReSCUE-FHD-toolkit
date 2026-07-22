@@ -11,12 +11,26 @@ mod_data_select_ui <- function(id) {
 	tagList(
 		tags$head(tags$style(
 			type = "text/css",
-			paste0(
-				".selectize-dropdown {
-                                                     bottom: 100% !important;
-                                                     top:auto!important;
-                                                 }}"
-			)
+			"
+			/* Make dropdowns open upward for footer filters */
+			.shiny-input-container:has(#data_select-species) .selectize-dropdown,
+			.shiny-input-container:has(#data_select-method) .selectize-dropdown,
+			.shiny-input-container:has(#data_select-season) .selectize-dropdown {
+				bottom: 100% !important;
+				top: auto !important;
+			}
+			/* Allow default_species dropdown to escape container and open normally */
+			.overflow-visible {
+				overflow: visible !important;
+			}
+			.shiny-input-container:has(#data_select-default_species) .selectize-dropdown {
+				bottom: auto !important;
+				top: 100% !important;
+			}
+			.bslib-card, .tab-content, .tab-pane, .card-body {
+      overflow: visible !important;
+    }
+			"
 		)),
 		bslib::page_fillable(
 			bslib::layout_columns(
@@ -114,6 +128,44 @@ mod_data_select_ui <- function(id) {
 
 				# Right-hand side: show selected data and go to analysis button
 				tagList(
+					bslib::card(
+						max_height = "15vh",
+						class = "overflow-visible",
+						bslib::card_body(
+							# Left-side: some text
+							bslib::layout_columns(
+								col_widths = c(8, 4),
+								HTML(
+									"If you are running the analysis for a single species, and want to use the recommended defaults, you can do so here.<br><br> This will auto-load the recommended flight-height distribution for the selected species, and will override any other selections."
+								),
+								tagList(
+									# This selectizeInput should drop downwards, unlike the others
+									selectizeInput(
+										ns("default_species"),
+										label = "Select Species",
+										choices = c(
+											"Puffin",
+											"Razorbill",
+											"Guillemot",
+											"Gannet",
+											"Shag",
+											"Kittiwake",
+											"Fulmar"
+										),
+										multiple = FALSE
+									),
+									actionButton(
+										ns("load_defaults"),
+										label = tagList(
+											bsicons::bs_icon("play-circle"),
+											"Load Defaults"
+										),
+										class = "not-arrow-btn"
+									)
+								)
+							)
+						)
+					),
 					bslib::card(
 						bslib::card_header(
 							"Selected Data",

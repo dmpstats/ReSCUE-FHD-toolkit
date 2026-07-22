@@ -86,7 +86,8 @@ mod_data_analysis_ui <- function(id) {
 						id = ns("card_fhdplot"),
 						bslib::card_header(
 							"Flight Height Distribution",
-							class = "text-bg-primary"
+							class = "text-bg-primary",
+							bslib::toolbar_spacer()
 						),
 						bslib::card_body(
 							plotly::plotlyOutput(ns("dummy_plot")),
