@@ -10,68 +10,95 @@
 mod_data_select_ui <- function(id) {
 	ns <- NS(id)
 	tagList(
+		tags$head(tags$style(
+			type = "text/css",
+			paste0(
+				".selectize-dropdown {
+                                                     bottom: 100% !important;
+                                                     top:auto!important;
+                                                 }}"
+			)
+		)),
 		bslib::page_fillable(
 			bslib::layout_columns(
 				col_widths = c(6, 6),
 				class = "h-100",
-
 				bslib::card(
+					class = "card border-primary mb-3 bg-light",
 					bslib::card_header(
 						"Data Selection",
 						class = "text-bg-primary",
 						bslib::toolbar(
-							bslib::popover(
+							mod_help_button_ui(ns("select_data"), type = "toolbar")
+						)
+					),
+					bslib::card_body(
+						leaflet::leafletOutput(
+							ns("source_map"),
+							# Fill the remainder of the space
+							height = "75vh"
+						),
+						class = "p-0"
+					),
+					bslib::card_footer(
+						fluidRow(
+							column(
+								3,
+								selectizeInput(
+									ns("species"),
+									label = "Species",
+									choices = NULL,
+									multiple = TRUE,
+									options = list(
+										hideSelected = FALSE,
+										remove_button = TRUE
+									)
+								)
+							),
+							column(
+								3,
+								selectizeInput(
+									ns("method"),
+									label = "Method",
+									choices = NULL,
+									multiple = TRUE
+								)
+							),
+							column(
+								3,
+								selectizeInput(
+									ns("season"),
+									label = "Season",
+									choices = c(
+										"Breeding" = "breeding",
+										"Non-breeding" = "non_breeding",
+										"Both" = "both"
+									),
+									multiple = TRUE
+								)
+							),
+							column(
+								3,
+								class = "d-flex align-items-center justify-content-center",
 								actionButton(
 									ns("advanced_filters"),
 									label = tagList(
 										bsicons::bs_icon("funnel"),
 										"Advanced Filters"
 									),
-									class = "btn btn-light btn-sm"
-								),
-								p("We will import extended filters here.")
-							),
-							mod_help_button_ui(ns("select_data"), type = "toolbar")
-						)
-					),
-					bslib::card_body(
-						fluidRow(
-							selectizeInput(
-								ns("species"),
-								label = "Species",
-								choices = c("Dummy", "Dummy2"),
-								width = "33%"
-							),
-							selectizeInput(
-								ns("method"),
-								label = "Method",
-								choices = c("Dummy", "Dummy2"),
-								multiple = TRUE,
-								width = "33%"
-							),
-							selectizeInput(
-								ns("season"),
-								label = "Season",
-								choices = c(
-									"Breeding" = "breeding",
-									"Non-breeding" = "non_breeding",
-									"Both" = "both"
-								),
-								selected = "both",
-								width = "33%"
+									class = "btn btn-dark w-100"
+								) |>
+									bslib::popover(
+										p("We will import extended filters here."),
+										placement = "top"
+									)
 							)
-						),
-						div(
-							leaflet::leafletOutput(ns("source_map"), height = "60vh"),
-							class = "rounded-box"
-						),
-					),
-					class = "card border-primary mb-3 bg-light",
+						)
+					)
 				),
 
 				# Right-hand side: show selected data and go to analysis button
 				tagList(
-					# 12,
 					bslib::card(
 						bslib::card_header(
 							"Selected Data",
@@ -119,6 +146,8 @@ mod_data_select_ui <- function(id) {
 #' @param id Module ID
 #' @param nav_id The ID of the parent navigation bar (e.g., "main-nav"). This is required to allow the module to control navigation between tabs.
 #' @param parent_session The session object of the parent Shiny app. This is required to allow the module to control navigation between tabs.
+#' @param metadata_tbl Data frame of all available FHD metadata.
+#' @param restore_payload Optional reactive carrying a previously saved session payload.
 #'
 #' @noRd
 mod_data_select_server <- function(
@@ -131,31 +160,50 @@ mod_data_select_server <- function(
 	moduleServer(id, function(input, output, session) {
 		ns <- session$ns
 
-		# Data selection sub-modules  ------------
-
-		## Adjusting filters to input data
+		# ── Filter choices (data-driven) ────────────────────────────────────────
 		observe({
-			# Species filter
 			updateSelectizeInput(
-				session = session,
-				inputId = "species",
-				choices = unique(metadata_tbl$Species),
-				selected = unique(metadata_tbl$Species)[1],
+				session,
+				"species",
+				choices = unique(metadata_tbl$species_id),
+				selected = character(0),
 				server = TRUE
 			)
-			# Method filter
 			updateSelectizeInput(
-				session = session,
-				inputId = "method",
+				session,
+				"method",
 				choices = unique(metadata_tbl$method),
-				selected = unique(metadata_tbl$method)[1],
+				selected = character(0),
 				server = TRUE
 			)
 		})
 
-		## Generate map
+		# ── Single source of truth: which fhd_ids are selected ──────────────────
+		selected_ids <- reactiveVal(character(0))
+
+		# ── Filtered data: shared by map and DT ─────────────────────────────────
+		# Empty selection for a filter = no constraint applied for that dimension.
+		filtered_data <- reactive({
+			data <- metadata_tbl
+			if (length(input$species) > 0) {
+				data <- dplyr::filter(data, species_id %in% input$species)
+			}
+			if (length(input$method) > 0) {
+				data <- dplyr::filter(data, method %in% input$method)
+			}
+			if (length(input$season) > 0) {
+				data <- dplyr::filter(data, season %in% input$season)
+			}
+			data
+		})
+
+		# ── Map: initial render with all data markers ───────────────────────────
 		output$source_map <- leaflet::renderLeaflet({
-			map <- leaflet::leaflet(
+			data <- metadata_tbl # Start with all data
+			ids <- selected_ids()
+
+			leaflet::leaflet(
+				data = data,
 				options = leaflet::leafletOptions(
 					attributionControl = FALSE,
 					zoomControl = FALSE,
@@ -164,12 +212,15 @@ mod_data_select_server <- function(
 			) |>
 				leaflet::addProviderTiles(leaflet::providers$CartoDB.DarkMatter) |>
 				leaflet::setView(lng = -3.5, lat = 56, zoom = 5) |>
-				# Add markers for the metadata coords
 				leaflet::addCircleMarkers(
-					data = metadata_tbl,
 					lng = ~lon,
 					lat = ~lat,
 					layerId = ~fhd_id,
+					radius = 10,
+					color = "black",
+					weight = 1,
+					fillOpacity = 0.85,
+					fillColor = ifelse(data$fhd_id %in% ids, "steelblue", "grey"),
 					popup = ~ paste0(
 						"<div style='width:200px;'>",
 						"<strong>",
@@ -186,65 +237,108 @@ mod_data_select_server <- function(
 						"', {priority:'event'})\" ",
 						"class='btn btn-sm btn-primary' ",
 						"style='margin-top:8px;width:100%;'>",
-						"Add Entry",
+						ifelse(fhd_id %in% ids, "Remove Entry", "Add Entry"),
 						"</button>",
 						"</div>"
 					)
 				)
 		})
 
-		selected_ids <- reactiveVal(character(0))
+		# ── Map markers: redrawn whenever filters or selection changes ───────────
+		# After initial render, update markers when filters or selection change.
+		observe({
+			data <- filtered_data()
+			ids <- selected_ids()
 
-		observeEvent(input$map_add_btn, {
-			clicked <- input$map_add_btn
-			current <- selected_ids()
-			if (clicked %in% current) {
-				selected_ids(setdiff(current, clicked)) # deselect
-			} else {
-				selected_ids(c(current, clicked)) # select
-			}
+			leaflet::leafletProxy("source_map", session) |>
+				leaflet::clearMarkers() |>
+				leaflet::addCircleMarkers(
+					data = data,
+					lng = ~lon,
+					lat = ~lat,
+					layerId = ~fhd_id,
+					radius = 10,
+					color = "black",
+					weight = 1,
+					fillOpacity = 0.85,
+					fillColor = ifelse(data$fhd_id %in% ids, "steelblue", "grey"),
+					popup = ~ paste0(
+						"<div style='width:200px;'>",
+						"<strong>",
+						species_id,
+						"</strong><br/>",
+						"Season: ",
+						season,
+						"<br/>",
+						"<button ",
+						"onclick=\"Shiny.setInputValue('",
+						ns("map_add_btn"),
+						"', '",
+						fhd_id,
+						"', {priority:'event'})\" ",
+						"class='btn btn-sm btn-primary' ",
+						"style='margin-top:8px;width:100%;'>",
+						ifelse(fhd_id %in% ids, "Remove Entry", "Add Entry"),
+						"</button>",
+						"</div>"
+					)
+				)
 		})
 
-		# Render a table of the selected data ------
+		# ---- When a map marker's "Add Entry" button is clicked, update the selection ----
+		observeEvent(input$map_add_btn, {
+			fhd_id <- input$map_add_btn
+			ids <- selected_ids()
+			if (fhd_id %in% ids) {
+				ids <- setdiff(ids, fhd_id)
+			} else {
+				ids <- c(ids, fhd_id)
+			}
+			selected_ids(ids)
+		})
 
+		# Show selected data ----
 		output$show_selected <- DT::renderDT({
-			selected_data <- metadata_tbl[metadata_tbl$fhd_id %in% selected_ids(), ]
+			data <- metadata_tbl[metadata_tbl$fhd_id %in% selected_ids(), ] |>
+				dplyr::select(
+					dplyr::all_of(
+						c(
+							"fhd_id",
+							"species_id",
+							"method",
+							"season"
+						)
+					)
+				)
 			DT::datatable(
-				selected_data,
+				data,
 				options = list(
 					pageLength = 5,
 					lengthChange = FALSE,
 					searching = FALSE,
+					ordering = FALSE,
 					info = FALSE
 				),
 				rownames = FALSE
 			)
 		})
 
-		# React to next-page button --------------
-		observeEvent(
-			input$go_analysis,
-			{
-				# If the user has not selected any data, show a modal warning
-
-				# ADD THIS LATER
-
-				bslib::nav_select(
-					id = nav_id,
-					selected = "nav-analysis",
-					session = parent_session
-				)
-			}
-		)
-
-		# Return the selected data as a reactive --------
-		return(
-			list(
-				selected_data = reactive({
-					metadata_tbl[metadata_tbl$fhd_id %in% selected_ids(), ]
-				}),
-				uploaded_data = NULL
+		# ── Navigation ───────────────────────────────────────────────────────────
+		observeEvent(input$go_analysis, {
+			# ADD LATER: modal warning if selected_ids() is empty
+			bslib::nav_select(
+				id = nav_id,
+				selected = "nav-analysis",
+				session = parent_session
 			)
-		)
+		})
+
+		# ── Return ───────────────────────────────────────────────────────────────
+		return(list(
+			selected_data = reactive({
+				metadata_tbl[metadata_tbl$fhd_id %in% selected_ids(), ]
+			}),
+			uploaded_data = NULL
+		))
 	})
 }
