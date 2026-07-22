@@ -197,7 +197,7 @@ mod_data_select_server <- function(
 		ns <- session$ns
 
 		# Continuously run the user-upload module within this -------
-		mod_user_upload_server(
+		user_uploads <- mod_user_upload_server(
 			id = "user_upload"
 		)
 
