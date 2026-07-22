@@ -277,6 +277,7 @@ mod_data_select_server <- function(
 					lat = ~lat,
 					layerId = ~fhd_id,
 					radius = 10,
+					group = "main_data",
 					color = "black",
 					weight = 1,
 					fillOpacity = 0.85,
@@ -333,7 +334,7 @@ mod_data_select_server <- function(
 			ids <- selected_ids()
 
 			leaflet::leafletProxy("source_map", session) |>
-				leaflet::clearMarkers() |>
+				leaflet::clearGroup("main_data") |>
 				leaflet::addCircleMarkers(
 					data = data,
 					lng = ~lon,
@@ -342,6 +343,7 @@ mod_data_select_server <- function(
 					radius = 10,
 					color = "black",
 					weight = 1,
+					group = "main_data",
 					fillOpacity = 0.85,
 					fillColor = ifelse(data$fhd_id %in% ids, "#ffa134", "grey"),
 					popup = ~ paste0(
@@ -390,6 +392,40 @@ mod_data_select_server <- function(
 						"More Details",
 						"</button>",
 						"</div>"
+					)
+				)
+		})
+
+		observe({
+			# Add user datasets to the main, if there are any
+			req(user_uploads$metadata())
+			userdat <- user_uploads$metadata() |>
+				dplyr::bind_rows()
+			req(nrow(userdat) > 0)
+			leaflet::leafletProxy("source_map", session) |>
+				leaflet::clearGroup("user_data") |>
+				leaflet::addCircleMarkers(
+					data = userdat,
+					lng = ~lon,
+					lat = ~lat,
+					layerId = ~fhd_id,
+					radius = 10,
+					color = "black",
+					weight = 1,
+					group = "user_data",
+					fillOpacity = 0.85,
+					fillColor = "#009b12",
+					popup = ~ paste0(
+						"<strong>USER DATASET</strong><br/>",
+						"<div style='width:200px;'>",
+						"<strong>",
+						species_id,
+						"</strong><br/>",
+						"<strong>Season: </strong>",
+						season,
+						"<br/>",
+						"<strong>Method: </strong>",
+						method
 					)
 				)
 		})
