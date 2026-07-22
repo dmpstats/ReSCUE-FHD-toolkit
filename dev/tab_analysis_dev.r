@@ -1,5 +1,6 @@
 library(shiny)
 library(bslib)
+library(golem)
 
 tab_analysis_app <- function() {
   ui <- tagList(
@@ -45,17 +46,38 @@ tab_analysis_app <- function() {
   )
 
   server <- function(input, output, session) {
-    browser()
+    # generate data that is being passed over from data selection module
+    fhd_files <- list.files("data-dummy/metadata", full.names = TRUE)
 
-    selected_data <- list.files("data-dummy/draws", full.names = TRUE) |>
+    fhd_id <- basename(fhd_files) |>
+      tools::file_path_sans_ext()
+
+    mtdt <- fhd_files |>
       purrr::map(readRDS) |>
-      shiny::reactiveVal()
+      purrr::map(function(x) {
+        x$covariates <- list(x$covariates %||% NULL)
+        x
+      }) |>
+      purrr::map(tibble::as_tibble_row) |>
+      purrr::list_rbind()
 
+    draws <- list.files("data-dummy/draws", full.names = TRUE) |>
+      purrr::map(readRDS) |>
+      setNames(fhd_id)
+
+    selected_data <- reactiveVal(
+      list(
+        selected_metadata = mtdt[c(1, 3, 5)],
+        selected_draws = draws[c(1, 3, 5)]
+      )
+    )
+
+    # call the module server function for the data analysis module, passing in the "selected" data
     mod_data_analysis_server(
       "data_analysis",
       nav_id = "main-nav",
       parent_session = session,
-      selected_data = data_select_output$selected_data
+      selected_data = selected_data
     )
   }
 
