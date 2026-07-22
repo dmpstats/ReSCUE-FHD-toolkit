@@ -120,6 +120,15 @@ mod_data_select_ui <- function(id) {
 							"Selected Data",
 							class = "text-bg-primary",
 							bslib::toolbar(
+								actionButton(
+									ns("clear_selection"),
+									label = bsicons::bs_icon("trash"),
+									class = "btn btn-sm btn-light"
+								) |>
+									bslib::tooltip(
+										"Clear all selected datasets.",
+										placement = "bottom"
+									),
 								mod_help_button_ui(ns("select_data"), type = "toolbar")
 							)
 						),
@@ -129,9 +138,9 @@ mod_data_select_ui <- function(id) {
 						height = "30vh"
 					),
 					bslib::layout_columns(
-						col_widths = c(4, 4, 4),
+						col_widths = c(6, 6),
 						actionButton(
-							ns("Upload Data"),
+							ns("upload_data"),
 							label = tagList(
 								bsicons::bs_icon("cloud-upload"),
 								"Upload Data"
@@ -141,17 +150,17 @@ mod_data_select_ui <- function(id) {
 							bslib::tooltip(
 								"Upload your own flight-height dataset of a suitable format."
 							),
-						actionButton(
-							ns("download_data"),
-							label = tagList(
-								bsicons::bs_icon("cloud-download"),
-								"Download Data"
-							),
-							class = "not-arrow-btn"
-						) |>
-							bslib::tooltip(
-								"Download the selected flight-height datasets before analysis."
-							),
+						# actionButton(
+						# 	ns("download_data"),
+						# 	label = tagList(
+						# 		bsicons::bs_icon("cloud-download"),
+						# 		"Download Data"
+						# 	),
+						# 	class = "not-arrow-btn"
+						# ) |>
+						# 	bslib::tooltip(
+						# 		"Download the selected flight-height datasets before analysis."
+						# 	),
 						actionButton(
 							ns("go_analysis"),
 							label = tagList(
@@ -186,6 +195,17 @@ mod_data_select_server <- function(
 ) {
 	moduleServer(id, function(input, output, session) {
 		ns <- session$ns
+
+		# Continuously run the user-upload module within this -------
+		user_uploads <- mod_user_upload_server(
+			id = "user_upload",
+			clear_trigger = reactive(input$clear_all_uploads)
+		)
+
+		# ---- Track some states -----------
+
+		ready_to_download <- reactiveVal(FALSE)
+		have_downloaded <- reactiveVal(FALSE)
 
 		# ── Filter choices (data-driven) ────────────────────────────────────────
 		observe({
@@ -389,6 +409,10 @@ mod_data_select_server <- function(
 		# Show selected data ----
 		output$show_selected <- DT::renderDT({
 			data <- metadata_tbl[metadata_tbl$fhd_id %in% selected_ids(), ] |>
+				dplyr::bind_rows(
+					user_uploads$metadata() |>
+						dplyr::bind_rows()
+				) |>
 				dplyr::select(
 					dplyr::all_of(
 						c(
@@ -450,9 +474,61 @@ mod_data_select_server <- function(
 			}
 		)
 
+		# ---- Clear selection button ----
+		observeEvent(input$clear_selection, {
+			# Modal to confirm and then clear
+			showModal(
+				modalDialog(
+					title = "Clear Selection",
+					tags$p(
+						"Are you sure you want to clear all selected datasets? ",
+						br(),
+						tags$strong("This will include any user-uploaded datasets.")
+					),
+					footer = tagList(
+						actionButton(
+							ns("confirm_clear"),
+							"Yes, clear selection",
+							class = "btn btn-outline-danger"
+						),
+						modalButton("Cancel")
+					),
+					easyClose = TRUE,
+					size = "m"
+				)
+			)
+		})
+		observeEvent(input$confirm_clear, {
+			selected_ids(character(0))
+			removeModal()
+		})
+
+		# ----- Merge the user-uploaded data -----------
+		#' The user can upload a dataset at any point. Reactively merge
+		#' the user-uploaded data with the main metadata table. This allows the user to select their own datasets for analysis.
+
 		# ── Navigation ───────────────────────────────────────────────────────────
+		outputs <- reactiveValues()
 		observeEvent(input$go_analysis, {
-			# ADD LATER: modal warning if selected_ids() is empty
+			# Download the FHDs for the selected datasets (not including user-uploads)
+			download_fhds <- metadata_tbl |>
+				dplyr::filter(fhd_id %in% selected_ids()) |>
+				dplyr::pull(fhd_id)
+			downloads <- lapply(download_fhds, function(fhd_id) {
+				readRDS(paste0("data-dummy/draws/", fhd_id, ".rds"))
+			})
+			names(downloads) <- download_fhds
+			outputs$draws <- c(
+				downloads,
+				user_uploads$draws()
+			)
+			outputs$metadata <- metadata_tbl |>
+				dplyr::filter(fhd_id %in% selected_ids()) |>
+				dplyr::bind_rows(
+					user_uploads$metadata() |>
+						dplyr::bind_rows()
+				)
+
 			bslib::nav_select(
 				id = nav_id,
 				selected = "nav-analysis",
@@ -460,11 +536,23 @@ mod_data_select_server <- function(
 			)
 		})
 
-		# ── Return ───────────────────────────────────────────────────────────────
+		# ==== User-upload module as a modal dialog ====
+		observeEvent(
+			input$upload_data,
+			{
+				showModal(
+					modalDialog(
+						title = "Upload Flight Height Dataset",
+						mod_user_upload_ui(ns("user_upload")),
+						easyClose = TRUE,
+						size = "xl"
+					)
+				)
+			}
+		)
+
 		return(list(
-			selected_data = reactive({
-				metadata_tbl[metadata_tbl$fhd_id %in% selected_ids(), ]
-			}),
+			selected_data = outputs,
 			uploaded_data = NULL
 		))
 	})
