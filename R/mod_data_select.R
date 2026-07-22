@@ -200,7 +200,7 @@ mod_data_select_server <- function(
 		# ── Map: initial render with all data markers ───────────────────────────
 		output$source_map <- leaflet::renderLeaflet({
 			data <- metadata_tbl # Start with all data
-			ids <- selected_ids()
+			# ids <- selected_ids()
 
 			leaflet::leaflet(
 				data = data,
@@ -220,7 +220,7 @@ mod_data_select_server <- function(
 					color = "black",
 					weight = 1,
 					fillOpacity = 0.85,
-					fillColor = ifelse(data$fhd_id %in% ids, "steelblue", "grey"),
+					fillColor = "grey",
 					popup = ~ paste0(
 						"<div style='width:200px;'>",
 						"<strong>",
@@ -237,7 +237,7 @@ mod_data_select_server <- function(
 						"', {priority:'event'})\" ",
 						"class='btn btn-sm btn-primary' ",
 						"style='margin-top:8px;width:100%;'>",
-						ifelse(fhd_id %in% ids, "Remove Entry", "Add Entry"),
+						"Add Entry", # because initially no entries are selected
 						"</button>",
 						"</div>"
 					)
@@ -261,7 +261,7 @@ mod_data_select_server <- function(
 					color = "black",
 					weight = 1,
 					fillOpacity = 0.85,
-					fillColor = ifelse(data$fhd_id %in% ids, "steelblue", "grey"),
+					fillColor = ifelse(data$fhd_id %in% ids, "#ffa134", "grey"),
 					popup = ~ paste0(
 						"<div style='width:200px;'>",
 						"<strong>",
