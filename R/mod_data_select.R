@@ -70,10 +70,12 @@ mod_data_select_ui <- function(id) {
 									ns("season"),
 									label = "Season",
 									choices = c(
+										"Any" = "any",
+										"Both" = "nonbreeding, breeding",
 										"Breeding" = "breeding",
-										"Non-breeding" = "non_breeding"
+										"Non-breeding" = "nonbreeding"
 									),
-									multiple = TRUE
+									multiple = FALSE
 								)
 							),
 							column(
@@ -88,7 +90,22 @@ mod_data_select_ui <- function(id) {
 									class = "btn btn-dark w-100"
 								) |>
 									bslib::popover(
-										p("We will import extended filters here."),
+										# Add some additional filters
+										selectizeInput(
+											ns("crm_recommended"),
+											label = "Recommended for CRM?",
+											choices = c(
+												"Yes" = TRUE,
+												"No" = FALSE
+											),
+											multiple = TRUE
+										),
+										selectizeInput(
+											ns("region"),
+											label = "Region",
+											choices = NULL,
+											multiple = TRUE
+										),
 										placement = "top"
 									)
 							)
@@ -186,6 +203,13 @@ mod_data_select_server <- function(
 				selected = character(0),
 				server = TRUE
 			)
+			updateSelectizeInput(
+				session,
+				"region",
+				choices = unique(metadata_tbl$region),
+				selected = character(0),
+				server = TRUE
+			)
 		})
 
 		# ── Single source of truth: which fhd_ids are selected ──────────────────
@@ -201,8 +225,14 @@ mod_data_select_server <- function(
 			if (length(input$method) > 0) {
 				data <- dplyr::filter(data, method %in% input$method)
 			}
-			if (length(input$season) > 0) {
+			if (length(input$season) > 0 && input$season != "any") {
 				data <- dplyr::filter(data, season %in% input$season)
+			}
+			if (length(input$crm_recommended) > 0) {
+				data <- dplyr::filter(data, crm_recommended %in% input$crm_recommended)
+			}
+			if (length(input$region) > 0) {
+				data <- dplyr::filter(data, region %in% input$region)
 			}
 			data
 		})
@@ -236,8 +266,19 @@ mod_data_select_server <- function(
 						"<strong>",
 						species_id,
 						"</strong><br/>",
-						"Season: ",
+						"<strong>Season: </strong>",
 						season,
+						"<br/>",
+						"<strong>Method: </strong>",
+						method,
+						"<br/>",
+						"<strong>Recommended for CRM: </strong>",
+						ifelse(
+							crm_recommended,
+							# Green text for yes, red for no
+							"<span style='color:green;'>Yes</span>",
+							"<span style='color:red;'>No</span>"
+						),
 						"<br/>",
 						"<button ",
 						"onclick=\"Shiny.setInputValue('",
@@ -247,7 +288,18 @@ mod_data_select_server <- function(
 						"', {priority:'event'})\" ",
 						"class='btn btn-sm btn-primary' ",
 						"style='margin-top:8px;width:100%;'>",
-						"Add Entry", # because initially no entries are selected
+						"Select Dataset", # because initially no entries are selected
+						"</button>",
+						# Add a button for 'More Details'
+						"<button ",
+						"onclick=\"Shiny.setInputValue('",
+						ns("map_details_btn"),
+						"', '",
+						fhd_id,
+						"', {priority:'event'})\" ",
+						"class='btn btn-sm btn-outline-primary' ",
+						"style='margin-top:8px;width:100%;'>",
+						"More Details",
 						"</button>",
 						"</div>"
 					)
@@ -277,8 +329,19 @@ mod_data_select_server <- function(
 						"<strong>",
 						species_id,
 						"</strong><br/>",
-						"Season: ",
+						"<strong>Season: </strong>",
 						season,
+						"<br/>",
+						"<strong>Method: </strong>",
+						method,
+						"<br/>",
+						"<strong>Recommended for CRM: </strong>",
+						ifelse(
+							crm_recommended,
+							# Green text for yes, red for no
+							"<span style='color:green;'>Yes</span>",
+							"<span style='color:red;'>No</span>"
+						),
 						"<br/>",
 						"<button ",
 						"onclick=\"Shiny.setInputValue('",
@@ -286,9 +349,25 @@ mod_data_select_server <- function(
 						"', '",
 						fhd_id,
 						"', {priority:'event'})\" ",
-						"class='btn btn-sm btn-primary' ",
+						ifelse(
+							fhd_id %in% ids,
+							"class='btn btn-sm btn-success' ",
+							"class='btn btn-sm btn-primary' "
+						),
+						# "class='btn btn-sm btn-primary' ",
 						"style='margin-top:8px;width:100%;'>",
-						ifelse(fhd_id %in% ids, "Remove Entry", "Add Entry"),
+						ifelse(fhd_id %in% ids, "Deselect Dataset", "Select Dataset"),
+						"</button>",
+						# Add a button for 'More Details'
+						"<button ",
+						"onclick=\"Shiny.setInputValue('",
+						ns("map_details_btn"),
+						"', '",
+						fhd_id,
+						"', {priority:'event'})\" ",
+						"class='btn btn-sm btn-outline-primary' ",
+						"style='margin-top:8px;width:100%;'>",
+						"More Details",
 						"</button>",
 						"</div>"
 					)
@@ -332,6 +411,44 @@ mod_data_select_server <- function(
 				rownames = FALSE
 			)
 		})
+
+		# ---- Show modal with more details when "More Details" button is clicked on map marker -----
+		observeEvent(
+			input$map_details_btn,
+			{
+				fhd_id <- input$map_details_btn
+				details <- metadata_tbl[metadata_tbl$fhd_id == fhd_id, ] |>
+					dplyr::mutate(
+						covariates = paste(names(covariates[[1]]), collapse = ", "),
+						covariates = ifelse(
+							covariates == "",
+							"No covariates",
+							covariates
+						)
+					) |>
+					dplyr::select(-dplyr::any_of(c("sf_obj")))
+				showModal(
+					modalDialog(
+						title = "Flight Height Dataset Details",
+						# Display details in a table format
+						tags$table(
+							class = "table table-striped",
+							tags$tbody(
+								lapply(names(details), function(name) {
+									tags$tr(
+										tags$th(name),
+										tags$td(as.character(details[[name]]))
+									)
+								})
+							)
+						),
+						easyClose = TRUE,
+						icon = bsicons::bs_icon("info-circle"),
+						size = "l"
+					)
+				)
+			}
+		)
 
 		# ── Navigation ───────────────────────────────────────────────────────────
 		observeEvent(input$go_analysis, {
