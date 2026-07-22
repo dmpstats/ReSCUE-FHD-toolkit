@@ -136,10 +136,12 @@ mod_data_analysis_server <- function(
 	moduleServer(id, function(input, output, session) {
 		ns <- session$ns
 
+		# Get the draws and metadata
+
 		# Render the dummy data passed from the previous
 		output$dummy_dt <- DT::renderDataTable(
 			{
-				selected_data()
+				selected_data$metadata
 			},
 			options = list(
 				paging = FALSE,
@@ -152,19 +154,19 @@ mod_data_analysis_server <- function(
 
 		# Simulate some dummy data
 		dummy_data <- reactive({
-			req(selected_data())
-			if (nrow(selected_data()) == 0) {
+			req(selected_data$metadata)
+			if (nrow(selected_data$metadata) == 0) {
 				return(NULL)
 			}
 			dummy_fheight_dists(
 				max_height = 100,
 				seed = 123,
-				n = nrow(selected_data())
+				n = nrow(selected_data$metadata)
 			)
 		})
 
 		output$dummy_plot <- plotly::renderPlotly({
-			req(selected_data())
+			req(selected_data$metadata)
 			req(dummy_data())
 			dummy_fheight_plot(
 				dummy_data(),

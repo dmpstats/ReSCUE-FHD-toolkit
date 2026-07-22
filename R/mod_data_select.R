@@ -198,7 +198,8 @@ mod_data_select_server <- function(
 
 		# Continuously run the user-upload module within this -------
 		user_uploads <- mod_user_upload_server(
-			id = "user_upload"
+			id = "user_upload",
+			clear_trigger = reactive(input$clear_all_uploads)
 		)
 
 		# ---- Track some states -----------
@@ -408,6 +409,10 @@ mod_data_select_server <- function(
 		# Show selected data ----
 		output$show_selected <- DT::renderDT({
 			data <- metadata_tbl[metadata_tbl$fhd_id %in% selected_ids(), ] |>
+				dplyr::bind_rows(
+					user_uploads$metadata() |>
+						dplyr::bind_rows()
+				) |>
 				dplyr::select(
 					dplyr::all_of(
 						c(
@@ -498,9 +503,32 @@ mod_data_select_server <- function(
 			removeModal()
 		})
 
+		# ----- Merge the user-uploaded data -----------
+		#' The user can upload a dataset at any point. Reactively merge
+		#' the user-uploaded data with the main metadata table. This allows the user to select their own datasets for analysis.
+
 		# ── Navigation ───────────────────────────────────────────────────────────
+		outputs <- reactiveValues()
 		observeEvent(input$go_analysis, {
-			# ADD LATER: modal warning if selected_ids() is empty
+			# Download the FHDs for the selected datasets (not including user-uploads)
+			download_fhds <- metadata_tbl |>
+				dplyr::filter(fhd_id %in% selected_ids()) |>
+				dplyr::pull(fhd_id)
+			downloads <- lapply(download_fhds, function(fhd_id) {
+				readRDS(paste0("data-dummy/draws/", fhd_id, ".rds"))
+			})
+			names(downloads) <- download_fhds
+			outputs$draws <- c(
+				downloads,
+				user_uploads$draws()
+			)
+			outputs$metadata <- metadata_tbl |>
+				dplyr::filter(fhd_id %in% selected_ids()) |>
+				dplyr::bind_rows(
+					user_uploads$metadata() |>
+						dplyr::bind_rows()
+				)
+
 			bslib::nav_select(
 				id = nav_id,
 				selected = "nav-analysis",
@@ -523,11 +551,25 @@ mod_data_select_server <- function(
 			}
 		)
 
-		# ── Return ───────────────────────────────────────────────────────────────
+		# ── Prepare outputs ───────────────────────────────────────────────────────────────
+
+		# Join the metadata with the user-uploaded metadata
+		# outputs <- reactive({
+		# 	# If the user has uploaded data, merge it with the main metadata table
+		# 	if (!is.null(user_uploads$uploaded_data)) {
+		# 		out <- dplyr::bind_rows(
+		# 			metadata_tbl[metadata_tbl$fhd_id %in% selected_ids(), ],
+		# 			user_uploads$metadata() |>
+		# 				dplyr::bind_rows()
+		# 		)
+		# 	} else {
+		# 		out <- metadata_tbl[metadata_tbl$fhd_id %in% selected_ids(), ]
+		# 	}
+		# 	out
+		# })
+
 		return(list(
-			selected_data = reactive({
-				metadata_tbl[metadata_tbl$fhd_id %in% selected_ids(), ]
-			}),
+			selected_data = outputs,
 			uploaded_data = NULL
 		))
 	})

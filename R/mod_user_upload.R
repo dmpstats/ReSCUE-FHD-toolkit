@@ -110,141 +110,154 @@ mod_user_upload_ui <- function(id) {
 #' user_upload Server Functions
 #'
 #' @noRd
-mod_user_upload_server <- function(id) {
-  moduleServer(id, function(input, output, session) {
-    ns <- session$ns
+mod_user_upload_server <- function(id, clear_trigger = reactive(NULL)) {
+  moduleServer(
+    id,
+    function(input, output, session) {
+      ns <- session$ns
 
-    # Keep reactive lists of the metadata entries and draws
-    metadata <- reactiveVal(list())
-    draws <- reactiveVal(list())
+      # Keep reactive lists of the metadata entries and draws
+      metadata <- reactiveVal(list())
+      draws <- reactiveVal(list())
 
-    # On Submit, prepare a metadata entry with these fields
-    observeEvent(
-      input$submit,
-      {
-        if (
-          length(input$fhd_id) == 0 ||
-            length(input$species) == 0 ||
-            length(input$method) == 0 ||
-            length(input$season) == 0 ||
-            is.null(input$fhd_file)
-        ) {
-          showNotification(
-            "Please fill in all required fields and upload a file.",
-            type = "error"
+      # On Submit, prepare a metadata entry with these fields
+      observeEvent(
+        input$submit,
+        {
+          if (
+            length(input$fhd_id) == 0 ||
+              length(input$species) == 0 ||
+              length(input$method) == 0 ||
+              length(input$season) == 0 ||
+              is.null(input$fhd_file)
+          ) {
+            showNotification(
+              "Please fill in all required fields and upload a file.",
+              type = "error"
+            )
+            return(NULL)
+          }
+
+          # Validate required fields
+          req(
+            input$fhd_id,
+            input$species,
+            input$method,
+            input$season,
+            input$fhd_file
           )
-          return(NULL)
-        }
 
-        # Validate required fields
-        req(
-          input$fhd_id,
-          input$species,
-          input$method,
-          input$season,
-          input$fhd_file
-        )
-
-        # Create a new metadata entry
-        new_entry <- data.frame(
-          fhd_id = input$fhd_id,
-          species_id = input$species,
-          method = input$method,
-          season = input$season,
-          file_path = input$fhd_file$datapath,
-          lon = input$lon,
-          lat = input$lat,
-          site = input$site_name,
-          stringsAsFactors = FALSE
-        )
-
-        # Read the uploaded file
-        file_data <- if (grepl("\\.csv$", input$fhd_file$name)) {
-          read.csv(input$fhd_file$datapath)
-        } else if (grepl("\\.rds$", input$fhd_file$name)) {
-          readRDS(input$fhd_file$datapath)
-        } else {
-          showNotification(
-            "Unsupported file type. Please upload a CSV or RDS file.",
-            type = "error"
+          # Create a new metadata entry
+          new_entry <- data.frame(
+            fhd_id = input$fhd_id,
+            species_id = input$species,
+            method = input$method,
+            season = input$season,
+            file_path = input$fhd_file$datapath,
+            lon = input$lon,
+            lat = input$lat,
+            site = input$site_name,
+            stringsAsFactors = FALSE
           )
-          return(NULL)
+
+          # Read the uploaded file
+          file_data <- if (grepl("\\.csv$", input$fhd_file$name)) {
+            read.csv(input$fhd_file$datapath)
+          } else if (grepl("\\.rds$", input$fhd_file$name)) {
+            readRDS(input$fhd_file$datapath)
+          } else {
+            showNotification(
+              "Unsupported file type. Please upload a CSV or RDS file.",
+              type = "error"
+            )
+            return(NULL)
+          }
+
+          # Later, we'll implement checks for essential columns here
+
+          # Update reactive lists with new entry
+          current_metadata <- metadata()
+          current_metadata[[input$fhd_id]] <- new_entry
+          metadata(current_metadata)
+
+          current_draws <- draws()
+          current_draws[[input$fhd_id]] <- file_data
+          draws(current_draws)
+
+          # If successful, show a success notification
+          showNotification(
+            paste("Successfully uploaded dataset:", input$fhd_id),
+            type = "message"
+          )
         }
-
-        # Later, we'll implement checks for essential columns here
-
-        # Update reactive lists with new entry
-        current_metadata <- metadata()
-        current_metadata[[input$fhd_id]] <- new_entry
-        metadata(current_metadata)
-
-        current_draws <- draws()
-        current_draws[[input$fhd_id]] <- file_data
-        draws(current_draws)
-
-        # If successful, show a success notification
-        showNotification(
-          paste("Successfully uploaded dataset:", input$fhd_id),
-          type = "message"
-        )
-      }
-    )
-
-    # Clear the fields when the clear button is pressed OR
-    # when the modal is closed OR
-    # when the user uploads a new dataset
-    observeEvent(
-      c(input$clear, input$submit),
-      {
-        updateTextInput(session, "fhd_id", value = "")
-        updateTextInput(session, "species", value = "")
-        updateRadioButtons(session, "method", selected = character(0))
-        updateRadioButtons(session, "season", selected = character(0))
-        updateNumericInput(session, "lon", value = NA)
-        updateNumericInput(session, "lat", value = NA)
-        updateTextInput(session, "site_name", value = "")
-      }
-    )
-
-    # Render the metadata uploaded by the user
-    output$metadata_table <- DT::renderDT({
-      req(length(metadata()) > 0)
-      DT::datatable(
-        metadata() |>
-          dplyr::bind_rows(),
-        options = list(pageLength = 5, scrollX = TRUE),
-        rownames = FALSE
       )
-    })
 
-    observeEvent(
-      input$clear_all_uploads,
-      {
-        if (length(metadata()) == 0) {
-          showNotification(
-            "No uploaded datasets to clear.",
-            type = "warning"
-          )
-          return(NULL)
+      # Clear the fields when the clear button is pressed OR
+      # when the modal is closed OR
+      # when the user uploads a new dataset
+      observeEvent(
+        c(input$clear, input$submit),
+        {
+          updateTextInput(session, "fhd_id", value = "")
+          updateTextInput(session, "species", value = "")
+          updateRadioButtons(session, "method", selected = character(0))
+          updateRadioButtons(session, "season", selected = character(0))
+          updateNumericInput(session, "lon", value = NA)
+          updateNumericInput(session, "lat", value = NA)
+          updateTextInput(session, "site_name", value = "")
         }
-
-        # Clear the reactive lists
-        metadata(list())
-        draws(list())
-
-        # Show a notification
-        showNotification(
-          "All uploaded datasets have been cleared.",
-          type = "message"
-        )
-      }
-    )
-
-    return(
-      list(
-        metadata = metadata,
-        draws = draws
       )
-    )
-  })
+
+      # Render the metadata uploaded by the user
+      output$metadata_table <- DT::renderDT({
+        req(length(metadata()) > 0)
+        DT::datatable(
+          metadata() |>
+            dplyr::bind_rows(),
+          options = list(pageLength = 5, scrollX = TRUE),
+          rownames = FALSE
+        )
+      })
+
+      observeEvent(
+        input$clear_all_uploads,
+        {
+          if (length(metadata()) == 0) {
+            showNotification(
+              "No uploaded datasets to clear.",
+              type = "warning"
+            )
+            return(NULL)
+          }
+
+          # Clear the reactive lists
+          metadata(list())
+          draws(list())
+
+          # Show a notification
+          showNotification(
+            "All uploaded datasets have been cleared.",
+            type = "message"
+          )
+        }
+      )
+
+      # Clear on the reactive trigger
+      observeEvent(
+        clear_trigger(),
+        {
+          # Clear the reactive lists
+          metadata(list())
+          draws(list())
+        }
+      )
+
+      return(
+        list(
+          metadata = metadata,
+          draws = draws
+        )
+      )
+    }
+  )
 }
