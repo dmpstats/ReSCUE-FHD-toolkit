@@ -90,7 +90,9 @@ mod_data_analysis_ui <- function(id) {
 						),
 						bslib::card_body(
 							plotly::plotlyOutput(ns("dummy_plot")),
-							uiOutput(ns("debug"))
+							uiOutput(ns("debug")),
+							# Make the background white
+							style = "background-color: white;"
 						),
 						class = "card border-primary mb-3 bg-light"
 					),

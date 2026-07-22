@@ -138,7 +138,7 @@ mod_data_select_ui <- function(id) {
 						height = "30vh"
 					),
 					bslib::layout_columns(
-						col_widths = c(4, 4, 4),
+						col_widths = c(6, 6),
 						actionButton(
 							ns("upload_data"),
 							label = tagList(
@@ -150,17 +150,17 @@ mod_data_select_ui <- function(id) {
 							bslib::tooltip(
 								"Upload your own flight-height dataset of a suitable format."
 							),
-						actionButton(
-							ns("download_data"),
-							label = tagList(
-								bsicons::bs_icon("cloud-download"),
-								"Download Data"
-							),
-							class = "not-arrow-btn"
-						) |>
-							bslib::tooltip(
-								"Download the selected flight-height datasets before analysis."
-							),
+						# actionButton(
+						# 	ns("download_data"),
+						# 	label = tagList(
+						# 		bsicons::bs_icon("cloud-download"),
+						# 		"Download Data"
+						# 	),
+						# 	class = "not-arrow-btn"
+						# ) |>
+						# 	bslib::tooltip(
+						# 		"Download the selected flight-height datasets before analysis."
+						# 	),
 						actionButton(
 							ns("go_analysis"),
 							label = tagList(
@@ -550,23 +550,6 @@ mod_data_select_server <- function(
 				)
 			}
 		)
-
-		# ── Prepare outputs ───────────────────────────────────────────────────────────────
-
-		# Join the metadata with the user-uploaded metadata
-		# outputs <- reactive({
-		# 	# If the user has uploaded data, merge it with the main metadata table
-		# 	if (!is.null(user_uploads$uploaded_data)) {
-		# 		out <- dplyr::bind_rows(
-		# 			metadata_tbl[metadata_tbl$fhd_id %in% selected_ids(), ],
-		# 			user_uploads$metadata() |>
-		# 				dplyr::bind_rows()
-		# 		)
-		# 	} else {
-		# 		out <- metadata_tbl[metadata_tbl$fhd_id %in% selected_ids(), ]
-		# 	}
-		# 	out
-		# })
 
 		return(list(
 			selected_data = outputs,
