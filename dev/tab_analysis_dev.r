@@ -2,6 +2,9 @@ library(shiny)
 library(bslib)
 library(golem)
 
+# set tibble width option to Inf to avoid truncation of data in the console
+options(tibble.width = Inf)
+
 tab_analysis_app <- function() {
   ui <- tagList(
     golem_add_external_resources(),
@@ -67,7 +70,7 @@ tab_analysis_app <- function() {
 
     selected_data <- reactiveVal(
       list(
-        selected_metadata = mtdt[c(1, 3, 5)],
+        selected_metadata = mtdt |> dplyr::slice(1, 3, 5),
         selected_draws = draws[c(1, 3, 5)]
       )
     )
