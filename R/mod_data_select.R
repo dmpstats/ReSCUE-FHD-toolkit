@@ -120,6 +120,15 @@ mod_data_select_ui <- function(id) {
 							"Selected Data",
 							class = "text-bg-primary",
 							bslib::toolbar(
+								actionButton(
+									ns("clear_selection"),
+									label = bsicons::bs_icon("trash"),
+									class = "btn btn-sm btn-light"
+								) |>
+									bslib::tooltip(
+										"Clear all selected datasets.",
+										placement = "bottom"
+									),
 								mod_help_button_ui(ns("select_data"), type = "toolbar")
 							)
 						),
@@ -131,7 +140,7 @@ mod_data_select_ui <- function(id) {
 					bslib::layout_columns(
 						col_widths = c(4, 4, 4),
 						actionButton(
-							ns("Upload Data"),
+							ns("upload_data"),
 							label = tagList(
 								bsicons::bs_icon("cloud-upload"),
 								"Upload Data"
@@ -186,6 +195,16 @@ mod_data_select_server <- function(
 ) {
 	moduleServer(id, function(input, output, session) {
 		ns <- session$ns
+
+		# Continuously run the user-upload module within this -------
+		mod_user_upload_server(
+			id = "user_upload"
+		)
+
+		# ---- Track some states -----------
+
+		ready_to_download <- reactiveVal(FALSE)
+		have_downloaded <- reactiveVal(FALSE)
 
 		# ── Filter choices (data-driven) ────────────────────────────────────────
 		observe({
@@ -450,6 +469,35 @@ mod_data_select_server <- function(
 			}
 		)
 
+		# ---- Clear selection button ----
+		observeEvent(input$clear_selection, {
+			# Modal to confirm and then clear
+			showModal(
+				modalDialog(
+					title = "Clear Selection",
+					tags$p(
+						"Are you sure you want to clear all selected datasets? ",
+						br(),
+						tags$strong("This will include any user-uploaded datasets.")
+					),
+					footer = tagList(
+						actionButton(
+							ns("confirm_clear"),
+							"Yes, clear selection",
+							class = "btn btn-outline-danger"
+						),
+						modalButton("Cancel")
+					),
+					easyClose = TRUE,
+					size = "m"
+				)
+			)
+		})
+		observeEvent(input$confirm_clear, {
+			selected_ids(character(0))
+			removeModal()
+		})
+
 		# ── Navigation ───────────────────────────────────────────────────────────
 		observeEvent(input$go_analysis, {
 			# ADD LATER: modal warning if selected_ids() is empty
@@ -459,6 +507,21 @@ mod_data_select_server <- function(
 				session = parent_session
 			)
 		})
+
+		# ==== User-upload module as a modal dialog ====
+		observeEvent(
+			input$upload_data,
+			{
+				showModal(
+					modalDialog(
+						title = "Upload Flight Height Dataset",
+						mod_user_upload_ui(ns("user_upload")),
+						easyClose = TRUE,
+						size = "xl"
+					)
+				)
+			}
+		)
 
 		# ── Return ───────────────────────────────────────────────────────────────
 		return(list(
