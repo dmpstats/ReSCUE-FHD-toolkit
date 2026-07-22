@@ -15,13 +15,18 @@ app_server <- function(input, output, session) {
 	})
 
 	# Call the top-level metadata
-	metadata <- list.files(
-		"data-dummy/metadata",
-		pattern = "\\.rds$",
-		full.names = TRUE
-	) |>
-		lapply(readRDS) |>
-		dplyr::bind_rows()
+	metadata <- lapply(metadata_files, readRDS) |>
+		# need to nest covariates list into a higher-level list so that list-columns are
+		# preserved
+		purrr::map(
+			function(x) {
+				#browser()
+				x$covariates <- list(x$covariates %||% NULL)
+				x
+			}
+		) |>
+		purrr::map(tibble::as_tibble_row) |>
+		purrr::list_rbind()
 
 	# Modules -----------------
 
