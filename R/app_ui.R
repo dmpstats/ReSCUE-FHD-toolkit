@@ -287,6 +287,14 @@ golem_add_external_resources <- function() {
         color: var(--bs-primary) !important;
         opacity: 1;
       }
+
+      /* Selectize dropdown z-index to sit above leaflet map */
+      .selectize-dropdown {
+        z-index: 9999 !important;
+      }
+      .selectize-input {
+        z-index: 9998 !important;
+      }
     "
 		))
 	)

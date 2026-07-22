@@ -10,45 +10,94 @@
 mod_data_select_ui <- function(id) {
 	ns <- NS(id)
 	tagList(
+		tags$head(tags$style(
+			type = "text/css",
+			paste0(
+				".selectize-dropdown {
+                                                     bottom: 100% !important;
+                                                     top:auto!important;
+                                                 }}"
+			)
+		)),
 		bslib::page_fillable(
 			bslib::layout_columns(
 				col_widths = c(6, 6),
 				class = "h-100",
-				bslib::accordion(
-					multiple = FALSE,
-					class = "card border-primary mb-3 bg-light h-80",
-					id = ns("card_data_select"),
-					# Map selection tab ----------
-					bslib::accordion_panel(
-						title = "Map Selection",
-						br(),
-						mod_map_picker_ui(ns("map_picker_1")),
-						class = "bg-light"
+				bslib::card(
+					class = "card border-primary mb-3 bg-light",
+					bslib::card_header(
+						"Data Selection",
+						class = "text-bg-primary",
+						bslib::toolbar(
+							mod_help_button_ui(ns("select_data"), type = "toolbar")
+						)
 					),
-
-					# Table selection tab ----------
-					bslib::accordion_panel(
-						title = "Table Selection",
-						br(),
-						mod_table_picker_ui(ns("table_picker_1")),
-						class = "bg-light"
+					bslib::card_body(
+						leaflet::leafletOutput(
+							ns("source_map"),
+							# Fill the remainder of the space
+							height = "75vh"
+						),
+						class = "p-0"
 					),
-
-					# User upload tab ----------
-					bslib::accordion_panel(
-						title = "Data Upload",
-						br(),
-						mod_user_upload_ui(ns("data_upload_1")),
-						class = "bg-light"
-					),
-					# bslib::nav_item(
-					# 	mod_help_button_ui(ns("select_data"))
-					# ),
+					bslib::card_footer(
+						fluidRow(
+							column(
+								3,
+								selectizeInput(
+									ns("species"),
+									label = "Species",
+									choices = NULL,
+									multiple = TRUE,
+									options = list(
+										hideSelected = FALSE,
+										remove_button = TRUE
+									)
+								)
+							),
+							column(
+								3,
+								selectizeInput(
+									ns("method"),
+									label = "Method",
+									choices = NULL,
+									multiple = TRUE
+								)
+							),
+							column(
+								3,
+								selectizeInput(
+									ns("season"),
+									label = "Season",
+									choices = c(
+										"Breeding" = "breeding",
+										"Non-breeding" = "non_breeding"
+									),
+									multiple = TRUE
+								)
+							),
+							column(
+								3,
+								class = "d-flex align-items-center justify-content-center",
+								actionButton(
+									ns("advanced_filters"),
+									label = tagList(
+										bsicons::bs_icon("funnel"),
+										"Advanced Filters"
+									),
+									class = "btn btn-dark w-100"
+								) |>
+									bslib::popover(
+										p("We will import extended filters here."),
+										placement = "top"
+									)
+							)
+						)
+					)
 				),
 
 				# Right-hand side: show selected data and go to analysis button
 				tagList(
-					# 12,
 					bslib::card(
 						bslib::card_header(
 							"Selected Data",
@@ -57,26 +106,35 @@ mod_data_select_ui <- function(id) {
 								mod_help_button_ui(ns("select_data"), type = "toolbar")
 							)
 						),
-						bslib::card_body(DT::DTOutput(ns("show_dt"))),
+						bslib::card_body(DT::DTOutput(ns("show_selected"))),
 						class = "card border-primary mb-3 bg-light",
 						full_screen = TRUE,
 						height = "30vh"
 					),
-					bslib::card(
-						bslib::card_header(
-							"Flight Height Preview",
-							class = "text-bg-primary"
-						),
-						bslib::card_body(
-							div(
-								plotly::plotlyOutput(ns("dummy_plot"), height = "35vh"),
-								class = "rounded-box"
-							)
-						),
-						class = "card border-primary mb-3 bg-light"
-					),
-					div(
-						class = "d-flex flex-column align-items-center gap-2 my-3",
+					bslib::layout_columns(
+						col_widths = c(4, 4, 4),
+						actionButton(
+							ns("Upload Data"),
+							label = tagList(
+								bsicons::bs_icon("cloud-upload"),
+								"Upload Data"
+							),
+							class = "not-arrow-btn"
+						) |>
+							bslib::tooltip(
+								"Upload your own flight-height dataset of a suitable format."
+							),
+						actionButton(
+							ns("download_data"),
+							label = tagList(
+								bsicons::bs_icon("cloud-download"),
+								"Download Data"
+							),
+							class = "not-arrow-btn"
+						) |>
+							bslib::tooltip(
+								"Download the selected flight-height datasets before analysis."
+							),
 						actionButton(
 							ns("go_analysis"),
 							label = tagList(
@@ -98,91 +156,199 @@ mod_data_select_ui <- function(id) {
 #' @param id Module ID
 #' @param nav_id The ID of the parent navigation bar (e.g., "main-nav"). This is required to allow the module to control navigation between tabs.
 #' @param parent_session The session object of the parent Shiny app. This is required to allow the module to control navigation between tabs.
+#' @param metadata_tbl Data frame of all available FHD metadata.
+#' @param restore_payload Optional reactive carrying a previously saved session payload.
 #'
 #' @noRd
 mod_data_select_server <- function(
 	id,
 	nav_id = "main-nav",
 	parent_session,
+	metadata_tbl,
 	restore_payload = NULL
 ) {
 	moduleServer(id, function(input, output, session) {
 		ns <- session$ns
 
-		# Data selection sub-modules  ------------
-		# We receive the reactive inputs from each one:
-		map_data <- mod_map_picker_server(
-			"map_picker_1",
-			restore_payload = restore_payload
-		)
-		table_data <- mod_table_picker_server("table_picker_1")
-		user_data <- mod_user_upload_server("data_upload_1")
-
-		# Helpfile modules
-		mod_help_button_server("select_data", help_file = "select_data", size = "l")
-
-		# Stack these and render them on the RHS
-		selected_data <- reactive({
-			dplyr::bind_rows(
-				map_data(),
-				table_data(),
-				user_data()
-			) |>
-				dplyr::select(
-					dplyr::any_of(
-						c("species_id", "method", "region", "season")
-					)
-				)
-		})
-		output$show_dt <- DT::renderDataTable(
-			{
-				selected_data()
-			},
-			options = list(
-				paging = FALSE,
-				searching = FALSE,
-				info = FALSE,
-				scrollY = "200px",
-				scrollCollapse = TRUE
+		# ── Filter choices (data-driven) ────────────────────────────────────────
+		observe({
+			updateSelectizeInput(
+				session,
+				"species",
+				choices = unique(metadata_tbl$species_id),
+				selected = character(0),
+				server = TRUE
 			)
-		)
-
-		# For now, plot a dummy flight-height preview
-		output$dummy_plot <- plotly::renderPlotly({
-			dumdat <- dummy_fheight_dists(max_height = 100, seed = 123, n = 1)
-			dummy_fheight_plot(dumdat, risk_min = NULL, risk_max = NULL)
+			updateSelectizeInput(
+				session,
+				"method",
+				choices = unique(metadata_tbl$method),
+				selected = character(0),
+				server = TRUE
+			)
 		})
 
-		# React to next-page button --------------
-		observeEvent(
-			input$go_analysis,
-			{
-				# If the user has not selected any data, show a modal warning
-				if (is.null(selected_data()) | nrow(selected_data()) == 0) {
-					shiny::showNotification(
-						"No data selected!",
-						type = "error",
-						duration = 3
-					)
-					return()
-				}
+		# ── Single source of truth: which fhd_ids are selected ──────────────────
+		selected_ids <- reactiveVal(character(0))
 
-				bslib::nav_select(
-					id = nav_id,
-					selected = "nav-analysis",
-					session = parent_session
-				)
+		# ── Filtered data: shared by map and DT ─────────────────────────────────
+		# Empty selection for a filter = no constraint applied for that dimension.
+		filtered_data <- reactive({
+			data <- metadata_tbl
+			if (length(input$species) > 0) {
+				data <- dplyr::filter(data, species_id %in% input$species)
 			}
-		)
+			if (length(input$method) > 0) {
+				data <- dplyr::filter(data, method %in% input$method)
+			}
+			if (length(input$season) > 0) {
+				data <- dplyr::filter(data, season %in% input$season)
+			}
+			data
+		})
 
-		# Return the selected data as a reactive --------
-		return(
-			list(
-				selected_data = selected_data,
-				map_data = map_data,
-				table_data = table_data,
-				user_data = user_data
+		# ── Map: initial render with all data markers ───────────────────────────
+		output$source_map <- leaflet::renderLeaflet({
+			data <- metadata_tbl # Start with all data
+			# ids <- selected_ids()
+
+			leaflet::leaflet(
+				data = data,
+				options = leaflet::leafletOptions(
+					attributionControl = FALSE,
+					zoomControl = FALSE,
+					minZoom = 3
+				)
+			) |>
+				leaflet::addProviderTiles(leaflet::providers$CartoDB.DarkMatter) |>
+				leaflet::setView(lng = -3.5, lat = 56, zoom = 5) |>
+				leaflet::addCircleMarkers(
+					lng = ~lon,
+					lat = ~lat,
+					layerId = ~fhd_id,
+					radius = 10,
+					color = "black",
+					weight = 1,
+					fillOpacity = 0.85,
+					fillColor = "grey",
+					popup = ~ paste0(
+						"<div style='width:200px;'>",
+						"<strong>",
+						species_id,
+						"</strong><br/>",
+						"Season: ",
+						season,
+						"<br/>",
+						"<button ",
+						"onclick=\"Shiny.setInputValue('",
+						ns("map_add_btn"),
+						"', '",
+						fhd_id,
+						"', {priority:'event'})\" ",
+						"class='btn btn-sm btn-primary' ",
+						"style='margin-top:8px;width:100%;'>",
+						"Add Entry", # because initially no entries are selected
+						"</button>",
+						"</div>"
+					)
+				)
+		})
+
+		# ── Map markers: redrawn whenever filters or selection changes ───────────
+		# After initial render, update markers when filters or selection change.
+		observe({
+			data <- filtered_data()
+			ids <- selected_ids()
+
+			leaflet::leafletProxy("source_map", session) |>
+				leaflet::clearMarkers() |>
+				leaflet::addCircleMarkers(
+					data = data,
+					lng = ~lon,
+					lat = ~lat,
+					layerId = ~fhd_id,
+					radius = 10,
+					color = "black",
+					weight = 1,
+					fillOpacity = 0.85,
+					fillColor = ifelse(data$fhd_id %in% ids, "#ffa134", "grey"),
+					popup = ~ paste0(
+						"<div style='width:200px;'>",
+						"<strong>",
+						species_id,
+						"</strong><br/>",
+						"Season: ",
+						season,
+						"<br/>",
+						"<button ",
+						"onclick=\"Shiny.setInputValue('",
+						ns("map_add_btn"),
+						"', '",
+						fhd_id,
+						"', {priority:'event'})\" ",
+						"class='btn btn-sm btn-primary' ",
+						"style='margin-top:8px;width:100%;'>",
+						ifelse(fhd_id %in% ids, "Remove Entry", "Add Entry"),
+						"</button>",
+						"</div>"
+					)
+				)
+		})
+
+		# ---- When a map marker's "Add Entry" button is clicked, update the selection ----
+		observeEvent(input$map_add_btn, {
+			fhd_id <- input$map_add_btn
+			ids <- selected_ids()
+			if (fhd_id %in% ids) {
+				ids <- setdiff(ids, fhd_id)
+			} else {
+				ids <- c(ids, fhd_id)
+			}
+			selected_ids(ids)
+		})
+
+		# Show selected data ----
+		output$show_selected <- DT::renderDT({
+			data <- metadata_tbl[metadata_tbl$fhd_id %in% selected_ids(), ] |>
+				dplyr::select(
+					dplyr::all_of(
+						c(
+							"fhd_id",
+							"species_id",
+							"method",
+							"season"
+						)
+					)
+				)
+			DT::datatable(
+				data,
+				options = list(
+					pageLength = 5,
+					lengthChange = FALSE,
+					searching = FALSE,
+					ordering = FALSE,
+					info = FALSE
+				),
+				rownames = FALSE
 			)
-		)
+		})
+
+		# ── Navigation ───────────────────────────────────────────────────────────
+		observeEvent(input$go_analysis, {
+			# ADD LATER: modal warning if selected_ids() is empty
+			bslib::nav_select(
+				id = nav_id,
+				selected = "nav-analysis",
+				session = parent_session
+			)
+		})
+
+		# ── Return ───────────────────────────────────────────────────────────────
+		return(list(
+			selected_data = reactive({
+				metadata_tbl[metadata_tbl$fhd_id %in% selected_ids(), ]
+			}),
+			uploaded_data = NULL
+		))
 	})
 }
