@@ -142,7 +142,7 @@ mod_data_analysis_server <- function(
 		# Render the dummy data passed from the previous
 		output$dummy_dt <- DT::renderDataTable(
 			{
-				selected_data()$selected_metadata |>
+				selected_data$metadata |>
 					dplyr::select(
 						name_common,
 						method,

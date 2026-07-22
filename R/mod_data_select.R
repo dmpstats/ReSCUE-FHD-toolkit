@@ -2,11 +2,10 @@
 #'
 #' @description A shiny Module allowing users to select flight-height datasets for analysis and comparison
 #'
-#' @param id,input,output,session Internal parameters for {shiny}.
-#'
-#' @noRd
+#' @param id,input,output,session Internal parameters for {shiny}.#'
 #'
 #' @importFrom shiny NS tagList
+#' @noRd
 mod_data_select_ui <- function(id) {
 	ns <- NS(id)
 	tagList(
@@ -504,8 +503,8 @@ mod_data_select_server <- function(
 		})
 
 		# ----- Merge the user-uploaded data -----------
-		#' The user can upload a dataset at any point. Reactively merge
-		#' the user-uploaded data with the main metadata table. This allows the user to select their own datasets for analysis.
+		# The user can upload a dataset at any point. Reactively merge
+		# the user-uploaded data with the main metadata table. This allows the user to select their own datasets for analysis.
 
 		# ── Navigation ───────────────────────────────────────────────────────────
 		outputs <- reactiveValues()

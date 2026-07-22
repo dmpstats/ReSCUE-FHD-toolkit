@@ -68,11 +68,9 @@ tab_analysis_app <- function() {
       purrr::map(readRDS) |>
       setNames(fhd_id)
 
-    selected_data <- reactiveVal(
-      list(
-        selected_metadata = mtdt |> dplyr::slice(1, 3, 5),
-        selected_draws = draws[c(1, 3, 5)]
-      )
+    selected_data <- reactiveValues(
+      metadata = mtdt |> dplyr::slice(1, 3, 5),
+      draws = draws[c(1, 3, 5)]
     )
 
     # call the module server function for the data analysis module, passing in the "selected" data

@@ -15,6 +15,12 @@ app_server <- function(input, output, session) {
 	})
 
 	# Call the top-level metadata
+	metadata_files <- list.files(
+		"data-dummy/metadata",
+		pattern = "\\.rds$",
+		full.names = TRUE
+	)
+
 	metadata <- lapply(metadata_files, readRDS) |>
 		# need to nest covariates list into a higher-level list so that list-columns are
 		# preserved
