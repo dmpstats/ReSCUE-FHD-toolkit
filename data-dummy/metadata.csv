@@ -1,6 +1,0 @@
-"fhd_id","Species","species_id","name_common","name_scientific","group","method","spatial_scale","temporal_scale","month","season","year","country","region","site","sea_area","crm_recommended","lon","lat"
-"Puffin_England_O_Point.rds","Puffin","species_puffin","Puffin","Cepphus_cristata","tern","Altimeter","regional","monthly",5,"breeding",2020,"UK","England","O Point","IVa",FALSE,-3.17068475252017,60.5135082872584
-"Kittiwake_Wales_V_Bay.rds","Kittiwake","species_kittiwake","Kittiwake","Fratercula_alca","diver","GPS","national","monthly",7,"nonbreeding",2019,"UK","Wales","V Bay","VIIe",FALSE,-5.70367623725906,55.4244522470981
-"Black Guillemot_UK_Q_Head.rds","Black Guillemot","species_black_guillemot","Black Guillemot","Cepphus_arctica","gull","GPS","national","monthly",10,"nonbreeding",2017,"UK","UK","Q Head","IVa",TRUE,-6.37378954072483,53.9360245484859
-"Shag_England_M_Bay.rds","Shag","species_shag","Shag","Fratercula_cristata","tern","Altimeter","regional","annual",4,"breeding, nonbreeding",2013,"UK","England","M Bay","IVb",FALSE,-6.64192787185311,56.6393140163273
-"Black Guillemot_Scotland_L_Point.rds","Black Guillemot","species_black_guillemot","Black Guillemot","Aves_guillemot","seaduck","LiDAR-DAS","national","annual",11,"breeding, nonbreeding",2022,"UK","Scotland","L Point","IVa",TRUE,-1.391938889632,56.5729290302843
