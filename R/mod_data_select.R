@@ -140,17 +140,27 @@ mod_data_select_ui <- function(id) {
 				# Right-hand side: show selected data and go to analysis button
 				tagList(
 					bslib::card(
-						max_height = "15vh",
+						# max_height = "15vh",
 						class = "overflow-visible",
 						bslib::card_body(
 							# Left-side: some text
 							bslib::layout_columns(
 								col_widths = c(8, 4),
 								HTML(
-									"If you are running the analysis for a single species, and want to use the recommended defaults, you can do so here.<br><br> This will auto-load the recommended flight-height distribution for the selected species, and will override any other selections."
+									"If you are running the analysis for a single species, and want to use the recommended defaults, you can do so here.<br><br><br> This will auto-load the recommended flight-height distribution for the selected species, and will override any other selections."
 								),
 								tagList(
 									# This selectizeInput should drop downwards, unlike the others
+									selectizeInput(
+										ns("default_region"),
+										label = "Select Region",
+										choices = c(
+											"North Sea",
+											"Norwegian Sea",
+											"Barents Sea",
+											"Atlantic Ocean"
+										)
+									),
 									selectizeInput(
 										ns("default_species"),
 										label = "Select Species",
@@ -463,6 +473,9 @@ mod_data_select_server <- function(
 			req(user_uploads$metadata())
 			userdat <- user_uploads$metadata() |>
 				dplyr::bind_rows()
+			req(nrow(userdat) > 0)
+			userdat <- userdat |>
+				dplyr::filter(!is.na(lon) & !is.na(lat))
 			req(nrow(userdat) > 0)
 			leaflet::leafletProxy("source_map", session) |>
 				leaflet::clearGroup("user_data") |>
