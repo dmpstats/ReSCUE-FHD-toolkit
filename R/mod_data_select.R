@@ -30,6 +30,17 @@ mod_data_select_ui <- function(id) {
 			.bslib-card, .tab-content, .tab-pane, .card-body {
       overflow: visible !important;
     }
+			/* Keep selectize dropdowns below Bootstrap modals */
+			.selectize-dropdown {
+				z-index: 1049 !important;
+			}
+			/* Raise modal stack above bslib stacking contexts (bslib uses up to z-index 1070) */
+			.modal-backdrop {
+				z-index: 10000 !important;
+			}
+			.modal {
+				z-index: 10005 !important;
+			}
 			"
 		)),
 		bslib::page_fillable(
