@@ -18,31 +18,70 @@ mod_data_analysis_ui <- function(id) {
 					# 12,
 					# First card: selected data
 					bslib::card(
-						bslib::card_header("Selected Data", class = "text-bg-primary"),
+						bslib::card_header(
+							"Selected Data",
+							class = "text-bg-primary"
+						),
 						bslib::card_body(DT::DTOutput(ns("dummy_dt"))),
 						# Ensure this card doesn't cover more than 30% of the page height
 						style = "max-height: 30vh; overflow-y: auto;",
 						class = "card border-primary mb-3 bg-light"
 					),
 					# Second card: defining turbine parameters
-					bslib::card(
-						bslib::card_header(
-							style = "display:flex; align-items:center; justify-content:space-between;",
-							class = "text-bg-primary",
-							htmltools::span("Turbine Parameters"),
-							bslib::toolbar(
-								bslib::toolbar_input_select(
-									id = ns("use_turb"),
-									label = "Use Turbine Parameters",
-									choices = c("On", "Off"),
-									class = "bg-secondary text-primary"
-								)
-							)
+					# bslib::card(
+					# 	bslib::card_header(
+					# 		style = "display:flex; align-items:center; justify-content:space-between;",
+					# 		class = "text-bg-primary",
+					# 		htmltools::span("Turbine Parameters"),
+					# 		bslib::toolbar(
+					# 			bslib::toolbar_input_select(
+					# 				id = ns("use_turb"),
+					# 				label = "Use Turbine Parameters",
+					# 				choices = c("On", "Off"),
+					# 				class = "bg-secondary text-primary"
+					# 			)
+					# 		)
+					# 	),
+					# 	bslib::card_body(
+					# 		fluidRow(
+					# 			bslib::layout_columns(
+					# 				col_widths = c(6, 6),
+					# 				numericInput(
+					# 					ns("rotor_min"),
+					# 					"Minimum Rotor Height (m)",
+					# 					value = 50,
+					# 					min = 0
+					# 				),
+					# 				numericInput(
+					# 					ns("rotor_max"),
+					# 					"Maximum Rotor Height (m)",
+					# 					value = 70,
+					# 					min = 0
+					# 				)
+					# 			)
+					# 		)
+					# 	),
+					# 	class = "card border-primary mb-3 bg-light",
+					# 	style = "max-height: 16vh; overflow-y: auto;"
+					# ),
+					# Third card: analysis results
+					bslib::navset_card_underline(
+						title = "Analysis",
+						bslib::nav_spacer(),
+						bslib::nav_panel(
+							title = "Risk Height"
 						),
-						bslib::card_body(
-							fluidRow(
-								bslib::layout_columns(
-									col_widths = c(6, 6),
+						bslib::nav_panel(
+							title = "Compare Distributions"
+						),
+						bslib::nav_item(
+							actionButton(
+								ns("test"),
+								icon = bsicons::bs_icon("gear"),
+								label = "Turbine Parameters",
+								class = "btn-success"
+							) |>
+								bslib::popover(
 									numericInput(
 										ns("rotor_min"),
 										"Minimum Rotor Height (m)",
@@ -56,22 +95,21 @@ mod_data_analysis_ui <- function(id) {
 										min = 0
 									)
 								)
-							)
 						),
-						class = "card border-primary mb-3 bg-light",
-						style = "max-height: 16vh; overflow-y: auto;"
-					),
-
-					# Third card: analysis results
-					bslib::navset_card_underline(
-						title = "Analysis",
-						bslib::nav_spacer(),
-						bslib::nav_panel(
-							title = "Risk Height"
-						),
-						bslib::nav_panel(
-							title = "Compare Distributions"
-						),
+						# bslib::nav_menu(
+						# 	title = tags$span(
+						# 		bsicons::bs_icon("gear"),
+						# 		"Turbine Parameters"
+						# 	),
+						# 	bslib::nav_item(
+						# 		numericInput(
+						# 			ns("rotor_min"),
+						# 			"Minimum Rotor Height (m)",
+						# 			value = 50,
+						# 			min = 0
+						# 		)
+						# 	)
+						# ),
 						full_screen = TRUE
 					) |>
 						htmltools::tagAppendAttributes(
