@@ -153,7 +153,7 @@ mod_landing_page_ui <- function(id) {
 								),
 								# Make font bold
 								class = "not-arrow-btn",
-								style = "width:18vw; height: 5vh;"
+								style = "width:18vw;"
 							),
 							actionButton(
 								ns("restore_session"),
@@ -162,7 +162,7 @@ mod_landing_page_ui <- function(id) {
 									"Restore Session"
 								),
 								class = "not-arrow-btn",
-								style = "width:18vw; height: 5vh;"
+								style = "width:18vw;"
 							),
 						),
 						div(
@@ -170,7 +170,7 @@ mod_landing_page_ui <- function(id) {
 							# tour guide module
 							mod_app_tour_ui(
 								ns("app_tour"),
-								style = "width:18vw; height: 5vh;"
+								style = "width:18vw;"
 							),
 							div(
 								id = ns("tutorial_selectdata"),
@@ -181,7 +181,7 @@ mod_landing_page_ui <- function(id) {
 										"Select Data"
 									),
 									class = "arrow-btn",
-									style = "width:18vw; height: 5vh;"
+									style = "width:18vw;"
 								)
 							)
 						)

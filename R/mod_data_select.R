@@ -146,14 +146,16 @@ mod_data_select_ui <- function(id) {
 				# Right-hand side: show selected data and go to analysis button
 				tagList(
 					bslib::card(
-						max_height = "15vh",
 						class = "overflow-visible",
 						bslib::card_body(
 							# Left-side: some text
 							bslib::layout_columns(
 								col_widths = c(8, 4),
 								HTML(
-									"If you are running the analysis for a single species, and want to use the recommended defaults, you can do so here.<br><br><br> This will auto-load the recommended flight-height distribution for the selected species, and will override any other selections."
+									"<h4>Recommended Defaults</h4>
+									If you are running the analysis for a single species, and want to use the recommended defaults, you can do so here.
+									<br><br>
+									This will auto-load the recommended flight-height distribution for the selected species, and will override any other selections."
 								),
 								tagList(
 									# This selectizeInput should drop downwards, unlike the others

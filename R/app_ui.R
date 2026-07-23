@@ -223,6 +223,9 @@ golem_add_external_resources <- function() {
         border-radius: 15px;
 				overflow: hidden;
       }
+			.card-body-white {
+        background-color: white !important;
+      }
 			.accordion-button {
         background-color: var(--bs-primary);
         color: white;
