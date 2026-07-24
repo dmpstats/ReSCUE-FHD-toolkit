@@ -106,10 +106,18 @@ app_ui <- function(request) {
 				mod_data_analysis_ui("data_analysis")
 			),
 
+			bslib::nav_menu(
+				title = NULL,
+				align = "right",
+				icon = bsicons::bs_icon("book-fill",
+				size = "1.5em",
+				title = "Documents"
+			),
+
 			# Tab 4: Data Sources ============================
 
 			bslib::nav_panel(
-				title = "",
+				title = "Data Sources",
 				icon = bsicons::bs_icon(
 					"database-fill",
 					size = "1.5em"
@@ -131,6 +139,47 @@ app_ui <- function(request) {
 				)
 			),
 
+			bslib::nav_panel(
+				title = "User Guide",
+				value = "nav-user-guide",
+				icon = bsicons::bs_icon(
+					"book-fill",
+					size = "1.5em"
+				) |>
+					bslib::tooltip(
+						placement = "bottom",
+						"User Guide"
+					),
+				bslib::page_fillable(
+					bslib::layout_columns(
+						col_widths = c(10, 2),
+						bslib::card(
+							bslib::card_header(
+								h2("User Guide"),
+								class = "text-bg-primary"
+							),
+							shiny::includeMarkdown(app_sys(
+								"app",
+								"md",
+								"userguide.md"
+							)),
+							class = "card border-primary mb-3 bg-light"
+						),
+						# Sidebar with logos
+						bslib::card(
+							class = "d-flex flex-column align-items-center gap-3 h-100",
+							logolink("dmp", height = 9),
+							logolink("ne", height = 9),
+							logolink("bto", height = 9),
+							logolink("blackbawks", height = 9),
+							logolink("niras", height = 9)
+						)
+					)
+				)
+			)
+			),
+
+		
 			# Drop-down for save/restore options  =======================
 
 			bslib::nav_menu(
