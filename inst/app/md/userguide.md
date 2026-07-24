@@ -69,9 +69,16 @@ The app provides comprehensive functionality for working with seabird flight hei
 ## Selecting your Flight Height Distribution
 
 ReSCUEApp provides three options for selecting the most suitable flight height distribution data for your use-case:
-1. **Default Data Selection** - Select a species and region, and the recommended regulator-approved flight height distribution will be automatically selected for you.
-2. **Manual Data Selection** - Select a species and region, and choose from a list of available flight height distributions, including recommended defaults and existing published data.
-3. **User Upload** - Upload your own ReSCUETools-generated flight height distribution data in CSV format for analysis and comparison with existing distributions.
+
+<div class="card border-primary mb-3">
+  <div class="card-body">
+  <ol>
+    <li><strong>Default Data Selection</strong> - Select a species and region, and the recommended regulator-approved flight height distribution will be automatically selected for you.</li>
+  <li><strong>Manual Data Selection</strong> - Select a species and region, and choose from a list of available flight height distributions, including recommended defaults and existing published data.</li>
+  <li><strong>User Upload</strong> - Upload your own ReSCUETools-generated flight height distribution data in CSV format for analysis and comparison with existing distributions.</li>
+  </ol>
+  </div>
+</div>
 
 In the below sections, we'll talk you through each of these options in more detail.
 
@@ -108,6 +115,7 @@ Once you have uploaded your distribution, click "Next" to proceed to the analysi
 
 <div class="card border-success mb-3">
   <div class="card-body">
+  <strong><h4>Mixing and Matching!</h4></strong>
     You can use a mix of the above data-selection options. For example, you may wish to compare the recommended distribution for your use-case to a distribution that you have uploaded yourself. Just use both methods separately to add the selected distributions to the selection table!
   </div>
 </div>
