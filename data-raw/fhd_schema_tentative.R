@@ -125,7 +125,7 @@ if (1) {
     "type",
     class = "<character>",
     descr = "type of covariate",
-    values = "'numeric', 'factor', 'logical'"
+    values = "'factor', 'logical'"
   )
 
   fhd_schema$metadata$covariates$cov2$AddChild(
@@ -209,13 +209,13 @@ if (1) {
   fhd_schema$metadata$AddChild(
     "group",
     class = "<character>",
-    descr = "Taxonomic or functional group"
+    descr = "Species taxonomic or functional group"
   )
 
   fhd_schema$metadata$AddChild(
     "crm_recommended",
     class = "<logical>",
-    descr = "Recommended for use in CRMS?"
+    descr = "Recommended for use in CRMs?"
   )
 
   fhd_schema$metadata$AddChild(
@@ -240,3 +240,10 @@ if (1) {
 
 
 print(fhd_schema, "class", "descr", "values")
+
+data.tree::ToDataFrameTree(fhd_schema, "class", "descr", "values") |>
+  saveRDS("data-raw/fhd_schema_tentative.rds")
+
+
+readRDS("data-dummy/metadata/Kittiwake_Wales_V_Bay.rds")
+readRDS("data-dummy/draws/Kittiwake_Wales_V_Bay.rds")

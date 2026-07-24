@@ -37,7 +37,8 @@ Imports:
     plotly,
     shiny,
     shinybusy,
-    shinyjs
+    shinyjs,
+    rlang
 Suggests:
     spelling,
     testthat (>= 3.0.0)

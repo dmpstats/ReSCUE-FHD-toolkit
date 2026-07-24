@@ -14,45 +14,6 @@ make_fhd_df <- function() {
   )
 }
 
-# resample_fhd() ------------------------------------------------------------------------
-
-test_that("testing resample_fhd()", {
-  skip("dev testing")
-
-  fhd_df <- expand.grid(
-    draw_id = 1:5,
-    height = seq(0.5, 2.5, by = 1),
-    wind_speed = c("high", "low"),
-    temperature = c("hot", "mild", "low"),
-    daytime = c(TRUE, FALSE)
-  ) |>
-    dplyr::mutate(probability = runif(length(draw_id)))
-
-  fhd_arr <- fhd_df_to_array(
-    fhd_df,
-    height_col = "height",
-    draw_col = "draw_id",
-    prob_col = "probability"
-  )
-
-  slice_fhd(
-    fhd_array = fhd_arr,
-    wind_speed = c("high"),
-    temperature = c("hot", "mild"),
-    daytime = NULL, #c(TRUE),
-    n_resamp = 5,
-    out_format = "df"
-  )
-
-  slice_fhd(
-    fhd_array = fhd_arr,
-    wind_speed = NULL, # c("high"),
-    temperature = NULL,
-    n_resamp = 5
-  )
-})
-
-
 # fhd_df_to_array() ---------------------------------------------------------------------
 
 test_that("fhd_df_to_array() produces correct dimensions and dimnames", {
@@ -108,9 +69,15 @@ test_that("fhd_df_to_array() attaches cov_combos and col_names attributes", {
   arr <- fhd_df_to_array(make_fhd_df())
 
   expect_equal(
-    attr(arr, "cov_combos"),
+    attr(arr, "covs")$combos,
     tibble::tibble(wind_speed = c("high", "low"))
   )
+
+  expect_equal(
+    attr(arr, "covs")$levels,
+    list(wind_speed = c("high", "low"))
+  )
+
   expect_equal(
     attr(arr, "col_names"),
     list(
@@ -120,6 +87,27 @@ test_that("fhd_df_to_array() attaches cov_combos and col_names attributes", {
       cov_cols = "wind_speed"
     )
   )
+})
+
+
+test_that("fhd_df_to_array() handles covar-free FHD", {
+  # data without covariates: 2 heights x 2 draws, forming a complete grid with known probability values.
+  fhd_df <- expand.grid(
+    draw_id = 1:5,
+    height = seq(0.5, 2.5, by = 1)
+  ) |>
+    dplyr::mutate(probability = runif(length(draw_id)))
+
+  arr <- fhd_df_to_array(fhd_df)
+
+  expect_equal(
+    dim(arr),
+    c(n_height = 3L, n_draws = 5L)
+  )
+
+  expect_named(dimnames(arr), c("height", "draw_id"))
+  expect_equal(dimnames(arr)$height, c("0.5", "1.5", "2.5"))
+  expect_equal(dimnames(arr)$draw_id, c("1", "2", "3", "4", "5"))
 })
 
 
@@ -178,14 +166,34 @@ test_that("fhd_array_to_df() errors when array lacks required attributes", {
   )
 })
 
-test_that("fhd_array_to_df() errors when array is not 3-dimensional", {
-  arr <- fhd_df_to_array(make_fhd_df())
-  matrix_arr <- arr[,, 1] # drop to 2D, keeping cov_combos/col_names attributes
-  attr(matrix_arr, "cov_combos") <- attr(arr, "cov_combos")
-  attr(matrix_arr, "col_names") <- attr(arr, "col_names")
+# test_that("fhd_array_to_df() errors when array is not 3-dimensional", {
+#   arr <- fhd_df_to_array(make_fhd_df())
+#   matrix_arr <- arr[,, 1] # drop to 2D, keeping cov_combos/col_names attributes
+#   attr(matrix_arr, "cov_combos") <- attr(arr, "cov_combos")
+#   attr(matrix_arr, "col_names") <- attr(arr, "col_names")
 
-  expect_error(
-    fhd_array_to_df(matrix_arr),
-    "3D array"
-  )
+#   expect_error(
+#     fhd_array_to_df(matrix_arr),
+#     "3D array"
+#   )
+# })
+
+test_that("fhd_array_to_df() handles covar-free case", {
+  # data without covariates: 2 heights x 2 draws, forming a complete grid with known probability values.
+  fhd_df <- expand.grid(
+    draw_id = 1:5,
+    height = seq(0.5, 2.5, by = 1)
+  ) |>
+    dplyr::mutate(probability = runif(length(draw_id)))
+
+  arr <- fhd_df_to_array(fhd_df)
+  df_back <- fhd_array_to_df(arr)
+
+  expect_setequal(names(df_back), names(fhd_df))
+
+  df_sorted <- dplyr::arrange(fhd_df, draw_id, height)
+  df_back_sorted <- dplyr::arrange(df_back, draw_id, height)
+
+  expect_equal(df_back_sorted$probability, df_sorted$probability)
+  expect_equal(df_back_sorted$height, df_sorted$height)
 })
