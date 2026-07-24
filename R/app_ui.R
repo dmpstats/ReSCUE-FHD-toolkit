@@ -150,20 +150,18 @@ app_ui <- function(request) {
 						placement = "bottom",
 						"User Guide"
 					),
-				bslib::page_fillable(
+				bslib::page_fixed(
 					bslib::layout_columns(
 						col_widths = c(10, 2),
 						bslib::card(
-							bslib::card_header(
-								h2("User Guide"),
-								class = "text-bg-primary"
-							),
+							bslib::card_body(
 							shiny::includeMarkdown(app_sys(
 								"app",
 								"md",
 								"userguide.md"
-							)),
-							class = "card border-primary mb-3 bg-light"
+							))
+						),
+							class = "card border-primary bg-light"
 						),
 						# Sidebar with logos
 						bslib::card(
