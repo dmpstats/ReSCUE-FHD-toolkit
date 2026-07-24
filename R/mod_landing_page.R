@@ -131,8 +131,8 @@ mod_landing_page_ui <- function(id) {
 							bslib::layout_columns(
 								col_widths = c(4, 4, 4),
 								logolink("dmp"),
-								logolink("bto"),
-								logolink("ne")
+								logolink("ne", height = 9),
+								logolink("bto")
 							),
 							bslib::layout_columns(
 								col_widths = c(6, 6),
