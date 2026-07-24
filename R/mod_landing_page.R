@@ -224,18 +224,12 @@ mod_landing_page_server <- function(
 		observeEvent(
 			input$link_guide,
 			{
-				# For now, we'll just open inst/app/md/userguide.md in a modal
-				showModal(modalDialog(
-					title = NULL,
-					shiny::includeMarkdown(app_sys(
-						"app",
-						"md",
-						"userguide.md"
-					)),
-					easyClose = TRUE,
-					footer = modalButton("Close"),
-					size = "xl"
-				))
+				# Navigate to the user guide tab
+				bslib::nav_select(
+					id = nav_id,
+					selected = "nav-user-guide",
+					session = parent_session
+				)
 			}
 		)
 
