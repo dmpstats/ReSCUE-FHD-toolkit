@@ -19,10 +19,11 @@ mod_data_select_ui <- function(id) {
 				bottom: 100% !important;
 				top: auto !important;
 			}
-			/* Allow default_species dropdown to escape container and open normally */
+			/* Allow default_species/default_region dropdowns to escape container and open normally */
 			.overflow-visible {
 				overflow: visible !important;
 			}
+			.shiny-input-container:has(#data_select-default_region) .selectize-dropdown,
 			.shiny-input-container:has(#data_select-default_species) .selectize-dropdown {
 				bottom: auto !important;
 				top: 100% !important;
@@ -30,9 +31,14 @@ mod_data_select_ui <- function(id) {
 			.bslib-card, .tab-content, .tab-pane, .card-body {
       overflow: visible !important;
     }
-			/* Keep selectize dropdowns below Bootstrap modals */
-			.selectize-dropdown {
-				z-index: 1049 !important;
+			/*
+			 * When a selectize is open, elevate its entire control as a stacking context
+			 * so the dropdown paints above sibling selectize inputs (z-index: 1) in the
+			 * same container, without reaching the modal layer.
+			 */
+			.selectize-control.dropdown-active {
+				position: relative;
+				z-index: 100 !important;
 			}
 			/* Raise modal stack above bslib stacking contexts (bslib uses up to z-index 1070) */
 			.modal-backdrop {
@@ -140,14 +146,16 @@ mod_data_select_ui <- function(id) {
 				# Right-hand side: show selected data and go to analysis button
 				tagList(
 					bslib::card(
-						# max_height = "15vh",
 						class = "overflow-visible",
 						bslib::card_body(
 							# Left-side: some text
 							bslib::layout_columns(
 								col_widths = c(8, 4),
 								HTML(
-									"If you are running the analysis for a single species, and want to use the recommended defaults, you can do so here.<br><br><br> This will auto-load the recommended flight-height distribution for the selected species, and will override any other selections."
+									"<h4>Recommended Defaults</h4>
+									If you are running the analysis for a single species, and want to use the recommended defaults, you can do so here.
+									<br><br>
+									This will auto-load the recommended flight-height distribution for the selected species, and will override any other selections."
 								),
 								tagList(
 									# This selectizeInput should drop downwards, unlike the others
@@ -271,7 +279,7 @@ mod_data_select_server <- function(
 		# Continuously run the user-upload module within this -------
 		user_uploads <- mod_user_upload_server(
 			id = "user_upload",
-			clear_trigger = reactive(input$clear_all_uploads)
+			clear_trigger = reactive(input$confirm_clear)
 		)
 
 		# ---- Track some states -----------
@@ -348,10 +356,10 @@ mod_data_select_server <- function(
 					lng = ~lon,
 					lat = ~lat,
 					layerId = ~fhd_id,
-					radius = 10,
+					radius = 14,
 					group = "main_data",
-					color = "black",
-					weight = 1,
+					color = "white",
+					weight = 4,
 					fillOpacity = 0.85,
 					fillColor = "grey",
 					popup = ~ paste0(
@@ -412,9 +420,9 @@ mod_data_select_server <- function(
 					lng = ~lon,
 					lat = ~lat,
 					layerId = ~fhd_id,
-					radius = 10,
-					color = "black",
-					weight = 1,
+					radius = 14,
+					color = "white",
+					weight = 4,
 					group = "main_data",
 					fillOpacity = 0.85,
 					fillColor = ifelse(data$fhd_id %in% ids, "#ffa134", "grey"),
@@ -470,6 +478,8 @@ mod_data_select_server <- function(
 
 		observe({
 			# Add user datasets to the main, if there are any
+			leaflet::leafletProxy("source_map", session) |>
+				leaflet::clearGroup("user_data")
 			req(user_uploads$metadata())
 			userdat <- user_uploads$metadata() |>
 				dplyr::bind_rows()
@@ -478,15 +488,14 @@ mod_data_select_server <- function(
 				dplyr::filter(!is.na(lon) & !is.na(lat))
 			req(nrow(userdat) > 0)
 			leaflet::leafletProxy("source_map", session) |>
-				leaflet::clearGroup("user_data") |>
 				leaflet::addCircleMarkers(
 					data = userdat,
 					lng = ~lon,
 					lat = ~lat,
 					layerId = ~fhd_id,
-					radius = 10,
-					color = "black",
-					weight = 1,
+					radius = 14,
+					color = "white",
+					weight = 4,
 					group = "user_data",
 					fillOpacity = 0.85,
 					fillColor = "#009b12",
