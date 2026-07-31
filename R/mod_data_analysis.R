@@ -35,10 +35,26 @@ mod_data_analysis_ui <- function(id) {
 						bslib::nav_spacer(),
 						bslib::nav_panel(
 							title = "Risk Height",
-							bslib::input_switch(
-								id = ns("show_as_percentages"),
-								value = TRUE,
-								label = "Show as percentages"
+							fluidRow(
+								bslib::input_switch(
+									id = ns("show_as_percentages"),
+									value = TRUE,
+									label = "Show as percentages",
+									width = "50%"
+								),
+								actionButton(
+									inputId = ns("recalc_heightshift"),
+									label = "Generate Table",
+									icon = bsicons::bs_icon("arrow-repeat"),
+									class = "btn-primary",
+									width = "50%"
+								) |>
+									bslib::tooltip(
+										"This might be slow for large datasets"
+									)
+							),
+							p(
+								"This table shows changes to the FHD risk-zone probabilities as the turbine height is increased or decreased. The first column shows the unique FHD identifiers, and the remaining columns show the probabilities of FHD risk for each height shift."
 							),
 							DT::DTOutput(ns("heightshift_table"))
 						),
@@ -393,23 +409,33 @@ mod_data_analysis_server <- function(
 		})
 
 		# -- Step 5: Generate the height-shift FHD table -------------
-		heightshift_data <- reactive({
-			req(plot_ready_data())
-			heightshift(
-				plot_ready_data(),
-				height_col = "height",
-				prob_col = "probability",
-				id_col = "unique_fhd",
-				draw_id_col = "draw_id",
-				risk_min = input$rotor_min,
-				risk_max = input$rotor_max,
-				type = ifelse(input$show_as_percentages, "percentage", "probability"),
-				round = ifelse(input$show_as_percentages, 2, 4)
-			)
-		})
+		heightshift_data <- reactiveVal(NULL)
+		observeEvent(
+			input$recalc_heightshift,
+			{
+				req(plot_ready_data())
+				heightshift_data(
+					heightshift(
+						plot_ready_data(),
+						height_col = "height",
+						prob_col = "probability",
+						id_col = "unique_fhd",
+						draw_id_col = "draw_id",
+						risk_min = input$rotor_min,
+						risk_max = input$rotor_max,
+						round = c(2, 4)
+					)
+				)
+			}
+		)
+
 		# Make the table
 		output$heightshift_table <- DT::renderDataTable(
 			{
+				type <- ifelse(input$show_as_percentages, "perc", "prob")
+				req(heightshift_data())
+				req(nrow(heightshift_data()[[type]]) > 0)
+
 				percjs <- if (input$show_as_percentages) {
 					"function(data, type, row) {
 						if(type === 'display' && data !== null) {
@@ -425,10 +451,9 @@ mod_data_analysis_server <- function(
 					NULL
 				}
 
-				req(heightshift_data())
-				num_cols <- ncol(heightshift_data())
+				num_cols <- ncol(heightshift_data()[[type]])
 				out <- DT::datatable(
-					heightshift_data(),
+					heightshift_data()[[type]],
 					rownames = FALSE,
 					extensions = c("Buttons", "FixedHeader"),
 					options = list(
@@ -451,7 +476,7 @@ mod_data_analysis_server <- function(
 				if (input$show_as_percentages) {
 					out <- out |>
 						DT::formatStyle(
-							columns = 2:ncol(heightshift_data()),
+							columns = 2:ncol(heightshift_data()[[type]]),
 							color = DT::styleInterval(
 								0,
 								c("green", "red")

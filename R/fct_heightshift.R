@@ -7,6 +7,11 @@
 #' @param height_col The column name for the turbine height values.
 #' @param prob_col The column name for the probability values.
 #' @param id_col The column name for the unique FHD identifiers.
+#' @param draw_id_col The column name for the draw identifiers.
+#' @param risk_min The minimum height of the turbine rotor (in meters).
+#' @param risk_max The maximum height of the turbine rotor (in meters).
+#' @param round A 2-length vector of integers specifying the number of decimal places to round the probability and percentage values to, respectively. If NULL, no rounding is performed.
+#'
 #'
 #' @return A matrix whereby each row represents a unique FHD identifier and each
 #'  column represents a unique turbine height. The values in the
@@ -22,8 +27,7 @@ heightshift <- function(
   draw_id_col = "draw_id",
   risk_min = 50,
   risk_max = 100,
-  type = c("probability", "percentage"),
-  round = 2
+  round = c(NULL, 2)
 ) {
   # Create a new .df with only the relevant columns
   fhd_data <- data.frame(
@@ -103,21 +107,24 @@ heightshift <- function(
 
   # If the desired type is percentages, convert all values to
   # percentage change from +0
-  if (type == "percentage") {
-    fhd_prob_matrix <- sweep(
-      fhd_prob_matrix,
-      1,
-      fhd_prob_matrix[, true_fhd_id],
-      FUN = function(x, y) (x - y) / y * 100
-    )
-  }
+  fhd_perc_matrix <- sweep(
+    fhd_prob_matrix,
+    1,
+    fhd_prob_matrix[, true_fhd_id],
+    FUN = function(x, y) (x - y) / y * 100
+  )
 
   # Round everything, if requested
   if (!is.null(round)) {
-    fhd_prob_matrix <- round(fhd_prob_matrix, round)
+    fhd_prob_matrix <- round(fhd_prob_matrix, round[1])
+    fhd_perc_matrix <- round(fhd_perc_matrix, round[2])
   }
 
   # Add the FIDs to the LHS of the matrix
+  fhd_perc_matrix <- cbind(
+    fhd_id = rownames(fhd_perc_matrix),
+    fhd_perc_matrix
+  )
   fhd_prob_matrix <- cbind(
     fhd_id = rownames(fhd_prob_matrix),
     fhd_prob_matrix
@@ -125,6 +132,12 @@ heightshift <- function(
 
   # Set the column of the true FHD as an attribute
   attr(fhd_prob_matrix, "true_fhd_col") <- true_fhd_id + 1
+  attr(fhd_perc_matrix, "true_fhd_col") <- true_fhd_id + 1
 
-  return(fhd_prob_matrix)
+  return(
+    list(
+      prob = fhd_prob_matrix,
+      perc = fhd_perc_matrix
+    )
+  )
 }

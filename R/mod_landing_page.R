@@ -13,7 +13,7 @@ mod_landing_page_ui <- function(id) {
 		bslib::page_fillable(
 			# Add a page-wide card
 			bslib::card(
-				class = "bg-light",
+				class = "bg-secondary",
 				full_screen = FALSE,
 				fill = FALSE, # <-- stops the card from growing to fill the page height
 				tags$a(
