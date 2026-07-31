@@ -11,6 +11,23 @@ mod_landing_page_ui <- function(id) {
 	ns <- NS(id)
 	tagList(
 		bslib::page_fillable(
+			# Add a page-wide card
+			bslib::card(
+				class = "bg-light",
+				full_screen = FALSE,
+				fill = FALSE, # <-- stops the card from growing to fill the page height
+				tags$a(
+					href = "google.com",
+					target = "_blank",
+					rel = "noopener noreferrer",
+					tags$img(
+						src = "www/ReSCUE_banner.png",
+						class = "logo-link",
+						alt = "ReSCUE Project Banner",
+						style = "max-width: 90vw; cursor: pointer; display: block; margin-left: auto; margin-right: auto;"
+					),
+				)
+			),
 			bslib::layout_columns(
 				col_widths = c(7, 5),
 				# LHS: A card containing project information.
@@ -129,10 +146,10 @@ mod_landing_page_ui <- function(id) {
 						),
 						bslib::card_body(
 							bslib::layout_columns(
-								col_widths = c(4, 4, 4),
+								col_widths = c(6, 6),
 								logolink("dmp"),
-								logolink("ne", height = 9),
-								logolink("bto")
+								# logolink("ne", height = 9),
+								logolink("bto", height = 8)
 							),
 							bslib::layout_columns(
 								col_widths = c(6, 6),
