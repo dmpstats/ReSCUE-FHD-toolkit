@@ -34,6 +34,10 @@ mod_data_analysis_ui <- function(id) {
 						title = "Analysis",
 						bslib::nav_spacer(),
 						bslib::nav_panel(
+							title = "Summary",
+							DT::DTOutput(ns("fhd_summaries"))
+						),
+						bslib::nav_panel(
 							title = "Risk Height",
 							fluidRow(
 								bslib::input_switch(
@@ -41,17 +45,17 @@ mod_data_analysis_ui <- function(id) {
 									value = TRUE,
 									label = "Show as percentages",
 									width = "50%"
-								),
-								actionButton(
-									inputId = ns("recalc_heightshift"),
-									label = "Generate Table",
-									icon = bsicons::bs_icon("arrow-repeat"),
-									class = "btn-primary",
-									width = "50%"
-								) |>
-									bslib::tooltip(
-										"This might be slow for large datasets"
-									)
+								)
+								# actionButton(
+								# 	inputId = ns("recalc_heightshift"),
+								# 	label = "Generate Table",
+								# 	icon = bsicons::bs_icon("arrow-repeat"),
+								# 	class = "btn-primary",
+								# 	width = "50%"
+								# ) |>
+								# 	bslib::tooltip(
+								# 		"This might be slow for large datasets"
+								# 	)
 							),
 							p(
 								"This table shows changes to the FHD risk-zone probabilities as the turbine height is increased or decreased. The first column shows the unique FHD identifiers, and the remaining columns show the probabilities of FHD risk for each height shift."
@@ -98,7 +102,12 @@ mod_data_analysis_ui <- function(id) {
 						bslib::card_header(
 							"Flight Height Distribution",
 							class = "text-bg-primary",
-							bslib::toolbar_spacer()
+							bslib::toolbar_spacer(),
+							bslib::input_switch(
+								id = ns("hide_legend"),
+								label = "Hide legend",
+								value = FALSE
+							)
 						),
 						bslib::card_body(
 							# class = "card-body-white",
@@ -185,7 +194,8 @@ mod_data_analysis_server <- function(
 						" No covariates available for this dataset."
 					)
 				} else {
-					cov_blocks <- lapply(names(covs), function(cov_name) {
+					cov_blocks <- lapply(seq_along(covs), function(ci) {
+						cov_name <- names(covs)[ci]
 						cov_meta <- covs[[cov_name]]
 						switch_id <- paste0(
 							"cov_switch_",
@@ -202,20 +212,24 @@ mod_data_analysis_server <- function(
 						cov_label <- cov_meta$label %||% cov_name
 						cov_levels <- cov_meta$levels %||% character(0)
 
-						tags$div(
-							class = "mb-2",
+						tagList(
+							# Separator between covariate blocks (skip before first)
+							if (ci > 1) tags$hr(class = "my-2") else NULL,
 							tags$div(
-								class = "d-flex align-items-center justify-content-between",
-								tags$span(
-									class = "small fw-semibold",
-									cov_label
-								),
-								bslib::input_switch(
-									id = ns(switch_id),
-									label = "Use",
-									value = FALSE
+								# Row: covariate name on left, "Use" label + switch on right
+								class = "d-flex align-items-center justify-content-between gap-2",
+								tags$span(class = "small fw-semibold", cov_label),
+								tags$div(
+									class = "d-flex align-items-center gap-1",
+									# tags$span(class = "small text-muted", "Use"),
+									bslib::input_switch(
+										id = ns(switch_id),
+										label = NULL,
+										value = FALSE
+									)
 								)
 							),
+							# Level checkboxes — indented with a left border when visible
 							conditionalPanel(
 								condition = paste0(
 									"input['",
@@ -223,7 +237,7 @@ mod_data_analysis_server <- function(
 									"'] === true"
 								),
 								tags$div(
-									class = "ms-1 mt-1",
+									class = "border-start border-2 ps-2 ms-1 mt-1",
 									checkboxGroupInput(
 										inputId = ns(levels_id),
 										label = tags$span(
@@ -257,18 +271,6 @@ mod_data_analysis_server <- function(
 					# LHS: Details button + label
 					tags$div(
 						class = "d-flex align-items-center gap-2 overflow-hidden",
-						tags$button(
-							class = "btn btn-sm btn-outline-info flex-shrink-0",
-							onclick = paste0(
-								"Shiny.setInputValue('",
-								ns("det_btn_click"),
-								"', '",
-								fhd_id,
-								"', {priority:'event'})"
-							),
-							bsicons::bs_icon("card-text"),
-							" Details"
-						),
 						tags$div(
 							class = "overflow-hidden",
 							tags$span(
@@ -283,6 +285,18 @@ mod_data_analysis_server <- function(
 						)
 					),
 					# RHS: Configure button + popover
+					tags$button(
+						class = "btn btn-sm btn-outline-info flex-shrink-0",
+						onclick = paste0(
+							"Shiny.setInputValue('",
+							ns("det_btn_click"),
+							"', '",
+							fhd_id,
+							"', {priority:'event'})"
+						),
+						bsicons::bs_icon("card-text"),
+						" Details"
+					),
 					actionButton(
 						inputId = ns(paste0("cfg_btn_", safe_id)),
 						label = tagList(
@@ -403,31 +417,46 @@ mod_data_analysis_server <- function(
 			uuid <- alldat |>
 				dplyr::select(dplyr::all_of(c("fhd_id", unexpected_cols))) |>
 				dplyr::distinct() |>
-				dplyr::mutate(unique_fhd = dplyr::row_number())
+				dplyr::group_by(fhd_id) |>
+				dplyr::mutate(
+					unique_fhd = if (length(unexpected_cols) == 0 || dplyr::n() == 1L) {
+						# No covariates, or only one combination — use fhd_id directly
+						fhd_id
+					} else {
+						# Multiple splits of the same FHD — append covariate values in brackets
+						paste0(
+							fhd_id,
+							" [",
+							apply(
+								dplyr::pick(dplyr::all_of(unexpected_cols)),
+								1,
+								paste,
+								collapse = " \u00b7 "
+							),
+							"]"
+						)
+					}
+				) |>
+				dplyr::ungroup()
 			alldat |>
 				dplyr::left_join(uuid, by = c("fhd_id", unexpected_cols))
 		})
 
 		# -- Step 5: Generate the height-shift FHD table -------------
-		heightshift_data <- reactiveVal(NULL)
-		observeEvent(
-			input$recalc_heightshift,
-			{
-				req(plot_ready_data())
-				heightshift_data(
-					heightshift(
-						plot_ready_data(),
-						height_col = "height",
-						prob_col = "probability",
-						id_col = "unique_fhd",
-						draw_id_col = "draw_id",
-						risk_min = input$rotor_min,
-						risk_max = input$rotor_max,
-						round = c(2, 4)
-					)
-				)
-			}
-		)
+
+		heightshift_data <- reactive({
+			req(plot_ready_data())
+			heightshift(
+				plot_ready_data(),
+				height_col = "height",
+				prob_col = "probability",
+				id_col = "unique_fhd",
+				draw_id_col = "draw_id",
+				risk_min = input$rotor_min,
+				risk_max = input$rotor_max,
+				round = c(4, 2)
+			)
+		})
 
 		# Make the table
 		output$heightshift_table <- DT::renderDataTable(
@@ -455,15 +484,16 @@ mod_data_analysis_server <- function(
 				out <- DT::datatable(
 					heightshift_data()[[type]],
 					rownames = FALSE,
-					extensions = c("Buttons", "FixedHeader"),
+					extensions = c("FixedHeader"),
 					options = list(
 						dom = "Bfrt",
-						buttons = c("copy", "csv", "excel", "pdf", "print"),
+						# buttons = c("copy", "csv", "excel", "pdf", "print"),
 						fixedHeader = TRUE,
-						pageLength = -1,
+						pageLength = 10,
 						searching = FALSE,
 						lengthMenu = c(5, 10, 25, 50, 100),
 						scrollX = TRUE,
+						scrollY = "30vh",
 						columnDefs = list(
 							list(
 								targets = 1:(num_cols - 1), # All columns except first (0-indexed)
@@ -496,6 +526,42 @@ mod_data_analysis_server <- function(
 			)
 		)
 
+		# ---- Step 6: Generate the FHD summaries ----
+		output$fhd_summaries <- DT::renderDataTable({
+			req(plot_ready_data())
+			sumdat <- make_fhd_summary(
+				plot_ready_data(),
+				id_col = "unique_fhd",
+				height_col = "height",
+				prob_col = "probability",
+				draw_col = "draw_id",
+				risk_min = input$rotor_min,
+				risk_max = input$rotor_max
+			) |>
+				# Add a % to all cols except the first
+				dplyr::mutate(
+					dplyr::across(
+						-1,
+						~ paste0(.x, "%")
+					)
+				)
+			DT::datatable(
+				sumdat,
+				# Add a % digit to the columns and prevent horizontal overrun
+				rownames = FALSE,
+				extensions = c("FixedHeader"),
+				options = list(
+					dom = "Bfrt",
+					fixedHeader = TRUE,
+					pageLength = 10,
+					searching = FALSE,
+					lengthMenu = c(5, 10, 25, 50, 100),
+					scrollX = TRUE,
+					scrollY = "30vh"
+				),
+			)
+		})
+
 		# ── FHD plot ──────────────────────────────────────────────────────────────
 		output$dummy_plot <- plotly::renderPlotly({
 			req(plot_ready_data())
@@ -504,6 +570,8 @@ mod_data_analysis_server <- function(
 			used_covs <- cov_selections() |>
 				purrr::map(~ names(Filter(\(x) !is.null(x), .x))) |>
 				purrr::reduce(union, .init = character(0))
+
+			max_prob <- 0
 
 			plt <- fhd_baseplot(
 				risk_min = input$rotor_min,
@@ -515,6 +583,8 @@ mod_data_analysis_server <- function(
 				fhd_subset <- dplyr::filter(plot_ready_data(), fhd_id == id)
 				# Only pass used_covs that actually exist as columns in this subset
 				plot_by_cov <- intersect(used_covs, names(fhd_subset))
+
+				max_prob <- max(max_prob, max(fhd_subset$probability, na.rm = TRUE))
 
 				plt <- add_fhd(
 					plot = plt,
@@ -529,6 +599,15 @@ mod_data_analysis_server <- function(
 						NULL
 					}
 				)
+
+				plt <- plt |>
+					plotly::layout(
+						yaxis = list(range = c(0, max_prob * 1.1))
+					)
+			}
+
+			if (isTRUE(input$hide_legend)) {
+				plt <- plt |> plotly::layout(showlegend = FALSE)
 			}
 
 			plt

@@ -6,76 +6,76 @@
 #'
 #'
 #' @import plotly
-#' @noRd
-plot_fhd <- function(
-  datalist,
-  id_col = "fhd_id",
-  height_col = "height",
-  draw_col = "draw_id",
-  prob_col = "probability",
-  risk_min = NULL,
-  risk_max = NULL,
-  cols_by_level = NULL
-) {
-  plotdat <- data.frame(
-    f_id = datalist[[id_col]],
-    draw_id = datalist[[draw_col]],
-    height = datalist[[height_col]],
-    prob = datalist[[prob_col]]
-  )
+# #' @noRd
+# plot_fhd <- function(
+#   datalist,
+#   id_col = "fhd_id",
+#   height_col = "height",
+#   draw_col = "draw_id",
+#   prob_col = "probability",
+#   risk_min = NULL,
+#   risk_max = NULL,
+#   cols_by_level = NULL
+# ) {
+#   plotdat <- data.frame(
+#     f_id = datalist[[id_col]],
+#     draw_id = datalist[[draw_col]],
+#     height = datalist[[height_col]],
+#     prob = datalist[[prob_col]]
+#   )
 
-  # For now, we'll plot the means grouped by f_id
-  plotdat_summed <- plotdat |>
-    dplyr::group_by(f_id, height) |>
-    dplyr::summarise(prob = mean(prob, na.rm = TRUE), .groups = "drop")
+#   # For now, we'll plot the means grouped by f_id
+#   plotdat_summed <- plotdat |>
+#     dplyr::group_by(f_id, height) |>
+#     dplyr::summarise(prob = mean(prob, na.rm = TRUE), .groups = "drop")
 
-  # Create the plotly plot
-  p1 <- plotly::plot_ly() |>
-    plotly::add_lines(
-      data = plotdat_summed,
-      x = ~height,
-      y = ~prob,
-      color = ~ as.factor(f_id),
-      colors = "Set1",
-      line = list(width = 2),
-      hoverinfo = "text",
-      text = ~ paste(
-        "fhd_id:",
-        f_id,
-        "<br>Height:",
-        height,
-        "<br>Probability:",
-        prob
-      )
-    ) |>
-    plotly::layout(
-      title = "Flight Height Distributions",
-      xaxis = list(title = "Height"),
-      yaxis = list(title = "Probability"),
-      legend = list(title = list(text = "fhd_id"))
-    )
+#   # Create the plotly plot
+#   p1 <- plotly::plot_ly() |>
+#     plotly::add_lines(
+#       data = plotdat_summed,
+#       x = ~height,
+#       y = ~prob,
+#       color = ~ as.factor(f_id),
+#       colors = "Set1",
+#       line = list(width = 2),
+#       hoverinfo = "text",
+#       text = ~ paste(
+#         "fhd_id:",
+#         f_id,
+#         "<br>Height:",
+#         height,
+#         "<br>Probability:",
+#         prob
+#       )
+#     ) |>
+#     plotly::layout(
+#       title = "Flight Height Distributions",
+#       xaxis = list(title = "Height"),
+#       yaxis = list(title = "Probability"),
+#       legend = list(title = list(text = "fhd_id"))
+#     )
 
-  if (
-    !is.null(risk_min) &&
-      !is.null(risk_max) &&
-      !is.na(risk_min) &&
-      !is.na(risk_max)
-  ) {
-    p1 <- p1 |>
-      plotly::add_trace(
-        x = c(risk_min, risk_max, risk_max, risk_min, risk_min),
-        y = c(0, 0, max(plotdat_summed$prob), max(plotdat_summed$prob), 0),
-        type = 'scatter',
-        mode = 'lines',
-        fill = 'toself',
-        fillcolor = 'rgba(255, 0, 0, 0.2)',
-        line = list(color = 'rgba(255, 0, 0, 0)'),
-        name = 'Risk Zone'
-      )
-  }
+#   if (
+#     !is.null(risk_min) &&
+#       !is.null(risk_max) &&
+#       !is.na(risk_min) &&
+#       !is.na(risk_max)
+#   ) {
+#     p1 <- p1 |>
+#       plotly::add_trace(
+#         x = c(risk_min, risk_max, risk_max, risk_min, risk_min),
+#         y = c(0, 0, max(plotdat_summed$prob), max(plotdat_summed$prob), 0),
+#         type = 'scatter',
+#         mode = 'lines',
+#         fill = 'toself',
+#         fillcolor = 'rgba(255, 0, 0, 0.2)',
+#         line = list(color = 'rgba(255, 0, 0, 0)'),
+#         name = 'Risk Zone'
+#       )
+#   }
 
-  p1
-}
+#   p1
+# }
 
 add_fhd <- function(
   plot,
@@ -96,22 +96,17 @@ add_fhd <- function(
   if (is.null(plot_by_cov) | length(plot_by_cov) == 0) {
     plotdat$group_col <- fhd_data[[id_col]]
   } else {
-    # Convert plot_by_cov to character vector if it's a single string
     plot_by_cov <- as.character(plot_by_cov)
 
-    # Build the group_col by concatenating covariate names and values
-    # Start with the first covariate
-    plotdat$group_col <- paste0(plot_by_cov[1], "=", plotdat[[plot_by_cov[1]]])
-
-    # Add remaining covariates if there are any
+    # Build compact legend labels using level values only (no "cov=" prefix).
+    # Multiple covariate values are joined with " · " for readability.
+    plotdat$group_col <- as.character(plotdat[[plot_by_cov[1]]])
     if (length(plot_by_cov) > 1) {
       for (cov in plot_by_cov[-1]) {
-        plotdat$group_col <- paste0(
+        plotdat$group_col <- paste(
           plotdat$group_col,
-          ", ",
-          cov,
-          "=",
-          plotdat[[cov]]
+          plotdat[[cov]],
+          sep = " \u00b7 "
         )
       }
     }

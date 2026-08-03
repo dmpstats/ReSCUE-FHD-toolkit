@@ -27,7 +27,7 @@ heightshift <- function(
   draw_id_col = "draw_id",
   risk_min = 50,
   risk_max = 100,
-  round = c(NULL, 2)
+  round = c(4, 2)
 ) {
   # Create a new .df with only the relevant columns
   fhd_data <- data.frame(
@@ -53,40 +53,47 @@ heightshift <- function(
       height_shift_id = dplyr::row_number()
     )
 
-  # Iterate over the FHDs and calculate the probability of FHD risk for each height shift
-  fhd_prob_matrix <- matrix(
-    nrow = length(unique(fhd_data$fhd_id)),
-    ncol = nrow(heightshifts),
-    dimnames = list(unique(fhd_data$fhd_id), heightshifts$height_shift_id)
+  # Pre-split data by fhd_id so we only subset the data frame once per FHD
+  data_split <- split(fhd_data, fhd_data$fhd_id)
+  fhd_ids <- names(data_split)
+
+  # Vectorised computation: for each FHD build a draw × height matrix, then
+  # for every height-shift window sum the relevant columns and average over draws.
+  hs_risk_min <- heightshifts$risk_min
+  hs_risk_max <- heightshifts$risk_max
+  n_shifts <- nrow(heightshifts)
+
+  fhd_prob_matrix <- vapply(
+    fhd_ids,
+    function(fid) {
+      sub <- data_split[[fid]]
+      # Pivot to a draw × height matrix (values = summed probability per cell)
+      wide <- tapply(sub$prob, list(sub$draw_id, sub$height), sum, default = 0)
+      heights_in_mat <- as.numeric(colnames(wide))
+
+      # For each height-shift window, pick columns in range, sum per draw, then average
+      vapply(
+        seq_len(n_shifts),
+        function(j) {
+          in_range <- heights_in_mat >= hs_risk_min[j] &
+            heights_in_mat <= hs_risk_max[j]
+          if (!any(in_range)) {
+            return(NA_real_)
+          }
+          mean(
+            rowSums(wide[, in_range, drop = FALSE], na.rm = TRUE),
+            na.rm = TRUE
+          )
+        },
+        numeric(1)
+      )
+    },
+    numeric(n_shifts)
   )
 
-  for (fid in unique(fhd_data$fhd_id)) {
-    for (hsid in heightshifts$height_shift_id) {
-      # Get the current risk_min and risk_max for this height shift
-      current_risk_min <- heightshifts$risk_min[
-        heightshifts$height_shift_id == hsid
-      ]
-      current_risk_max <- heightshifts$risk_max[
-        heightshifts$height_shift_id == hsid
-      ]
-
-      # Filter the FHD data for the current FHD and height shift
-      fhd_subset <- fhd_data |>
-        dplyr::filter(
-          fhd_id == fid,
-          height >= current_risk_min,
-          height <= current_risk_max
-        )
-
-      # Considering the draws, calculate the mean probability for the current FHD and height shift
-      mean_prob <- fhd_subset |>
-        dplyr::group_by(draw_id) |>
-        dplyr::summarise(mean_prob = sum(prob, na.rm = TRUE)) |>
-        dplyr::summarise(mean_prob = mean(mean_prob, na.rm = TRUE)) |>
-        dplyr::pull(mean_prob)
-      fhd_prob_matrix[fid, hsid] <- mean_prob
-    }
-  }
+  # vapply returns a n_shifts × n_fhds matrix; transpose to n_fhds × n_shifts
+  fhd_prob_matrix <- t(fhd_prob_matrix)
+  dimnames(fhd_prob_matrix) <- list(fhd_ids, heightshifts$height_shift_id)
 
   # Get the ID of the 'true' FHD (where the risk_min is equal to the true risk_min)
   true_fhd_id <- heightshifts |>
