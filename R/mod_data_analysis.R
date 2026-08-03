@@ -268,9 +268,14 @@ mod_data_analysis_server <- function(
 						"list-group-item d-flex align-items-center",
 						"justify-content-between gap-2 px-2 py-2"
 					),
-					# LHS: Details button + label
+					# LHS: index badge + Details button + label
 					tags$div(
 						class = "d-flex align-items-center gap-2 overflow-hidden",
+						tags$span(
+							class = "badge bg-secondary flex-shrink-0",
+							style = "font-size: 1.5rem;",
+							i
+						),
 						tags$div(
 							class = "overflow-hidden",
 							tags$span(
@@ -578,11 +583,15 @@ mod_data_analysis_server <- function(
 				risk_max = input$rotor_max
 			)
 
+			meta <- selected_data$metadata
 			fhd_ids <- unique(plot_ready_data()$fhd_id)
 			for (id in fhd_ids) {
 				fhd_subset <- dplyr::filter(plot_ready_data(), fhd_id == id)
 				# Only pass used_covs that actually exist as columns in this subset
 				plot_by_cov <- intersect(used_covs, names(fhd_subset))
+				# Row index in metadata — used as the legend prefix when covariates
+				# are active so entries from different FHDs never collide (e.g. "1.cold.low")
+				fhd_index <- match(id, meta$fhd_id)
 
 				max_prob <- max(max_prob, max(fhd_subset$probability, na.rm = TRUE))
 
@@ -593,11 +602,8 @@ mod_data_analysis_server <- function(
 					height_col = "height",
 					draw_col = "draw_id",
 					prob_col = "probability",
-					plot_by_cov = if (length(plot_by_cov) > 0) {
-						plot_by_cov
-					} else {
-						NULL
-					}
+					plot_by_cov = if (length(plot_by_cov) > 0) plot_by_cov else NULL,
+					index = if (length(plot_by_cov) > 0) fhd_index else NULL
 				)
 
 				plt <- plt |>

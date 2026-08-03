@@ -3,7 +3,6 @@
 export(run_app)
 import(bslib)
 import(conductor)
-import(plotly)
 import(sf)
 import(shiny)
 importFrom(conductor,Conductor)
