@@ -12,22 +12,22 @@ mod_landing_page_ui <- function(id) {
 	tagList(
 		bslib::page_fillable(
 			# Add a page-wide card
-			bslib::card(
-				class = "bg-secondary",
-				full_screen = FALSE,
-				fill = FALSE, # <-- stops the card from growing to fill the page height
-				tags$a(
-					href = "google.com",
-					target = "_blank",
-					rel = "noopener noreferrer",
-					tags$img(
-						src = "www/ReSCUE_banner.png",
-						class = "logo-link",
-						alt = "ReSCUE Project Banner",
-						style = "max-width: 90vw; cursor: pointer; display: block; margin-left: auto; margin-right: auto;"
-					),
-				)
-			),
+			# bslib::card(
+			# 	class = "bg-secondary",
+			# 	full_screen = FALSE,
+			# 	fill = FALSE, # <-- stops the card from growing to fill the page height
+			# 	tags$a(
+			# 		href = "google.com",
+			# 		target = "_blank",
+			# 		rel = "noopener noreferrer",
+			# 		tags$img(
+			# 			src = "www/ReSCUE_banner.png",
+			# 			class = "logo-link",
+			# 			alt = "ReSCUE Project Banner",
+			# 			style = "max-width: 90vw; cursor: pointer; display: block; margin-left: auto; margin-right: auto;"
+			# 		),
+			# 	)
+			# ),
 			bslib::layout_columns(
 				col_widths = c(7, 5),
 				# LHS: A card containing project information.
@@ -139,25 +139,67 @@ mod_landing_page_ui <- function(id) {
 				# ),
 				column(
 					12,
+					# OWEC logo in its own card
 					bslib::card(
-						bslib::card_header(
-							"Project Partners",
-							class = "text bg-primary"
-						),
 						bslib::card_body(
-							bslib::layout_columns(
-								col_widths = c(6, 6),
-								logolink("dmp"),
-								# logolink("ne", height = 9),
-								logolink("bto", height = 8)
-							),
-							bslib::layout_columns(
-								col_widths = c(6, 6),
-								logolink("blackbawks"),
-								logolink("niras")
-							)
+							class = "d-flex justify-content-center align-items-center",
+							logolink("owec", height = 35)
 						),
 						class = "card border-primary mb-3 bg-secondary"
+					),
+					# DMP and NE logos in individual cards
+					bslib::layout_columns(
+						col_widths = c(6, 6),
+						bslib::card(
+							bslib::card_body(
+								class = "d-flex justify-content-center align-items-center",
+								logolink("dmp")
+							),
+							class = "card border-primary bg-secondary"
+						),
+						bslib::card(
+							bslib::card_body(
+								class = "d-flex justify-content-center align-items-center",
+								logolink("ne", height = 9)
+							),
+							class = "card border-primary bg-secondary"
+						)
+					),
+					# ReSCUE and BTO logos in individual cards
+					bslib::layout_columns(
+						col_widths = c(6, 6),
+						bslib::card(
+							bslib::card_body(
+								class = "d-flex justify-content-center align-items-center",
+								logolink("rescue")
+							),
+							class = "card border-primary bg-secondary"
+						),
+						bslib::card(
+							bslib::card_body(
+								class = "d-flex justify-content-center align-items-center",
+								logolink("bto", height = 8)
+							),
+							class = "card border-primary bg-secondary"
+						)
+					),
+					# Black Hawks and NIRAS logos in individual cards
+					bslib::layout_columns(
+						col_widths = c(6, 6),
+						bslib::card(
+							bslib::card_body(
+								class = "d-flex justify-content-center align-items-center",
+								logolink("blackbawks")
+							),
+							class = "card border-primary bg-secondary"
+						),
+						bslib::card(
+							bslib::card_body(
+								class = "d-flex justify-content-center align-items-center",
+								logolink("niras")
+							),
+							class = "card border-primary bg-secondary"
+						)
 					),
 					bslib::layout_columns(
 						div(

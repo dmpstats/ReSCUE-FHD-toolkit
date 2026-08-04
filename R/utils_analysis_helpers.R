@@ -14,6 +14,17 @@ make_fhd_summary <- function(
   risk_min = 50,
   risk_max = 100
 ) {
+  if (is.null(fhd_data) || nrow(fhd_data) == 0) {
+    cli::cli_abort(
+      "fhd_data is NULL or empty. Please provide a valid data frame."
+    )
+  }
+  if (!all(c(id_col, height_col, prob_col, draw_col) %in% colnames(fhd_data))) {
+    cli::cli_abort(
+      "One or more specified columns do not exist in fhd_data. Please check the column names."
+    )
+  }
+
   # Create a new .df with only the relevant columns
   fhd_data <- data.frame(
     fhd_id = fhd_data[[id_col]],

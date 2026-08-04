@@ -392,13 +392,23 @@ mod_data_analysis_server <- function(
 			purrr::imap(fhd_arrays(), function(arr, fhd_id) {
 				sel <- cov_selections()[[fhd_id]]
 
-				sliced_df <- rlang::inject(
-					slice_fhd(
-						fhd_array = arr,
-						!!!sel,
-						out_format = "df",
-						seed = 8421L # fixed seed for reproducible resampling
-					)
+				sliced_df <- tryCatch(
+					{
+						rlang::inject(
+							slice_fhd(
+								fhd_array = arr,
+								!!!sel,
+								out_format = "df",
+								seed = 8421L # fixed seed for reproducible resampling
+							)
+						)
+					},
+					error = function(e) {
+						cli::cli_alert_warning(
+							"Failed to slice FHD {.val {fhd_id}}: {.val {e$message}}"
+						)
+						return(NULL)
+					}
 				)
 
 				sliced_df$fhd_id <- fhd_id
@@ -409,6 +419,7 @@ mod_data_analysis_server <- function(
 		# ── Step 4: Combine all processed FHDs into one long data frame ───────────
 		plot_ready_data <- reactive({
 			req(processed_fhds())
+			req(length(processed_fhds()) > 0)
 			# The columns we can always expect are height, draw_id, probability, fhd_id.
 			# Any additional columns are covariates.
 			# Create a new column identifying each unique FHD, i.e. unique
@@ -447,10 +458,48 @@ mod_data_analysis_server <- function(
 				dplyr::left_join(uuid, by = c("fhd_id", unexpected_cols))
 		})
 
+		# Generate a toast when the plot-ready data is not suitable
+		observeEvent(plot_ready_data(), {
+			req(plot_ready_data())
+			if (
+				nrow(plot_ready_data()) == 0 ||
+					!all(
+						c("height", "probability", "unique_fhd", "draw_id") %in%
+							names(plot_ready_data())
+					)
+			) {
+				bslib::show_toast(
+					bslib::toast(
+						header = "Warning",
+						"Processing the selected FHDs failed. Please check the covariate selections and try again.",
+						icon = bsicons::bs_icon("exclamation-triangle-fill"),
+						type = "warning",
+						duration_s = 0,
+						id = "fhd_processing_warning",
+						position = "bottom-right"
+					)
+				)
+			} else {
+				bslib::hide_toast("fhd_processing_warning")
+			}
+		})
+
 		# -- Step 5: Generate the height-shift FHD table -------------
 
 		heightshift_data <- reactive({
 			req(plot_ready_data())
+
+			# if the input data is bad, return an empty dataset
+			if (
+				nrow(plot_ready_data()) == 0 ||
+					!all(
+						c("height", "probability", "unique_fhd", "draw_id") %in%
+							names(plot_ready_data())
+					)
+			) {
+				return(list(perc = data.frame(), prob = data.frame()))
+			}
+
 			heightshift(
 				plot_ready_data(),
 				height_col = "height",
@@ -534,6 +583,25 @@ mod_data_analysis_server <- function(
 		# ---- Step 6: Generate the FHD summaries ----
 		output$fhd_summaries <- DT::renderDataTable({
 			req(plot_ready_data())
+			if (
+				nrow(plot_ready_data()) == 0 ||
+					!all(
+						c("height", "probability", "unique_fhd", "draw_id") %in%
+							names(plot_ready_data())
+					)
+			) {
+				return(DT::datatable(
+					data.frame(
+						Message = "No valid data available for summary."
+					),
+					rownames = FALSE,
+					options = list(
+						dom = "t",
+						paging = FALSE,
+						searching = FALSE
+					)
+				))
+			}
 			sumdat <- make_fhd_summary(
 				plot_ready_data(),
 				id_col = "unique_fhd",
@@ -582,6 +650,17 @@ mod_data_analysis_server <- function(
 				risk_min = input$rotor_min,
 				risk_max = input$rotor_max
 			)
+
+			# If the input data is bad, just return the empty plot
+			if (
+				nrow(plot_ready_data()) == 0 ||
+					!all(
+						c("height", "probability", "unique_fhd", "draw_id") %in%
+							names(plot_ready_data())
+					)
+			) {
+				return(plt)
+			}
 
 			meta <- selected_data$metadata
 			fhd_ids <- unique(plot_ready_data()$fhd_id)
