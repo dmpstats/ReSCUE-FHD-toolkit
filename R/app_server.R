@@ -57,6 +57,12 @@ app_server <- function(input, output, session) {
 		selected_data = data_select_output$selected_data
 	)
 
+	mod_metadata_builder_server(
+		"metadata_builder",
+		nav_id = "main-nav",
+		parent_session = session
+	)
+
 	# React to page-reset button --------------
 
 	observeEvent(

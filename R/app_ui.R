@@ -174,6 +174,20 @@ app_ui <- function(request) {
 							# )
 						)
 					# )
+				),
+
+				bslib::nav_panel(
+					title = "Metadata Builder",
+					value = "nav-metadata-builder",
+					icon = bsicons::bs_icon(
+						"hammer",
+						size = "1.5em"
+					) |>
+						bslib::tooltip(
+							placement = "bottom",
+							"Metadata Builder"
+						),
+					mod_metadata_builder_ui("metadata_builder")
 				)
 			),
 

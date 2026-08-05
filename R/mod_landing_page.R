@@ -42,7 +42,7 @@ mod_landing_page_ui <- function(id) {
 				bslib::accordion(
 					multiple = FALSE,
 					class = "card border-primary mb-3 bg-light",
-					height = "90%",
+					height = "95%",
 					bslib::accordion_panel(
 						title = "Project Overview",
 						icon = bsicons::bs_icon("info-circle"),

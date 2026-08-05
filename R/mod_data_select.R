@@ -673,7 +673,7 @@ mod_data_select_server <- function(
 
 		return(list(
 			selected_data = outputs,
-			uploaded_data = NULL
+			user_fhds = NULL
 		))
 	})
 }
