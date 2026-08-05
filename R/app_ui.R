@@ -151,8 +151,8 @@ app_ui <- function(request) {
 							"User Guide"
 						),
 					bslib::page_fixed(
-						bslib::layout_columns(
-							col_widths = c(10, 2),
+						# bslib::layout_columns(
+							# col_widths = c(10, 2),
 							bslib::card(
 								bslib::card_body(
 									shiny::includeMarkdown(app_sys(
@@ -161,19 +161,19 @@ app_ui <- function(request) {
 										"userguide.md"
 									))
 								),
-								class = "card border-primary bg-light"
+								class = "card border-primary bg-light",
 							),
 							# Sidebar with logos
-							bslib::card(
-								class = "d-flex flex-column align-items-center gap-3 h-100",
-								logolink("dmp", height = 9),
-								logolink("ne", height = 9),
-								logolink("bto", height = 9),
-								logolink("blackbawks", height = 9),
-								logolink("niras", height = 9)
-							)
+							# bslib::card(
+							# 	class = "d-flex flex-column align-items-center gap-3 h-100",
+							# 	logolink("dmp", height = 9),
+							# 	logolink("ne", height = 9),
+							# 	logolink("bto", height = 9),
+							# 	logolink("blackbawks", height = 9),
+							# 	logolink("niras", height = 9)
+							# )
 						)
-					)
+					# )
 				)
 			),
 

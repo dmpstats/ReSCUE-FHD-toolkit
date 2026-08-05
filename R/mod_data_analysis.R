@@ -152,18 +152,33 @@ mod_data_analysis_ui <- function(id) {
 					)
 				)
 			),
-			div(
-				class = "d-flex flex-column align-items-start gap-2 my-3",
+			# Add a button as an absolutePanel in the bottom-left corner
+			shiny::absolutePanel(
 				actionButton(
-					ns("go_data_selection"),
-					label = tagList(
-						bsicons::bs_icon("play-circle"),
-						"Data Selection"
-					),
-					full_screen = TRUE,
-					class = "left-arrow-btn"
-				)
+							ns("go_data_selection"),
+							label = tagList(
+								bsicons::bs_icon("play-circle"),
+								"Data Selection"
+							),
+							full_screen = TRUE,
+							class = "left-arrow-btn"
+						),
+						left = 10,
+						bottom = 10,
+						draggable = TRUE
 			)
+			# div(
+			# 	class = "d-flex flex-column align-items-start gap-2 my-3",
+			# 	actionButton(
+			# 		ns("go_data_selection"),
+			# 		label = tagList(
+			# 			bsicons::bs_icon("play-circle"),
+			# 			"Data Selection"
+			# 		),
+			# 		full_screen = TRUE,
+			# 		class = "left-arrow-btn"
+			# 	)
+			# )
 		)
 	)
 }
