@@ -23,16 +23,12 @@ add_fhd <- function(
     # Build compact legend labels: covariate level values joined with ".".
     # Prefix with the FHD index so entries from different FHDs never collide
     # in the plotly legend (e.g. "1.cold.low", "2.cold.low").
-    plotdat$group_col <- as.character(plotdat[[plot_by_cov[1]]])
-    if (length(plot_by_cov) > 1) {
-      for (cov in plot_by_cov[-1]) {
-        plotdat$group_col <- paste(
-          plotdat$group_col,
-          plotdat[[cov]],
-          sep = "."
-        )
-      }
-    }
+    # NAs are omitted to avoid mismatches between FHDs with different covariates.
+    plotdat$group_col <- apply(
+      plotdat[, plot_by_cov, drop = FALSE],
+      1,
+      function(x) paste(na.omit(x), collapse = ".")
+    )
     if (!is.null(index)) {
       plotdat$group_col <- paste0(index, ".", plotdat$group_col)
     }

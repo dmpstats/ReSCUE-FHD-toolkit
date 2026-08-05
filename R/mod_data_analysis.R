@@ -18,15 +18,15 @@ mod_data_analysis_ui <- function(id) {
 					# 12,
 					# First card: selected data
 					bslib::card(
-						bslib::card_header(
-							"Selected Data",
-							class = "text-bg-primary"
-						),
+						# bslib::card_header(
+						# 	"Selected Data",
+						# 	class = "text-bg-primary"
+						# ),
 						bslib::card_body(
 							uiOutput(ns("fhd_config_table"))
 						),
-						# Ensure this card doesn't cover more than 30% of the page height
-						style = "max-height: 35vh; overflow-y: auto;",
+						# Ensure this card doesn't cover more than 40% of the page height
+						style = "height: 35vh; overflow-y: auto;",
 						class = "card border-primary mb-3 bg-light"
 					),
 					# Second card: analysis results
@@ -46,21 +46,14 @@ mod_data_analysis_ui <- function(id) {
 									label = "Show as percentages",
 									width = "50%"
 								)
-								# actionButton(
-								# 	inputId = ns("recalc_heightshift"),
-								# 	label = "Generate Table",
-								# 	icon = bsicons::bs_icon("arrow-repeat"),
-								# 	class = "btn-primary",
-								# 	width = "50%"
-								# ) |>
-								# 	bslib::tooltip(
-								# 		"This might be slow for large datasets"
-								# 	)
 							),
-							p(
-								"This table shows changes to the FHD risk-zone probabilities as the turbine height is increased or decreased. The first column shows the unique FHD identifiers, and the remaining columns show the probabilities of FHD risk for each height shift."
-							),
-							DT::DTOutput(ns("heightshift_table"))
+							# p(
+							# 	"This table shows changes to the FHD risk-zone probabilities as the turbine height is increased or decreased. The first column shows the unique FHD identifiers, and the remaining columns show the probabilities of FHD risk for each height shift."
+							# ),
+							div(
+								DT::DTOutput(ns("heightshift_table")),
+								style = "height: 25vh; overflow-y: auto; overflow-x: auto;"
+							)
 						),
 						bslib::nav_panel(
 							title = "Compare Distributions"
@@ -124,8 +117,37 @@ mod_data_analysis_ui <- function(id) {
 							class = "text-bg-primary"
 						),
 						bslib::card_body(
-							"Download options content will go here"
-						),
+							# Add a drop-down to select the FHD to output
+							bslib::layout_columns(
+								tagList(
+									selectInput(
+										ns("selected_fhd"),
+										"Select FHD to download",
+										choices = NULL,
+										width = "100%"									
+									),
+									actionButton(
+										ns("download_btn"),
+										"Download",
+										icon = bsicons::bs_icon("download"),
+										class = "btn-success",
+										width = "100%"
+									)
+								),
+								checkboxGroupInput(
+									ns("download_contents"),
+									"Select contents to download",
+									choices = c(
+										"FHD Data" = "data",
+										"FHD Plot" = "plot",
+										"Metadata" = "metadata"
+									),
+									width = "100%",
+									selected = c("data", "plot", "metadata")
+								)
+								)
+							),
+							
 						class = "card border-primary mb-3 bg-light"
 					)
 				)
@@ -165,6 +187,36 @@ mod_data_analysis_server <- function(
 		# ── Helpers ───────────────────────────────────────────────────────────────
 		# Sanitise fhd_id into a valid Shiny input-ID fragment.
 		make_safe_id <- function(x) gsub("[^A-Za-z0-9]", "_", x)
+
+		# ── Error state ───────────────────────────────────────────────────────────
+		# Single reactive value used to surface processing errors as a toast.
+		# NULL means "no error"; any other value is shown as the toast message.
+		# Call `set_error(msg)` from within a reactive/observer to populate it.
+		error_state <- reactiveVal(NULL)
+		set_error <- function(msg) error_state(msg)
+
+		# Show/hide the toast whenever error_state changes.
+		observeEvent(
+			error_state(),
+			{
+				if (!is.null(error_state())) {
+					bslib::show_toast(
+						bslib::toast(
+							header = "Warning",
+							error_state(),
+							icon = bsicons::bs_icon("exclamation-triangle-fill"),
+							type = "warning",
+							duration_s = 0,
+							id = "fhd_processing_warning",
+							position = "bottom-right"
+						)
+					)
+				} else {
+					bslib::hide_toast("fhd_processing_warning")
+				}
+			},
+			ignoreNULL = FALSE
+		)
 
 		# ── Per-row popover table ─────────────────────────────────────────────────
 		output$fhd_config_table <- renderUI({
@@ -289,32 +341,35 @@ mod_data_analysis_server <- function(
 							)
 						)
 					),
-					# RHS: Configure button + popover
-					tags$button(
-						class = "btn btn-sm btn-outline-info flex-shrink-0",
-						onclick = paste0(
-							"Shiny.setInputValue('",
-							ns("det_btn_click"),
-							"', '",
-							fhd_id,
-							"', {priority:'event'})"
+					# RHS: Button container
+					tags$div(
+						class = "d-flex gap-2",
+						tags$button(
+							class = "btn btn-sm btn-outline-info flex-shrink-0",
+							onclick = paste0(
+								"Shiny.setInputValue('",
+								ns("det_btn_click"),
+								"', '",
+								fhd_id,
+								"', {priority:'event'})"
+							),
+							bsicons::bs_icon("card-text"),
+							" Details"
 						),
-						bsicons::bs_icon("card-text"),
-						" Details"
-					),
-					actionButton(
-						inputId = ns(paste0("cfg_btn_", safe_id)),
-						label = tagList(
-							bsicons::bs_icon("sliders"),
-							" Configure"
-						),
-						class = "btn btn-sm btn-outline-secondary flex-shrink-0"
-					) |>
-						bslib::popover(
-							title = row$name_common,
-							placement = "right",
-							popover_content
-						)
+						actionButton(
+							inputId = ns(paste0("cfg_btn_", safe_id)),
+							label = tagList(
+								bsicons::bs_icon("sliders"),
+								" Configure"
+							),
+							class = "btn btn-sm btn-outline-secondary flex-shrink-0"
+						) |>
+							bslib::popover(
+								title = row$name_common,
+								placement = "right",
+								popover_content
+							)
+					)
 				)
 			})
 
@@ -389,6 +444,10 @@ mod_data_analysis_server <- function(
 		processed_fhds <- reactive({
 			req(fhd_arrays(), cov_selections())
 
+			# Reset any stale error from a previous processing run, so a fixed
+			# upstream issue doesn't leave the toast stuck on screen.
+			error_state(NULL)
+
 			purrr::imap(fhd_arrays(), function(arr, fhd_id) {
 				sel <- cov_selections()[[fhd_id]]
 
@@ -407,6 +466,12 @@ mod_data_analysis_server <- function(
 						cli::cli_alert_warning(
 							"Failed to slice FHD {.val {fhd_id}}: {.val {e$message}}"
 						)
+						set_error(paste0(
+							"Processing the selected FHDs failed for '",
+							fhd_id,
+							"': ",
+							e$message
+						))
 						return(NULL)
 					}
 				)
@@ -427,7 +492,11 @@ mod_data_analysis_server <- function(
 			alldat <- dplyr::bind_rows(processed_fhds(), .id = "fhd_id")
 			expected_cols <- c("height", "draw_id", "probability", "fhd_id")
 			unexpected_cols <- setdiff(
-				names(processed_fhds()[[1]]),
+				lapply(
+					processed_fhds(),
+					names
+				) |> 
+					unlist(),
 				expected_cols
 			)
 			uuid <- alldat |>
@@ -446,19 +515,41 @@ mod_data_analysis_server <- function(
 							apply(
 								dplyr::pick(dplyr::all_of(unexpected_cols)),
 								1,
-								paste,
-								collapse = " \u00b7 "
+								function(x) paste(na.omit(x), collapse = " \u00b7 ")
 							),
 							"]"
 						)
 					}
 				) |>
 				dplyr::ungroup()
-			alldat |>
+			out <- alldat |>
 				dplyr::left_join(uuid, by = c("fhd_id", unexpected_cols))
+
+			# If there are >10 unique FHDs, filter to only the first 10, 
+			# and show a warning toast.
+			if (length(unique(out$unique_fhd)) > 10) {
+				set_error(
+					"More than 10 unique FHDs were generated. Only the first 10 will be analysed."
+				)
+				out <- dplyr::filter(
+					out,
+					unique_fhd %in% unique(out$unique_fhd)[1:10]
+				)
+			}
+
+			# Populate the FHD selection drop-down with the unique FHDs.
+			updateSelectInput(
+				parent_session,
+				ns("selected_fhd"),
+				choices = unique(out$unique_fhd),
+				selected = unique(out$unique_fhd)[1]
+			)
+
+			out
 		})
 
-		# Generate a toast when the plot-ready data is not suitable
+		# Populate error_state when the plot-ready data is not suitable; the
+		# observer on error_state() above takes care of showing/hiding the toast.
 		observeEvent(plot_ready_data(), {
 			req(plot_ready_data())
 			if (
@@ -468,19 +559,9 @@ mod_data_analysis_server <- function(
 							names(plot_ready_data())
 					)
 			) {
-				bslib::show_toast(
-					bslib::toast(
-						header = "Warning",
-						"Processing the selected FHDs failed. Please check the covariate selections and try again.",
-						icon = bsicons::bs_icon("exclamation-triangle-fill"),
-						type = "warning",
-						duration_s = 0,
-						id = "fhd_processing_warning",
-						position = "bottom-right"
-					)
+				set_error(
+					"Processing the selected FHDs failed. Please check the covariate selections and try again."
 				)
-			} else {
-				bslib::hide_toast("fhd_processing_warning")
 			}
 		})
 
@@ -547,7 +628,6 @@ mod_data_analysis_server <- function(
 						searching = FALSE,
 						lengthMenu = c(5, 10, 25, 50, 100),
 						scrollX = TRUE,
-						scrollY = "30vh",
 						columnDefs = list(
 							list(
 								targets = 1:(num_cols - 1), # All columns except first (0-indexed)
@@ -596,9 +676,13 @@ mod_data_analysis_server <- function(
 					),
 					rownames = FALSE,
 					options = list(
-						dom = "t",
-						paging = FALSE,
-						searching = FALSE
+						dom = "Bfrt",
+						fixedHeader = TRUE,
+						pageLength = 10,
+						searching = FALSE,
+						lengthMenu = c(5, 10, 25, 50, 100),
+						scrollX = TRUE,
+						scrollY = "30vh"
 					)
 				))
 			}
@@ -770,6 +854,21 @@ mod_data_analysis_server <- function(
 					id = nav_id,
 					selected = "nav-data-select",
 					session = parent_session
+				)
+			}
+		)
+
+		# Download button handler --------------------------------------------------
+		observeEvent(
+			input$download_btn,
+			{
+				shiny::showModal(
+					shiny::modalDialog(
+						title = "Download Options",
+						"Download functionality is not yet implemented.",
+						easyClose = TRUE,
+						footer = shiny::modalButton("Close")
+					)
 				)
 			}
 		)

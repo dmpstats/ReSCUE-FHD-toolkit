@@ -29,7 +29,7 @@ mod_landing_page_ui <- function(id) {
 			# 	)
 			# ),
 			bslib::layout_columns(
-				col_widths = c(7, 5),
+				col_widths = c(6, 6),
 				# LHS: A card containing project information.
 				# bslib::card(
 				# bslib::card_header(
@@ -147,9 +147,8 @@ mod_landing_page_ui <- function(id) {
 						),
 						class = "card border-primary mb-3 bg-secondary"
 					),
-					# DMP and NE logos in individual cards
 					bslib::layout_columns(
-						col_widths = c(6, 6),
+						col_widths = c(4, 4, 4),
 						bslib::card(
 							bslib::card_body(
 								class = "d-flex justify-content-center align-items-center",
@@ -163,11 +162,17 @@ mod_landing_page_ui <- function(id) {
 								logolink("ne", height = 9)
 							),
 							class = "card border-primary bg-secondary"
+						),
+						bslib::card(
+							bslib::card_body(
+								class = "d-flex justify-content-center align-items-center",
+								logolink("blackbawks")
+							),
+							class = "card border-primary bg-secondary"
 						)
 					),
-					# ReSCUE and BTO logos in individual cards
 					bslib::layout_columns(
-						col_widths = c(6, 6),
+						col_widths = c(4, 4, 4),
 						bslib::card(
 							bslib::card_body(
 								class = "d-flex justify-content-center align-items-center",
@@ -179,17 +184,6 @@ mod_landing_page_ui <- function(id) {
 							bslib::card_body(
 								class = "d-flex justify-content-center align-items-center",
 								logolink("bto", height = 8)
-							),
-							class = "card border-primary bg-secondary"
-						)
-					),
-					# Black Hawks and NIRAS logos in individual cards
-					bslib::layout_columns(
-						col_widths = c(6, 6),
-						bslib::card(
-							bslib::card_body(
-								class = "d-flex justify-content-center align-items-center",
-								logolink("blackbawks")
 							),
 							class = "card border-primary bg-secondary"
 						),
