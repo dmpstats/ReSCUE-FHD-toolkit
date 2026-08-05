@@ -17,7 +17,7 @@
 #'
 #' @export
 #'
-#' @importFrom shiny fluidRow column textInput numericInput selectInput selectizeInput radioButtons actionButton downloadButton downloadHandler verbatimTextOutput renderPrint reactiveVal req showModal removeModal modalDialog modalButton observeEvent showNotification icon shinyApp tagList tags NS renderText textOutput textAreaInput conditionalPanel uiOutput renderUI
+#' @importFrom shiny fluidRow column textInput numericInput selectInput selectizeInput radioButtons actionButton downloadButton downloadHandler verbatimTextOutput renderPrint reactiveVal reactive observe req showModal removeModal modalDialog modalButton observeEvent showNotification icon shinyApp tagList tags NS renderText textOutput textAreaInput conditionalPanel uiOutput renderUI fileInput updateSelectInput
 #' @importFrom bslib page_fillable card card_header card_body layout_columns input_switch value_box
 run_metadata_builder <- function(...) {
   ui <- run_metadata_builder_ui()
@@ -64,14 +64,10 @@ run_metadata_builder_ui <- function() {
               "Species ID*",
               placeholder = "e.g. species_kittiwake"
             ),
-            shiny::selectizeInput(
+            shiny::textInput(
               "group",
-              "Species group",
-              choices = c("auk", "diver", "gull"),
-              options = list(
-                create = TRUE,
-                placeholder = "select or type a group"
-              )
+              "Taxonomic or functional group",
+              placeholder = "e.g. auk, diver, gull"
             )
           ),
           bslib::layout_columns(
@@ -146,16 +142,40 @@ run_metadata_builder_ui <- function() {
           shiny::tags$hr(),
           shiny::tags$h5("Location"),
           bslib::layout_columns(
-            col_widths = c(3, 3, 3, 3),
-            shiny::textInput("country", "Country", value = "UK"),
-            shiny::textInput("region", "Region"),
-            shiny::textInput("site", "Site"),
-            shiny::textInput("sea_area", "Sea area (e.g. ICES division)")
-          ),
-          bslib::layout_columns(
             col_widths = c(6, 6),
-            shiny::numericInput("lon", "Longitude", value = NA, step = 0.001),
-            shiny::numericInput("lat", "Latitude", value = NA, step = 0.001)
+            tagList(
+              shiny::textInput("country", "Country", value = "UK"),
+              shiny::textInput("region", "Region"),
+              shiny::textInput("site", "Site"),
+              shiny::textInput("sea_area", "Sea area (e.g. ICES division)")
+            ),
+            tagList(
+              shiny::selectInput(
+                "bdmps_reg",
+                "BDMPS Region or Spatial Feature",
+                choices = list()
+              ),
+              shiny::conditionalPanel(
+                "input.bdmps_reg == 'Manual upload'",
+                shiny::fileInput(
+                  "bdmps_upload",
+                  "Upload spatial file (.gpkg, .geojson/.json, .kml, or a full .shp/.shx/.dbf/.prj set)",
+                  multiple = TRUE,
+                  accept = c(
+                    ".shp",
+                    ".shx",
+                    ".dbf",
+                    ".prj",
+                    ".cpg",
+                    ".geojson",
+                    ".json",
+                    ".gpkg",
+                    ".kml"
+                  )
+                )
+              ),
+              leaflet::leafletOutput("bdprev")
+            )
           ),
 
           shiny::tags$hr(),
@@ -220,6 +240,104 @@ run_metadata_builder_server <- function() {
   function(input, output, session) {
     covariates <- shiny::reactiveVal(list())
     metadata_built <- shiny::reactiveVal(NULL)
+
+    # ---- Load BDMPS regions ---------------------------------------------
+    bd <- sf::st_read(
+      "data-raw/BDMPS_regions/Final BDMPS regions long format.shp",
+      quiet = TRUE
+    ) |>
+      dplyr::mutate(
+        region.id = paste0(Species, " - ", BDMPS.regi)
+      )
+
+    # "Manual upload" sits alongside the real regions; selecting it is what
+    # reveals the file-upload control and skips the built-in shapefile.
+    shiny::observe(
+      shiny::updateSelectInput(
+        session,
+        "bdmps_reg",
+        choices = c("Manual upload", sort(bd$region.id))
+      )
+    )
+
+    # ---- Manual upload of a user-supplied spatial file -------------------
+    manual_sf <- shiny::reactiveVal(NULL)
+
+    shiny::observeEvent(input$bdmps_upload, {
+      files <- input$bdmps_upload
+      shiny::req(files)
+
+      # st_read()/GDAL rely on file extensions, but Shiny renames uploads to
+      # opaque temp names -- copy them into a scratch dir under their
+      # original names first (this also reassembles multi-file shapefiles).
+      tmp_dir <- file.path(
+        tempdir(),
+        paste0("bdmps_upload_", as.integer(Sys.time()))
+      )
+      dir.create(tmp_dir)
+      Map(file.copy, from = files$datapath, to = file.path(tmp_dir, files$name))
+
+      target <- files$name[grepl("\\.shp$", files$name, ignore.case = TRUE)]
+      if (length(target) == 0) {
+        target <- files$name[1]
+      }
+
+      uploaded <- tryCatch(
+        sf::st_read(file.path(tmp_dir, target), quiet = TRUE),
+        error = function(e) {
+          shiny::showNotification(
+            paste(
+              "Could not read the uploaded file as spatial data:",
+              conditionMessage(e)
+            ),
+            type = "error"
+          )
+          NULL
+        }
+      )
+      manual_sf(uploaded)
+    })
+
+    # ---- Currently selected region/upload, used for preview + build -----
+    selected_region <- shiny::reactive({
+      if (identical(input$bdmps_reg, "Manual upload")) {
+        manual_sf()
+      } else if (!is.null(input$bdmps_reg) && nzchar(input$bdmps_reg)) {
+        bd |> dplyr::filter(region.id == input$bdmps_reg)
+      } else {
+        NULL
+      }
+    })
+
+    # ---- Preview selected/uploaded polygon(s) ----------------------------
+    output$bdprev <- leaflet::renderLeaflet({
+      region_sf <- selected_region()
+      shiny::req(region_sf, nrow(region_sf) > 0)
+
+      bbox <- sf::st_bbox(sf::st_transform(region_sf, 4326))
+      labels <- if ("region.id" %in% names(region_sf)) {
+        region_sf$region.id
+      } else {
+        NULL
+      }
+
+      leaflet::leaflet() |>
+        leaflet::addProviderTiles("CartoDB.Positron") |>
+        leaflet::addPolygons(
+          data = region_sf,
+          fillColor = "orange",
+          color = "black",
+          fillOpacity = 0.5,
+          weight = 1,
+          label = labels
+        ) |>
+        leaflet::fitBounds(
+          bbox[["xmin"]],
+          bbox[["ymin"]],
+          bbox[["xmax"]],
+          bbox[["ymax"]]
+        )
+    })
 
     # ---- Add a covariate via modal ------------------------------------
     shiny::observeEvent(input$add_covariate, {
@@ -358,18 +476,15 @@ run_metadata_builder_server <- function() {
         return(invisible(NULL))
       }
 
-      lon_val <- input$lon %||% NA
-      lat_val <- input$lat %||% NA
-      has_coords <- !is.na(lon_val) && !is.na(lat_val)
-
+      region_sf <- selected_region()
       sf_obj <- NULL
-      if (has_coords && requireNamespace("sf", quietly = TRUE)) {
-        sf_obj <- sf::st_sfc(sf::st_point(c(lon_val, lat_val)), crs = 4326)
-      } else if (has_coords) {
+      if (is.null(region_sf) || nrow(region_sf) == 0) {
         shiny::showNotification(
-          "Package 'sf' isn't installed; skipping 'sf_obj' (lon/lat still saved).",
+          "No BDMPS region selected/uploaded; 'sf_obj' will be left empty.",
           type = "warning"
         )
+      } else {
+        sf_obj <- sf::st_geometry(region_sf)
       }
 
       cov <- covariates()
@@ -397,8 +512,6 @@ run_metadata_builder_server <- function() {
         name_scientific = input$name_scientific,
         group = input$group,
         crm_recommended = isTRUE(input$crm_recommended),
-        lon = lon_val,
-        lat = lat_val,
         sf_obj = sf_obj,
         input_type = input$input_type,
         covariates = if (length(cov) == 0) NULL else cov
