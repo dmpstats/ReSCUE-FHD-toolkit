@@ -32,7 +32,8 @@ app_server <- function(input, output, session) {
 			}
 		) |>
 		purrr::map(tibble::as_tibble_row) |>
-		purrr::list_rbind()
+		purrr::list_rbind() |>
+		sf::st_as_sf()
 
 	# Modules -----------------
 

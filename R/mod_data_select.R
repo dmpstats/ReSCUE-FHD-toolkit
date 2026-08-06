@@ -78,7 +78,7 @@ mod_data_select_ui <- function(id) {
 									ns("species"),
 									label = "Species",
 									choices = NULL,
-									multiple = TRUE,
+									multiple = FALSE,
 									options = list(
 										hideSelected = FALSE,
 										remove_button = TRUE
@@ -293,7 +293,7 @@ mod_data_select_server <- function(
 				session,
 				"species",
 				choices = unique(metadata_tbl$species_id),
-				selected = character(0),
+				selected = unique(metadata_tbl$species_id)[1],
 				server = TRUE
 			)
 			updateSelectizeInput(
@@ -339,11 +339,11 @@ mod_data_select_server <- function(
 
 		# ── Map: initial render with all data markers ───────────────────────────
 		output$source_map <- leaflet::renderLeaflet({
-			data <- metadata_tbl # Start with all data
-			# ids <- selected_ids()
+			req(input$species)
+
+			data <- filtered_data()
 
 			leaflet::leaflet(
-				data = data,
 				options = leaflet::leafletOptions(
 					attributionControl = FALSE,
 					zoomControl = FALSE,
@@ -352,128 +352,18 @@ mod_data_select_server <- function(
 			) |>
 				leaflet::addProviderTiles(leaflet::providers$CartoDB.DarkMatter) |>
 				leaflet::setView(lng = -3.5, lat = 56, zoom = 5) |>
-				leaflet::addCircleMarkers(
-					lng = ~lon,
-					lat = ~lat,
-					layerId = ~fhd_id,
-					radius = 14,
-					group = "main_data",
-					color = "white",
-					weight = 4,
-					fillOpacity = 0.85,
-					fillColor = "grey",
-					popup = ~ paste0(
-						"<div style='width:200px;'>",
-						"<strong>",
-						species_id,
-						"</strong><br/>",
-						"<strong>Season: </strong>",
-						season,
-						"<br/>",
-						"<strong>Method: </strong>",
-						method,
-						"<br/>",
-						"<strong>Recommended for CRM: </strong>",
-						ifelse(
-							crm_recommended,
-							# Green text for yes, red for no
-							"<span style='color:green;'>Yes</span>",
-							"<span style='color:red;'>No</span>"
-						),
-						"<br/>",
-						"<button ",
-						"onclick=\"Shiny.setInputValue('",
-						ns("map_add_btn"),
-						"', '",
-						fhd_id,
-						"', {priority:'event'})\" ",
-						"class='btn btn-sm btn-primary' ",
-						"style='margin-top:8px;width:100%;'>",
-						"Select Dataset", # because initially no entries are selected
-						"</button>",
-						# Add a button for 'More Details'
-						"<button ",
-						"onclick=\"Shiny.setInputValue('",
-						ns("map_details_btn"),
-						"', '",
-						fhd_id,
-						"', {priority:'event'})\" ",
-						"class='btn btn-sm btn-outline-primary' ",
-						"style='margin-top:8px;width:100%;'>",
-						"More Details",
-						"</button>",
-						"</div>"
-					)
-				)
+				# Initial render: selected IDs left empty to prevent re-rendering
+				add_fhd_polygons(data = data, selected_ids = c(), ns = ns)
 		})
 
 		# ── Map markers: redrawn whenever filters or selection changes ───────────
 		# After initial render, update markers when filters or selection change.
 		observe({
 			data <- filtered_data()
-			ids <- selected_ids()
 
 			leaflet::leafletProxy("source_map", session) |>
 				leaflet::clearGroup("main_data") |>
-				leaflet::addCircleMarkers(
-					data = data,
-					lng = ~lon,
-					lat = ~lat,
-					layerId = ~fhd_id,
-					radius = 14,
-					color = "white",
-					weight = 4,
-					group = "main_data",
-					fillOpacity = 0.85,
-					fillColor = ifelse(data$fhd_id %in% ids, "#ffa134", "grey"),
-					popup = ~ paste0(
-						"<div style='width:200px;'>",
-						"<strong>",
-						species_id,
-						"</strong><br/>",
-						"<strong>Season: </strong>",
-						season,
-						"<br/>",
-						"<strong>Method: </strong>",
-						method,
-						"<br/>",
-						"<strong>Recommended for CRM: </strong>",
-						ifelse(
-							crm_recommended,
-							# Green text for yes, red for no
-							"<span style='color:green;'>Yes</span>",
-							"<span style='color:red;'>No</span>"
-						),
-						"<br/>",
-						"<button ",
-						"onclick=\"Shiny.setInputValue('",
-						ns("map_add_btn"),
-						"', '",
-						fhd_id,
-						"', {priority:'event'})\" ",
-						ifelse(
-							fhd_id %in% ids,
-							"class='btn btn-sm btn-success' ",
-							"class='btn btn-sm btn-primary' "
-						),
-						# "class='btn btn-sm btn-primary' ",
-						"style='margin-top:8px;width:100%;'>",
-						ifelse(fhd_id %in% ids, "Deselect Dataset", "Select Dataset"),
-						"</button>",
-						# Add a button for 'More Details'
-						"<button ",
-						"onclick=\"Shiny.setInputValue('",
-						ns("map_details_btn"),
-						"', '",
-						fhd_id,
-						"', {priority:'event'})\" ",
-						"class='btn btn-sm btn-outline-primary' ",
-						"style='margin-top:8px;width:100%;'>",
-						"More Details",
-						"</button>",
-						"</div>"
-					)
-				)
+				add_fhd_polygons(data = data, selected_ids = selected_ids(), ns = ns)
 		})
 
 		observe({
@@ -640,7 +530,6 @@ mod_data_select_server <- function(
 				bslib::hide_toast("too_many_datasets_toast")
 			}
 		})
-
 
 		# ── Navigation ───────────────────────────────────────────────────────────
 		outputs <- reactiveValues()

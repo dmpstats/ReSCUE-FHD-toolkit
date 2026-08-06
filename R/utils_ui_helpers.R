@@ -75,3 +75,81 @@ logolink <- function(company, tooltip = TRUE, height = 10) {
 
   out
 }
+
+#' Add FHD polygons to a leaflet map
+#'
+#' @description Helper function to add polygon layers for FHD data to a leaflet map.
+#' Handles styling and popup creation with interactive buttons.
+#'
+#' @param map A leaflet map object or proxy to add polygons to.
+#' @param data A data frame containing polygon data with columns: fhd_id, species_id,
+#'   season, method, crm_recommended, and geometry.
+#' @param selected_ids Character vector of currently selected FHD IDs.
+#' @param ns A Shiny namespace function for generating input IDs.
+#'
+#' @return The updated leaflet map/proxy object with polygons added.
+#'
+#' @noRd
+add_fhd_polygons <- function(map, data, selected_ids, ns) {
+  if (is.null(data) || nrow(data) == 0) {
+    return(map)
+  }
+  map |>
+    leaflet::addPolygons(
+      data = data,
+      layerId = ~fhd_id,
+      group = "main_data",
+      color = "white",
+      weight = 3,
+      fillOpacity = 0.25,
+      opacity = 1.0,
+      fillColor = ifelse(data$fhd_id %in% selected_ids, "#ffa134", "grey"),
+      label = ~region,
+      popup = ~ paste0(
+        "<div style='width:200px;'>",
+        "<strong>",
+        species_id,
+        "</strong><br/>",
+        "<strong>Season: </strong>",
+        season,
+        "<br/>",
+        "<strong>Method: </strong>",
+        method,
+        "<br/>",
+        "<strong>Recommended for CRM: </strong>",
+        ifelse(
+          crm_recommended,
+          # Green text for yes, red for no
+          "<span style='color:green;'>Yes</span>",
+          "<span style='color:red;'>No</span>"
+        ),
+        "<br/>",
+        "<button ",
+        "onclick=\"Shiny.setInputValue('",
+        ns("map_add_btn"),
+        "', '",
+        fhd_id,
+        "', {priority:'event'})\" ",
+        ifelse(
+          fhd_id %in% selected_ids,
+          "class='btn btn-sm btn-success' ",
+          "class='btn btn-sm btn-primary' "
+        ),
+        "style='margin-top:8px;width:100%;'>",
+        ifelse(fhd_id %in% selected_ids, "Deselect Dataset", "Select Dataset"),
+        "</button>",
+        # Add a button for 'More Details'
+        "<button ",
+        "onclick=\"Shiny.setInputValue('",
+        ns("map_details_btn"),
+        "', '",
+        fhd_id,
+        "', {priority:'event'})\" ",
+        "class='btn btn-sm btn-outline-primary' ",
+        "style='margin-top:8px;width:100%;'>",
+        "More Details",
+        "</button>",
+        "</div>"
+      )
+    )
+}
