@@ -10,34 +10,31 @@
 #'
 #' @noRd
 dummy_fheight_dists <- function(max_height = 100, seed = 123, n = 3) {
+  
   # Create a grid of heights
   height_steps <- seq(0, max_height, length.out = 100)
   t <- seq(0, 1, length.out = length(height_steps))
-
-  dists <- replicate(
-    n,
-    {
-      seed <- seed + 1
-      # Number of kernels to sum
-      num_kernels <- sample(3:6, 1)
-
-      # Random centers and widths for the kernels
-      centers <- runif(num_kernels, 0, 1)
-      widths <- runif(num_kernels, 0.05, 0.3)
-      amplitudes <- runif(num_kernels, 0.5, 1.5)
-
-      # Calculate kernel values
-      # We use the Gaussian function: amp * exp(-(t - center)^2 / (2 * width^2))
-      kernel_vals <- sapply(t, function(x) {
-        sum(amplitudes * exp(-(x - centers)^2 / (2 * widths^2)))
-      })
-
-      # Normalize so probabilities sum to 1
-      kernel_vals / sum(kernel_vals)
-    },
-    simplify = FALSE
-  )
-
+  
+  dists <- replicate(n, {
+    seed <- seed + 1
+    # Number of kernels to sum
+    num_kernels <- sample(3:6, 1)
+    
+    # Random centers and widths for the kernels
+    centers <- runif(num_kernels, 0, 1)
+    widths <- runif(num_kernels, 0.05, 0.3)
+    amplitudes <- runif(num_kernels, 0.5, 1.5)
+    
+    # Calculate kernel values
+    # We use the Gaussian function: amp * exp(-(t - center)^2 / (2 * width^2))
+    kernel_vals <- sapply(t, function(x) {
+      sum(amplitudes * exp(-(x - centers)^2 / (2 * widths^2)))
+    })
+    
+    # Normalize so probabilities sum to 1
+    kernel_vals / sum(kernel_vals)
+  }, simplify = FALSE)
+  
   # Convert to long format dataframe
   df <- data.frame(
     f_id = rep(seq_len(n), each = length(height_steps)),
@@ -48,7 +45,7 @@ dummy_fheight_dists <- function(max_height = 100, seed = 123, n = 3) {
       lc_prob = pmax(0, prob - 0.001),
       hc_prob = pmin(1, prob + 0.001)
     )
-
+  
   return(df)
 }
 
@@ -60,7 +57,7 @@ dummy_fheight_plot <- function(df, risk_min = 50, risk_max = 70) {
       x = ~height,
       ymin = ~lc_prob,
       ymax = ~hc_prob,
-      color = ~ as.factor(f_id),
+      color = ~as.factor(f_id),
       opacity = 0.2,
       name = "Confidence Interval",
       # Not in legend
@@ -70,24 +67,18 @@ dummy_fheight_plot <- function(df, risk_min = 50, risk_max = 70) {
       data = df,
       x = ~height,
       y = ~prob,
-      color = ~ as.factor(f_id),
+      color = ~as.factor(f_id),
       type = 'scatter',
       mode = 'lines',
       line = list(width = 2)
     ) |>
-    plotly::layout(
-      title = "Dummy Flight Height Distributions",
-      xaxis = list(title = "Height"),
-      yaxis = list(title = "Probability")
-    )
+    plotly::layout(title = "Dummy Flight Height Distributions",
+                   xaxis = list(title = "Height"),
+                   yaxis = list(title = "Probability"))
+                     
 
   # If risk_min and risk_max are not NA and not NULL, add a rectangular bar between them
-  if (
-    !is.null(risk_min) &&
-      !is.null(risk_max) &&
-      !is.na(risk_min) &&
-      !is.na(risk_max)
-  ) {
+  if (!is.null(risk_min) && !is.null(risk_max) && !is.na(risk_min) && !is.na(risk_max)) {
     p1 <- p1 |>
       plotly::add_trace(
         x = c(risk_min, risk_max, risk_max, risk_min, risk_min),

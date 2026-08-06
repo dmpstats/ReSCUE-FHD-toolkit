@@ -245,5 +245,5 @@ data.tree::ToDataFrameTree(fhd_schema, "class", "descr", "values") |>
   saveRDS("data-raw/fhd_schema_tentative.rds")
 
 
-# readRDS("data-dummy/metadata/Kittiwake_Wales_V_Bay.rds")
-# readRDS("data-dummy/draws/Kittiwake_Wales_V_Bay.rds")
+readRDS("data-dummy/metadata/Kittiwake_Wales_V_Bay.rds")
+readRDS("data-dummy/draws/Kittiwake_Wales_V_Bay.rds")

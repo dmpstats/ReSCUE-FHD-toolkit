@@ -45,10 +45,6 @@ mod_user_upload_ui <- function(id) {
         inline = FALSE
       ),
       # File Upload Section
-      bslib::card(
-        "Note: User-uploaded files with additional covariates are not yet supported.",
-        class = "card bg-warning"
-      ),
       fileInput(
         ns("fhd_file"),
         "Upload Flight Height Distribution CSV*",

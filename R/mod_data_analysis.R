@@ -18,15 +18,13 @@ mod_data_analysis_ui <- function(id) {
 					# 12,
 					# First card: selected data
 					bslib::card(
-						# bslib::card_header(
-						# 	"Selected Data",
-						# 	class = "text-bg-primary"
-						# ),
-						bslib::card_body(
-							uiOutput(ns("fhd_config_table"))
+						bslib::card_header(
+							"Selected Data",
+							class = "text-bg-primary"
 						),
-						# Ensure this card doesn't cover more than 40% of the page height
-						style = "height: 35vh; overflow-y: auto;",
+						bslib::card_body(DT::DTOutput(ns("selected_data_dt"))),
+						# Ensure this card doesn't cover more than 30% of the page height
+						style = "max-height: 30vh; overflow-y: auto;",
 						class = "card border-primary mb-3 bg-light"
 					),
 					# Second card: analysis results
@@ -34,26 +32,7 @@ mod_data_analysis_ui <- function(id) {
 						title = "Analysis",
 						bslib::nav_spacer(),
 						bslib::nav_panel(
-							title = "Summary",
-							DT::DTOutput(ns("fhd_summaries"))
-						),
-						bslib::nav_panel(
-							title = "Risk Height",
-							fluidRow(
-								bslib::input_switch(
-									id = ns("show_as_percentages"),
-									value = TRUE,
-									label = "Show as percentages",
-									width = "50%"
-								)
-							),
-							# p(
-							# 	"This table shows changes to the FHD risk-zone probabilities as the turbine height is increased or decreased. The first column shows the unique FHD identifiers, and the remaining columns show the probabilities of FHD risk for each height shift."
-							# ),
-							div(
-								DT::DTOutput(ns("heightshift_table")),
-								style = "height: 25vh; overflow-y: auto; overflow-x: auto;"
-							)
+							title = "Risk Height"
 						),
 						bslib::nav_panel(
 							title = "Compare Distributions"
@@ -95,12 +74,7 @@ mod_data_analysis_ui <- function(id) {
 						bslib::card_header(
 							"Flight Height Distribution",
 							class = "text-bg-primary",
-							bslib::toolbar_spacer(),
-							bslib::input_switch(
-								id = ns("hide_legend"),
-								label = "Hide legend",
-								value = FALSE
-							)
+							bslib::toolbar_spacer()
 						),
 						bslib::card_body(
 							# class = "card-body-white",
@@ -112,73 +86,24 @@ mod_data_analysis_ui <- function(id) {
 
 					# Second card will contain download options
 					bslib::card(
-						bslib::card_header(
-							"Download Options",
-							class = "text-bg-primary"
-						),
-						bslib::card_body(
-							# Add a drop-down to select the FHD to output
-							bslib::layout_columns(
-								tagList(
-									selectInput(
-										ns("selected_fhd"),
-										"Select FHD to download",
-										choices = NULL,
-										width = "100%"									
-									),
-									actionButton(
-										ns("download_btn"),
-										"Download",
-										icon = bsicons::bs_icon("download"),
-										class = "btn-success",
-										width = "100%"
-									)
-								),
-								checkboxGroupInput(
-									ns("download_contents"),
-									"Select contents to download",
-									choices = c(
-										"FHD Data" = "data",
-										"FHD Plot" = "plot",
-										"Metadata" = "metadata"
-									),
-									width = "100%",
-									selected = c("data", "plot", "metadata")
-								)
-								)
-							),
-							
+						bslib::card_header("Download Options", class = "text-bg-primary"),
+						bslib::card_body("Download options content will go here"),
 						class = "card border-primary mb-3 bg-light"
 					)
 				)
 			),
-			# Add a button as an absolutePanel in the bottom-left corner
-			shiny::absolutePanel(
+			div(
+				class = "d-flex flex-column align-items-start gap-2 my-3",
 				actionButton(
-							ns("go_data_selection"),
-							label = tagList(
-								bsicons::bs_icon("play-circle"),
-								"Data Selection"
-							),
-							full_screen = TRUE,
-							class = "left-arrow-btn"
-						),
-						left = 10,
-						bottom = 10,
-						draggable = TRUE
+					ns("go_data_selection"),
+					label = tagList(
+						bsicons::bs_icon("play-circle"),
+						"Data Selection"
+					),
+					full_screen = TRUE,
+					class = "left-arrow-btn"
+				)
 			)
-			# div(
-			# 	class = "d-flex flex-column align-items-start gap-2 my-3",
-			# 	actionButton(
-			# 		ns("go_data_selection"),
-			# 		label = tagList(
-			# 			bsicons::bs_icon("play-circle"),
-			# 			"Data Selection"
-			# 		),
-			# 		full_screen = TRUE,
-			# 		class = "left-arrow-btn"
-			# 	)
-			# )
 		)
 	)
 }
@@ -199,669 +124,60 @@ mod_data_analysis_server <- function(
 	moduleServer(id, function(input, output, session) {
 		ns <- session$ns
 
-		# ── Helpers ───────────────────────────────────────────────────────────────
-		# Sanitise fhd_id into a valid Shiny input-ID fragment.
-		make_safe_id <- function(x) gsub("[^A-Za-z0-9]", "_", x)
+		# Get the draws and metadata
 
-		# ── Error state ───────────────────────────────────────────────────────────
-		# Single reactive value used to surface processing errors as a toast.
-		# NULL means "no error"; any other value is shown as the toast message.
-		# Call `set_error(msg)` from within a reactive/observer to populate it.
-		error_state <- reactiveVal(NULL)
-		set_error <- function(msg) error_state(msg)
-
-		# Show/hide the toast whenever error_state changes.
-		observeEvent(
-			error_state(),
+		# Render the dummy data passed from the previous
+		output$selected_data_dt <- DT::renderDataTable(
 			{
-				if (!is.null(error_state())) {
-					bslib::show_toast(
-						bslib::toast(
-							header = "Warning",
-							error_state(),
-							icon = bsicons::bs_icon("exclamation-triangle-fill"),
-							type = "warning",
-							duration_s = 0,
-							id = "fhd_processing_warning",
-							position = "bottom-right"
-						)
+				req(selected_data$metadata)
+				req(nrow(selected_data$metadata) > 0)
+				selected_data$metadata |>
+					dplyr::select(
+						name_common,
+						method,
+						spatial_scale,
+						temporal_scale,
+						season,
+						year,
+						region,
+						site,
+						group,
+						input_type
 					)
-				} else {
-					bslib::hide_toast("fhd_processing_warning")
-				}
 			},
-			ignoreNULL = FALSE
-		)
-
-		# ── Per-row popover table ─────────────────────────────────────────────────
-		output$fhd_config_table <- renderUI({
-			req(selected_data$metadata)
-			meta <- selected_data$metadata
-			if (nrow(meta) == 0) {
-				return(
-					tags$p(
-						class = "text-muted small py-2 mb-0",
-						bsicons::bs_icon("info-circle"),
-						" No datasets selected."
-					)
-				)
-			}
-
-			rows <- lapply(seq_len(nrow(meta)), function(i) {
-				row <- meta[i, ]
-				fhd_id <- row$fhd_id
-				safe_id <- make_safe_id(fhd_id)
-				covs <- row$covariates[[1]] # named list or NULL
-
-				# ---- Tab 1: Covariates ----------------------------------------
-				covariates_tab <- if (is.null(covs) || length(covs) == 0) {
-					tags$p(
-						class = "text-muted small mb-0 py-1",
-						bsicons::bs_icon("info-circle"),
-						" No covariates available for this dataset."
-					)
-				} else {
-					cov_blocks <- lapply(seq_along(covs), function(ci) {
-						cov_name <- names(covs)[ci]
-						cov_meta <- covs[[cov_name]]
-						switch_id <- paste0(
-							"cov_switch_",
-							safe_id,
-							"_",
-							cov_name
-						)
-						levels_id <- paste0(
-							"cov_levels_",
-							safe_id,
-							"_",
-							cov_name
-						)
-						cov_label <- cov_meta$label %||% cov_name
-						cov_levels <- cov_meta$levels %||% character(0)
-
-						tagList(
-							# Separator between covariate blocks (skip before first)
-							if (ci > 1) tags$hr(class = "my-2") else NULL,
-							tags$div(
-								# Row: covariate name on left, "Use" label + switch on right
-								class = "d-flex align-items-center justify-content-between gap-2",
-								tags$span(class = "small fw-semibold", cov_label),
-								tags$div(
-									class = "d-flex align-items-center gap-1",
-									# tags$span(class = "small text-muted", "Use"),
-									bslib::input_switch(
-										id = ns(switch_id),
-										label = NULL,
-										value = FALSE
-									)
-								)
-							),
-							# Level checkboxes — indented with a left border when visible
-							conditionalPanel(
-								condition = paste0(
-									"input['",
-									ns(switch_id),
-									"'] === true"
-								),
-								tags$div(
-									class = "border-start border-2 ps-2 ms-1 mt-1",
-									checkboxGroupInput(
-										inputId = ns(levels_id),
-										label = tags$span(
-											class = "small text-muted",
-											"Levels:"
-										),
-										choices = cov_levels,
-										selected = cov_levels,
-										inline = TRUE
-									)
-								)
-							)
-						)
-					})
-
-					tagList(!!!cov_blocks)
-				}
-
-				# ---- Popover content: covariates only --------------------------------
-				popover_content <- tags$div(
-					style = "min-width: 280px;",
-					covariates_tab
-				)
-
-				# ---- List-group item -----------------------------------------
-				tags$li(
-					class = paste(
-						"list-group-item d-flex align-items-center",
-						"justify-content-between gap-2 px-2 py-2"
-					),
-					# LHS: index badge + Details button + label
-					tags$div(
-						class = "d-flex align-items-center gap-2 overflow-hidden",
-						tags$span(
-							class = "badge bg-secondary flex-shrink-0",
-							style = "font-size: 1.5rem;",
-							i
-						),
-						tags$div(
-							class = "overflow-hidden",
-							tags$span(
-								class = "fw-semibold small d-block lh-sm text-truncate",
-								row$name_common
-							),
-							tags$span(
-								class = "text-muted",
-								style = "font-size: 0.72rem;",
-								paste0(row$method, " \u00b7 ", row$season)
-							)
-						)
-					),
-					# RHS: Button container
-					tags$div(
-						class = "d-flex gap-2",
-						tags$button(
-							class = "btn btn-sm btn-outline-info flex-shrink-0",
-							onclick = paste0(
-								"Shiny.setInputValue('",
-								ns("det_btn_click"),
-								"', '",
-								fhd_id,
-								"', {priority:'event'})"
-							),
-							bsicons::bs_icon("card-text"),
-							" Details"
-						),
-						actionButton(
-							inputId = ns(paste0("cfg_btn_", safe_id)),
-							label = tagList(
-								bsicons::bs_icon("sliders"),
-								" Configure"
-							),
-							class = "btn btn-sm btn-outline-secondary flex-shrink-0"
-						) |>
-							bslib::popover(
-								title = row$name_common,
-								placement = "right",
-								popover_content
-							)
-					)
-				)
-			})
-
-			tags$ul(
-				class = "list-group list-group-flush",
-				!!!rows
-			)
-		})
-
-		# ── Step 1: Convert raw draws to fhd_array objects ───────────────────────
-		fhd_arrays <- reactive({
-			req(selected_data$draws)
-			purrr::imap(selected_data$draws, function(draws_df, fhd_id) {
-				fhd_df_to_array(
-					draws_df,
-					height_col = "height",
-					draw_col = "draw_id",
-					prob_col = "probability"
-				)
-			})
-		})
-
-		# ── Step 2: Read per-FHD covariate selections from dynamic inputs ─────────
-		# Returns a named list (one entry per fhd_id).
-		# Each entry is a named list: cov_name -> NULL (drop) or character vector of levels.
-		cov_selections <- reactive({
-			req(selected_data$metadata)
-			meta <- selected_data$metadata
-
-			purrr::map(
-				seq_len(nrow(meta)),
-				function(i) {
-					row <- meta[i, ]
-					fhd_id <- row$fhd_id
-					safe_id <- make_safe_id(fhd_id)
-					covs <- row$covariates[[1]]
-
-					if (is.null(covs) || length(covs) == 0) {
-						return(list())
-					}
-
-					purrr::map(names(covs), function(cov_name) {
-						switch_id <- paste0(
-							"cov_switch_",
-							safe_id,
-							"_",
-							cov_name
-						)
-						levels_id <- paste0(
-							"cov_levels_",
-							safe_id,
-							"_",
-							cov_name
-						)
-						using_cov <- isTRUE(input[[switch_id]])
-
-						if (using_cov) {
-							lvls <- input[[levels_id]]
-							# Treat an empty level selection the same as "drop"
-							if (length(lvls) == 0) NULL else lvls
-						} else {
-							NULL
-						}
-					}) |>
-						setNames(names(covs))
-				}
-			) |>
-				setNames(meta$fhd_id)
-		})
-
-		# ── Step 3: Slice each array by covariate selections → labelled data frames
-		processed_fhds <- reactive({
-			req(fhd_arrays(), cov_selections())
-
-			# Reset any stale error from a previous processing run, so a fixed
-			# upstream issue doesn't leave the toast stuck on screen.
-			error_state(NULL)
-
-			purrr::imap(fhd_arrays(), function(arr, fhd_id) {
-				sel <- cov_selections()[[fhd_id]]
-
-				sliced_df <- tryCatch(
-					{
-						rlang::inject(
-							slice_fhd(
-								fhd_array = arr,
-								!!!sel,
-								out_format = "df",
-								seed = 8421L # fixed seed for reproducible resampling
-							)
-						)
-					},
-					error = function(e) {
-						cli::cli_alert_warning(
-							"Failed to slice FHD {.val {fhd_id}}: {.val {e$message}}"
-						)
-						set_error(paste0(
-							"Processing the selected FHDs failed for '",
-							fhd_id,
-							"': ",
-							e$message
-						))
-						return(NULL)
-					}
-				)
-
-				sliced_df$fhd_id <- fhd_id
-				sliced_df
-			})
-		})
-
-		# ── Step 4: Combine all processed FHDs into one long data frame ───────────
-		plot_ready_data <- reactive({
-			req(processed_fhds())
-			req(length(processed_fhds()) > 0)
-			# The columns we can always expect are height, draw_id, probability, fhd_id.
-			# Any additional columns are covariates.
-			# Create a new column identifying each unique FHD, i.e. unique
-			# combination of fhd_id and covariate levels.
-			alldat <- dplyr::bind_rows(processed_fhds(), .id = "fhd_id")
-			expected_cols <- c("height", "draw_id", "probability", "fhd_id")
-			unexpected_cols <- setdiff(
-				lapply(
-					processed_fhds(),
-					names
-				) |> 
-					unlist(),
-				expected_cols
-			)
-			uuid <- alldat |>
-				dplyr::select(dplyr::all_of(c("fhd_id", unexpected_cols))) |>
-				dplyr::distinct() |>
-				dplyr::group_by(fhd_id) |>
-				dplyr::mutate(
-					unique_fhd = if (length(unexpected_cols) == 0 || dplyr::n() == 1L) {
-						# No covariates, or only one combination — use fhd_id directly
-						fhd_id
-					} else {
-						# Multiple splits of the same FHD — append covariate values in brackets
-						paste0(
-							fhd_id,
-							" [",
-							apply(
-								dplyr::pick(dplyr::all_of(unexpected_cols)),
-								1,
-								function(x) paste(na.omit(x), collapse = " \u00b7 ")
-							),
-							"]"
-						)
-					}
-				) |>
-				dplyr::ungroup()
-			out <- alldat |>
-				dplyr::left_join(uuid, by = c("fhd_id", unexpected_cols))
-
-			# If there are >10 unique FHDs, filter to only the first 10, 
-			# and show a warning toast.
-			if (length(unique(out$unique_fhd)) > 10) {
-				set_error(
-					"More than 10 unique FHDs were generated. Only the first 10 will be analysed."
-				)
-				out <- dplyr::filter(
-					out,
-					unique_fhd %in% unique(out$unique_fhd)[1:10]
-				)
-			}
-
-			# Populate the FHD selection drop-down with the unique FHDs.
-			updateSelectInput(
-				parent_session,
-				ns("selected_fhd"),
-				choices = unique(out$unique_fhd),
-				selected = unique(out$unique_fhd)[1]
-			)
-
-			out
-		})
-
-		# Populate error_state when the plot-ready data is not suitable; the
-		# observer on error_state() above takes care of showing/hiding the toast.
-		observeEvent(plot_ready_data(), {
-			req(plot_ready_data())
-			if (
-				nrow(plot_ready_data()) == 0 ||
-					!all(
-						c("height", "probability", "unique_fhd", "draw_id") %in%
-							names(plot_ready_data())
-					)
-			) {
-				set_error(
-					"Processing the selected FHDs failed. Please check the covariate selections and try again."
-				)
-			}
-		})
-
-		# -- Step 5: Generate the height-shift FHD table -------------
-
-		heightshift_data <- reactive({
-			req(plot_ready_data())
-
-			# if the input data is bad, return an empty dataset
-			if (
-				nrow(plot_ready_data()) == 0 ||
-					!all(
-						c("height", "probability", "unique_fhd", "draw_id") %in%
-							names(plot_ready_data())
-					)
-			) {
-				return(list(perc = data.frame(), prob = data.frame()))
-			}
-
-			heightshift(
-				plot_ready_data(),
-				height_col = "height",
-				prob_col = "probability",
-				id_col = "unique_fhd",
-				draw_id_col = "draw_id",
-				risk_min = input$rotor_min,
-				risk_max = input$rotor_max,
-				round = c(4, 2)
-			)
-		})
-
-		# Make the table
-		output$heightshift_table <- DT::renderDataTable(
-			{
-				type <- ifelse(input$show_as_percentages, "perc", "prob")
-				req(heightshift_data())
-				req(nrow(heightshift_data()[[type]]) > 0)
-
-				percjs <- if (input$show_as_percentages) {
-					"function(data, type, row) {
-						if(type === 'display' && data !== null) {
-							var num = parseFloat(data);
-							if(!isNaN(num)) {
-								var prefix = num > 0 ? '+' : '';
-								return prefix + data + '%';
-							}
-						}
-						return data;
-					}"
-				} else {
-					NULL
-				}
-
-				num_cols <- ncol(heightshift_data()[[type]])
-				out <- DT::datatable(
-					heightshift_data()[[type]],
-					rownames = FALSE,
-					extensions = c("FixedHeader"),
-					options = list(
-						dom = "Bfrt",
-						# buttons = c("copy", "csv", "excel", "pdf", "print"),
-						fixedHeader = TRUE,
-						pageLength = 10,
-						searching = FALSE,
-						lengthMenu = c(5, 10, 25, 50, 100),
-						scrollX = TRUE,
-						columnDefs = list(
-							list(
-								targets = 1:(num_cols - 1), # All columns except first (0-indexed)
-								render = DT::JS(percjs)
-							)
-						)
-					)
-				)
-
-				if (input$show_as_percentages) {
-					out <- out |>
-						DT::formatStyle(
-							columns = 2:ncol(heightshift_data()[[type]]),
-							color = DT::styleInterval(
-								0,
-								c("green", "red")
-							)
-						)
-				}
-
-				out
-			},
-			# Use the "compact" style to reduce padding
-			class = "compact stripe hover row-border",
-			# Colour values green if negative and red if positive
-			callback = DT::JS(
-				"function(settings, json) {",
-				"  $(this.api().table().header()).css({'background-color': '#f8f9fa', 'color': '#212529'});",
-				"}"
+			options = list(
+				paging = FALSE,
+				searching = FALSE,
+				info = FALSE,
+				scrollY = "200px",
+				scrollCollapse = TRUE
 			)
 		)
 
-		# ---- Step 6: Generate the FHD summaries ----
-		output$fhd_summaries <- DT::renderDataTable({
-			req(plot_ready_data())
-			if (
-				nrow(plot_ready_data()) == 0 ||
-					!all(
-						c("height", "probability", "unique_fhd", "draw_id") %in%
-							names(plot_ready_data())
-					)
-			) {
-				return(DT::datatable(
-					data.frame(
-						Message = "No valid data available for summary."
-					),
-					rownames = FALSE,
-					options = list(
-						dom = "Bfrt",
-						fixedHeader = TRUE,
-						pageLength = 10,
-						searching = FALSE,
-						lengthMenu = c(5, 10, 25, 50, 100),
-						scrollX = TRUE,
-						scrollY = "30vh"
-					)
-				))
+		# Simulate some dummy data
+		dummy_data <- reactive({
+			req(selected_data$metadata)
+			if (nrow(selected_data$metadata) == 0) {
+				return(NULL)
 			}
-			sumdat <- make_fhd_summary(
-				plot_ready_data(),
-				id_col = "unique_fhd",
-				height_col = "height",
-				prob_col = "probability",
-				draw_col = "draw_id",
-				risk_min = input$rotor_min,
-				risk_max = input$rotor_max
-			) |>
-				# Add a % to all cols except the first
-				dplyr::mutate(
-					dplyr::across(
-						-1,
-						~ paste0(.x, "%")
-					)
-				)
-			DT::datatable(
-				sumdat,
-				# Add a % digit to the columns and prevent horizontal overrun
-				rownames = FALSE,
-				extensions = c("FixedHeader"),
-				options = list(
-					dom = "Bfrt",
-					fixedHeader = TRUE,
-					pageLength = 10,
-					searching = FALSE,
-					lengthMenu = c(5, 10, 25, 50, 100),
-					scrollX = TRUE,
-					scrollY = "30vh"
-				),
+			dummy_fheight_dists(
+				max_height = 100,
+				seed = 123,
+				n = nrow(selected_data$metadata)
 			)
 		})
 
-		# ── FHD plot ──────────────────────────────────────────────────────────────
 		output$dummy_plot <- plotly::renderPlotly({
-			req(plot_ready_data())
-
-			# Identify covariates being *used* across any FHD
-			used_covs <- cov_selections() |>
-				purrr::map(~ names(Filter(\(x) !is.null(x), .x))) |>
-				purrr::reduce(union, .init = character(0))
-
-			max_prob <- 0
-
-			plt <- fhd_baseplot(
+			req(selected_data$metadata)
+			req(dummy_data())
+			dummy_fheight_plot(
+				dummy_data(),
 				risk_min = input$rotor_min,
 				risk_max = input$rotor_max
 			)
-
-			# If the input data is bad, just return the empty plot
-			if (
-				nrow(plot_ready_data()) == 0 ||
-					!all(
-						c("height", "probability", "unique_fhd", "draw_id") %in%
-							names(plot_ready_data())
-					)
-			) {
-				return(plt)
-			}
-
-			meta <- selected_data$metadata
-			fhd_ids <- unique(plot_ready_data()$fhd_id)
-			for (id in fhd_ids) {
-				fhd_subset <- dplyr::filter(plot_ready_data(), fhd_id == id)
-				# Only pass used_covs that actually exist as columns in this subset
-				plot_by_cov <- intersect(used_covs, names(fhd_subset))
-				# Row index in metadata — used as the legend prefix when covariates
-				# are active so entries from different FHDs never collide (e.g. "1.cold.low")
-				fhd_index <- match(id, meta$fhd_id)
-
-				max_prob <- max(max_prob, max(fhd_subset$probability, na.rm = TRUE))
-
-				plt <- add_fhd(
-					plot = plt,
-					fhd_data = fhd_subset,
-					id_col = "fhd_id",
-					height_col = "height",
-					draw_col = "draw_id",
-					prob_col = "probability",
-					plot_by_cov = if (length(plot_by_cov) > 0) plot_by_cov else NULL,
-					index = if (length(plot_by_cov) > 0) fhd_index else NULL
-				)
-
-				plt <- plt |>
-					plotly::layout(
-						yaxis = list(range = c(0, max_prob * 1.1))
-					)
-			}
-
-			if (isTRUE(input$hide_legend)) {
-				plt <- plt |> plotly::layout(showlegend = FALSE)
-			}
-
-			plt
 		})
 
-		# ── Details modal ────────────────────────────────────────────────────────
-		observeEvent(input$det_btn_click, {
-			fhd_id <- input$det_btn_click
-			row <- selected_data$metadata[
-				selected_data$metadata$fhd_id == fhd_id,
-			]
-
-			details_fields <- c(
-				"fhd_id",
-				"name_common",
-				"name_scientific",
-				"method",
-				"spatial_scale",
-				"temporal_scale",
-				"season",
-				"year",
-				"country",
-				"region",
-				"site",
-				"group",
-				"crm_recommended",
-				"input_type"
-			)
-			covs <- row$covariates[[1]]
-			cov_names_str <- {
-				cn <- names(covs)
-				if (length(cn) == 0) "None" else paste(cn, collapse = ", ")
-			}
-
-			details_table <- tags$table(
-				class = "table table-sm table-striped",
-				tags$tbody(
-					lapply(
-						intersect(details_fields, names(row)),
-						function(col) {
-							tags$tr(
-								tags$th(
-									style = "width: 35%; white-space: nowrap;",
-									col
-								),
-								tags$td(as.character(row[[col]]))
-							)
-						}
-					),
-					tags$tr(
-						tags$th("covariates"),
-						tags$td(cov_names_str)
-					)
-				)
-			)
-
-			showModal(modalDialog(
-				title = tagList(
-					bsicons::bs_icon("card-text"),
-					" ",
-					row$name_common
-				),
-				details_table,
-				easyClose = TRUE,
-				footer = modalButton("Close"),
-				size = "m"
-			))
-		})
-
-		# ── Navigation ────────────────────────────────────────────────────────────
+		# React to go to data selection tab --------------
 		observeEvent(
 			input$go_data_selection,
 			{
@@ -869,21 +185,6 @@ mod_data_analysis_server <- function(
 					id = nav_id,
 					selected = "nav-data-select",
 					session = parent_session
-				)
-			}
-		)
-
-		# Download button handler --------------------------------------------------
-		observeEvent(
-			input$download_btn,
-			{
-				shiny::showModal(
-					shiny::modalDialog(
-						title = "Download Options",
-						"Download functionality is not yet implemented.",
-						easyClose = TRUE,
-						footer = shiny::modalButton("Close")
-					)
 				)
 			}
 		)
