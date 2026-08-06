@@ -11,8 +11,25 @@ mod_landing_page_ui <- function(id) {
 	ns <- NS(id)
 	tagList(
 		bslib::page_fillable(
+			# Add a page-wide card
+			# bslib::card(
+			# 	class = "bg-secondary",
+			# 	full_screen = FALSE,
+			# 	fill = FALSE, # <-- stops the card from growing to fill the page height
+			# 	tags$a(
+			# 		href = "google.com",
+			# 		target = "_blank",
+			# 		rel = "noopener noreferrer",
+			# 		tags$img(
+			# 			src = "www/ReSCUE_banner.png",
+			# 			class = "logo-link",
+			# 			alt = "ReSCUE Project Banner",
+			# 			style = "max-width: 90vw; cursor: pointer; display: block; margin-left: auto; margin-right: auto;"
+			# 		),
+			# 	)
+			# ),
 			bslib::layout_columns(
-				col_widths = c(7, 5),
+				col_widths = c(6, 6),
 				# LHS: A card containing project information.
 				# bslib::card(
 				# bslib::card_header(
@@ -25,7 +42,7 @@ mod_landing_page_ui <- function(id) {
 				bslib::accordion(
 					multiple = FALSE,
 					class = "card border-primary mb-3 bg-light",
-					height = "90%",
+					height = "95%",
 					bslib::accordion_panel(
 						title = "Project Overview",
 						icon = bsicons::bs_icon("info-circle"),
@@ -77,14 +94,14 @@ mod_landing_page_ui <- function(id) {
 						# CONTACTS -----------------
 						bslib::value_box(
 							title = "ReSCUE Project Lead",
-							value = "Dummy Name",
+							value = "Eddie Cole",
 							# Add a link to an email
 							tags$a(
-								href = "mailto:dummy@something.co.uk",
-								"dummy@something.co.uk"
+								href = "mailto:Eddie.Cole@naturalengland.org.uk",
+								"Eddie.Cole@naturalengland.org.uk"
 							),
 							showcase = tags$a(
-								href = "mailto:dummy@something.co.uk",
+								href = "mailto:Eddie.Cole@naturalengland.org.uk",
 								bsicons::bs_icon("envelope-fill", class = "text-secondary")
 							)
 						),
@@ -122,25 +139,61 @@ mod_landing_page_ui <- function(id) {
 				# ),
 				column(
 					12,
+					# OWEC logo in its own card
 					bslib::card(
-						bslib::card_header(
-							"Project Partners",
-							class = "text bg-primary"
-						),
 						bslib::card_body(
-							bslib::layout_columns(
-								col_widths = c(4, 4, 4),
-								logolink("dmp"),
-								logolink("ne", height = 9),
-								logolink("bto")
-							),
-							bslib::layout_columns(
-								col_widths = c(6, 6),
-								logolink("blackbawks"),
-								logolink("niras")
-							)
+							class = "d-flex justify-content-center align-items-center",
+							logolink("owec", height = 35)
 						),
 						class = "card border-primary mb-3 bg-secondary"
+					),
+					bslib::layout_columns(
+						col_widths = c(4, 4, 4),
+						bslib::card(
+							bslib::card_body(
+								class = "d-flex justify-content-center align-items-center",
+								logolink("dmp")
+							),
+							class = "card border-primary bg-secondary"
+						),
+						bslib::card(
+							bslib::card_body(
+								class = "d-flex justify-content-center align-items-center",
+								logolink("ne", height = 9)
+							),
+							class = "card border-primary bg-secondary"
+						),
+						bslib::card(
+							bslib::card_body(
+								class = "d-flex justify-content-center align-items-center",
+								logolink("blackbawks")
+							),
+							class = "card border-primary bg-secondary"
+						)
+					),
+					bslib::layout_columns(
+						col_widths = c(4, 4, 4),
+						bslib::card(
+							bslib::card_body(
+								class = "d-flex justify-content-center align-items-center",
+								logolink("rescue")
+							),
+							class = "card border-primary bg-secondary"
+						),
+						bslib::card(
+							bslib::card_body(
+								class = "d-flex justify-content-center align-items-center",
+								logolink("bto", height = 8)
+							),
+							class = "card border-primary bg-secondary"
+						),
+						bslib::card(
+							bslib::card_body(
+								class = "d-flex justify-content-center align-items-center",
+								logolink("niras")
+							),
+							class = "card border-primary bg-secondary"
+						)
 					),
 					bslib::layout_columns(
 						div(

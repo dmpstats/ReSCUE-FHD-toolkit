@@ -623,9 +623,24 @@ mod_data_select_server <- function(
 			removeModal()
 		})
 
-		# ----- Merge the user-uploaded data -----------
-		# The user can upload a dataset at any point. Reactively merge
-		# the user-uploaded data with the main metadata table. This allows the user to select their own datasets for analysis.
+		# ----- Too-much-data toast ------------
+		# If over 10 datasets are selected, show a warning toast that the analysis will only analyze the first 10 datasets.
+		observeEvent(selected_ids(), {
+			if (length(selected_ids()) > 10) {
+				bslib::showToast(
+					bslib::toast(
+						header = "Too many datasets selected",
+						icon = bsicons::bs_icon("exclamation-triangle-fill"),
+						"Only the first 10 datasets will be analyzed. Please deselect some datasets if you want to analyze fewer than 10.",
+						type = "warning",
+						id = "too_many_datasets_toast"
+					)
+				)
+			} else {
+				bslib::hide_toast("too_many_datasets_toast")
+			}
+		})
+
 
 		# ── Navigation ───────────────────────────────────────────────────────────
 		outputs <- reactiveValues()
@@ -673,7 +688,7 @@ mod_data_select_server <- function(
 
 		return(list(
 			selected_data = outputs,
-			uploaded_data = NULL
+			user_fhds = NULL
 		))
 	})
 }
