@@ -10,11 +10,25 @@
 library(tools)
 library(sf)
 
+# Call BDMPS regions
+bd <- sf::st_read(
+  "data-raw/BDMPS_regions/Final BDMPS regions long format.shp",
+  quiet = TRUE
+)
+
 generate_dummy_data <- function(
-  n_datasets = 10,
   dir = "data-dummy",
-  seed = 1234
+  seed = 1234,
+  bd = NULL
 ) {
+  # If bd is not provided, load it from file
+  if (is.null(bd)) {
+    bd <- sf::st_read(
+      "data-raw/BDMPS_regions/Final BDMPS regions long format.shp",
+      quiet = TRUE
+    )
+  }
+
   draws_dir <- file.path(dir, "draws")
   metadata_dir <- file.path(dir, "metadata")
 
@@ -64,24 +78,20 @@ generate_dummy_data <- function(
 
   set.seed(seed)
 
-  for (i in seq_len(n_datasets)) {
+  # Iterate over each row in bd (species/BDMPS region/geometry combination)
+  for (i in seq_len(nrow(bd))) {
     # ------------------------------------------------------------------
-    # Sample species
+    # Extract species and BDMPS region from bd
     # ------------------------------------------------------------------
-    species <- sample(
-      c(
-        "Puffin",
-        "Guillemot",
-        "Black Guillemot",
-        "Great Northern Diver",
-        "Shag",
-        "Razorbill",
-        "Kittiwake"
-      ),
-      1
-    )
+    species <- bd$Species[i]
+    bdmps_region <- bd$BDMPS.regi[i]
+    bd_polygon <- sf::st_geometry(bd)[i]
+
+    # Create species_id from the actual species name
     species_id <- paste0("species_", gsub(" ", "_", tolower(species)))
     name_common <- tools::toTitleCase(species)
+
+    # Generate synthetic scientific name (plaintext, doesn't matter later)
     name_scientific <- paste0(
       sample(c("Aves", "Alcidae", "Uria", "Cepphus", "Fratercula"), 1),
       "_",
@@ -91,7 +101,7 @@ generate_dummy_data <- function(
     crm_recommended <- sample(c(TRUE, FALSE), 1)
 
     # ------------------------------------------------------------------
-    # Sample data-source descriptors
+    # Sample data-source descriptors (plaintext, doesn't matter later)
     # ------------------------------------------------------------------
     method <- sample(c("LiDAR-DAS", "GPS", "Altimeter"), 1)
     spatial_scale <- sample(c("site-specific", "regional", "national"), 1)
@@ -103,18 +113,14 @@ generate_dummy_data <- function(
       sample(1:2, 1),
       replace = FALSE
     )
-    region <- sample(
-      c("UK", "Scotland", "England", "Wales", "Northern Ireland"),
-      1
-    )
+    region <- bdmps_region
     sea_area <- sample(c("IVa", "IVb", "IVc", "VIa", "VIIe"), 1)
     site <- paste(
       sample(LETTERS, 1),
       sample(c("Point", "Head", "Isle", "Bay"), 1)
     )
-    lat <- runif(1, 49.5, 61.5)
-    lon <- runif(1, -8.5, 2.5)
-    sf_obj <- sf::st_sfc(sf::st_point(c(lon, lat)), crs = 4326)
+    # Use polygon geometry from bd instead of random point
+    sf_obj <- bd_polygon
 
     # ------------------------------------------------------------------
     # Covariates (nested; kept outside flat structure by design)
@@ -133,14 +139,14 @@ generate_dummy_data <- function(
     }
 
     # ------------------------------------------------------------------
-    # Unique entry ID
+    # Unique entry ID (based on species and BDMPS region)
     # ------------------------------------------------------------------
     fhd_id <- paste0(
-      species,
+      gsub(" ", "_", tolower(species)),
       "_",
-      stringr::str_replace_all(region, " ", "_"),
+      stringr::str_replace_all(bdmps_region, " ", "_"),
       "_",
-      stringr::str_replace_all(site, " ", "_")
+      i  # add index to ensure uniqueness if needed
     )
 
     # ------------------------------------------------------------------
@@ -207,8 +213,6 @@ generate_dummy_data <- function(
       name_scientific = name_scientific,
       group = group,
       crm_recommended = crm_recommended,
-      lon = lon,
-      lat = lat,
       sf_obj = sf_obj,
       input_type = "rescue-library",
       covariates = covariates # nested; excluded from flat row-binding
@@ -223,7 +227,7 @@ generate_dummy_data <- function(
 
   message(
     "Done. Wrote ",
-    n_datasets,
+    nrow(bd),
     " entries to:\n",
     "  draws:    ",
     draws_dir,
@@ -234,7 +238,7 @@ generate_dummy_data <- function(
   invisible(NULL)
 }
 
-generate_dummy_data(n_datasets = 5, dir = "data-dummy")
+generate_dummy_data(dir = "data-dummy", bd = bd)
 
 # Try calling and binding the metadata
 metadata_files <- list.files(
