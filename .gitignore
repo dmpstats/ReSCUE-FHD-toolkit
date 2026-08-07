@@ -1,2 +1,6 @@
 
 /scrap
+
+/.quarto/
+**/*.quarto_ipynb
+*.dcf

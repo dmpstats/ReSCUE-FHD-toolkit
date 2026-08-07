@@ -124,7 +124,7 @@ mod_data_analysis_ui <- function(id) {
 										ns("selected_fhd"),
 										"Select FHD to download",
 										choices = NULL,
-										width = "100%"									
+										width = "100%"
 									),
 									actionButton(
 										ns("download_btn"),
@@ -132,9 +132,10 @@ mod_data_analysis_ui <- function(id) {
 										icon = bsicons::bs_icon("download"),
 										class = "btn-success",
 										width = "100%"
-									)
+									),
+									uiOutput(ns("covar_warning"))
 								),
-								checkboxGroupInput(
+								shinyWidgets::prettyCheckboxGroup(
 									ns("download_contents"),
 									"Select contents to download",
 									choices = c(
@@ -143,11 +144,23 @@ mod_data_analysis_ui <- function(id) {
 										"Metadata" = "metadata"
 									),
 									width = "100%",
-									selected = c("data", "plot", "metadata")
+									selected = c("data", "plot", "metadata"),
+									status = "success"
 								)
-								)
-							),
-							
+								# checkboxGroupInput(
+								# 	ns("download_contents"),
+								# 	"Select contents to download",
+								# 	choices = c(
+								# 		"FHD Data" = "data",
+								# 		"FHD Plot" = "plot",
+								# 		"Metadata" = "metadata"
+								# 	),
+								# 	width = "100%",
+								# 	selected = c("data", "plot", "metadata")
+								# )
+							)
+						),
+
 						class = "card border-primary mb-3 bg-light"
 					)
 				)
@@ -155,17 +168,17 @@ mod_data_analysis_ui <- function(id) {
 			# Add a button as an absolutePanel in the bottom-left corner
 			shiny::absolutePanel(
 				actionButton(
-							ns("go_data_selection"),
-							label = tagList(
-								bsicons::bs_icon("play-circle"),
-								"Data Selection"
-							),
-							full_screen = TRUE,
-							class = "left-arrow-btn"
-						),
-						left = 10,
-						bottom = 10,
-						draggable = TRUE
+					ns("go_data_selection"),
+					label = tagList(
+						bsicons::bs_icon("play-circle"),
+						"Data Selection"
+					),
+					full_screen = TRUE,
+					class = "left-arrow-btn"
+				),
+				left = 10,
+				bottom = 10,
+				draggable = TRUE
 			)
 			# div(
 			# 	class = "d-flex flex-column align-items-start gap-2 my-3",
@@ -261,15 +274,18 @@ mod_data_analysis_server <- function(
 						" No covariates available for this dataset."
 					)
 				} else {
+					switch_ids <- vapply(
+						names(covs),
+						function(cov_name) {
+							paste0("cov_switch_", safe_id, "_", cov_name)
+						},
+						character(1)
+					)
+
 					cov_blocks <- lapply(seq_along(covs), function(ci) {
 						cov_name <- names(covs)[ci]
 						cov_meta <- covs[[cov_name]]
-						switch_id <- paste0(
-							"cov_switch_",
-							safe_id,
-							"_",
-							cov_name
-						)
+						switch_id <- switch_ids[[ci]]
 						levels_id <- paste0(
 							"cov_levels_",
 							safe_id,
@@ -320,12 +336,61 @@ mod_data_analysis_server <- function(
 						)
 					})
 
-					tagList(!!!cov_blocks)
+					# Warning shown when some (but not all) covariates are
+					# switched on — the processing step only supports using
+					# NO covariates or ALL covariates; a partial selection
+					# will cause an error downstream.
+					partial_selection_warning <- if (length(switch_ids) > 1) {
+						switch_input_ids <- vapply(
+							switch_ids,
+							function(id) ns(id),
+							character(1)
+						)
+						js_array <- paste0(
+							"[",
+							paste0(
+								"input['",
+								switch_input_ids,
+								"']",
+								collapse = ", "
+							),
+							"]"
+						)
+						js_condition <- paste0(
+							"(function(vals) {",
+							"var any = vals.some(function(v) { return v === true; });",
+							"var all = vals.every(function(v) { return v === true; });",
+							"return any && !all;",
+							"})(",
+							js_array,
+							")"
+						)
+
+						conditionalPanel(
+							condition = js_condition,
+							tags$div(
+								class = "alert alert-warning small py-1 px-2 mt-2 mb-0",
+								style = paste(
+									"max-width: 75%;",
+									"overflow-wrap: break-word;",
+									"word-break: break-word;",
+									"box-sizing: border-box;"
+								),
+								bsicons::bs_icon("exclamation-triangle-fill"),
+								" Select either no covariates or all covariates. ",
+								"A partial selection will cause an error when processing."
+							)
+						)
+					} else {
+						NULL
+					}
+
+					tagList(!!!cov_blocks, partial_selection_warning)
 				}
 
 				# ---- Popover content: covariates only --------------------------------
 				popover_content <- tags$div(
-					style = "min-width: 280px;",
+					style = "min-width: 320px;",
 					covariates_tab
 				)
 
@@ -510,7 +575,7 @@ mod_data_analysis_server <- function(
 				lapply(
 					processed_fhds(),
 					names
-				) |> 
+				) |>
 					unlist(),
 				expected_cols
 			)
@@ -540,7 +605,7 @@ mod_data_analysis_server <- function(
 			out <- alldat |>
 				dplyr::left_join(uuid, by = c("fhd_id", unexpected_cols))
 
-			# If there are >10 unique FHDs, filter to only the first 10, 
+			# If there are >10 unique FHDs, filter to only the first 10,
 			# and show a warning toast.
 			if (length(unique(out$unique_fhd)) > 10) {
 				set_error(
@@ -795,6 +860,46 @@ mod_data_analysis_server <- function(
 			}
 
 			plt
+		})
+
+		# ---- Track FHDs with covars -----------------------------------------------
+		fhds_with_active_covs <- reactive({
+			req(cov_selections())
+
+			# Return vector of fhd_ids that have ANY covariate actively selected
+			cov_selections() |>
+				purrr::map_lgl(function(fhd_covs) {
+					# Check if ANY covariate has non-NULL (i.e., selected) levels
+					any(!sapply(fhd_covs, is.null))
+				}) |>
+				# Get which are TRUE
+				which() |>
+				# Get the names (fhd_ids) of those TRUE entries
+				names()
+		})
+
+		# Render a warning if the selected FHD is in fhds_with_active_covs
+		output$covar_warning <- renderUI({
+			req(input$selected_fhd)
+			if (
+				length(fhds_with_active_covs() > 0) &&
+					stringr::str_detect(
+						input$selected_fhd,
+						paste(fhds_with_active_covs(), collapse = "|")
+					)
+			) {
+				bslib::card(
+					tags$p(
+						"Warning: The selected FHD has covariate selections active. This makes it unsuitable for use in an SCRM analysis."
+					),
+					tags$p(
+						"You may still download the outputs, but it should not be used in an SCRM analysis."
+					),
+					class = "card border-warning"
+				)
+			} else {
+				NULL
+			}
 		})
 
 		# ── Details modal ────────────────────────────────────────────────────────

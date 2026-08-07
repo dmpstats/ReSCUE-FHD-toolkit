@@ -107,7 +107,6 @@ app_server <- function(input, output, session) {
 		content = function(file) {
 			saveRDS(
 				list(
-					map_data = data_select_output$map_data(),
 					current_tab = input[["main-nav"]]
 				),
 				file

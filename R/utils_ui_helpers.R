@@ -51,19 +51,23 @@ logolink <- function(company, tooltip = TRUE, height = 10) {
         switch(
           company,
           "dmp" = HTML(
-            "<strong>DMP Statistical Solutions</strong> <br>ReSCUETOols Developers"
+            "<strong>DMP Statistical Solutions</strong> <br>ReSCUEApp Developers"
           ),
           "bto" = HTML(
-            "<strong>British Trust for Ornithology</strong><br>ReSCUE Research Partner"
+            "<strong>British Trust for Ornithology</strong><br>ReSCUETools Developers"
           ),
           "ne" = HTML(
             "<strong>Natural England</strong><br>ReSCUE Project Lead"
           ),
           "blackbawks" = HTML(
-            "<strong>Black Bawks Data Science</strong><br>CLARIFY ROLE"
+            "<strong>Black Bawks Data Science</strong><br>ReSCUE Project Manager"
           ),
-          "niras" = HTML("<strong>NIRAS</strong><br>CLARIFY ROLE"),
-          "owec" = HTML("<strong>OWEC</strong><br>Project Funder"),
+          "niras" = HTML(
+            "<strong>NIRAS</strong><br>ReSCUE Development Consultants"
+          ),
+          "owec" = HTML(
+            "<strong>OWEC / Crown Estate</strong><br>Project Funding Agency"
+          ),
           "rescue" = HTML(
             "<strong>ReSCUE Project</strong><br>Project Website"
           ),
@@ -124,6 +128,27 @@ add_fhd_polygons <- function(map, data, selected_ids, ns) {
           "<span style='color:red;'>No</span>"
         ),
         "<br/>",
+
+        # Add a section listing the covariates, which are in a nested list
+        # (one list of named covariate specs per row of `data`)
+        "<strong>Covariates: </strong>",
+        vapply(
+          covariates,
+          function(covs) {
+            if (length(covs) == 0) {
+              return("None")
+            }
+            labels <- vapply(covs, function(cov) cov$label, character(1))
+            paste0(
+              "<ul>",
+              paste0("<li>", labels, "</li>", collapse = ""),
+              "</ul>"
+            )
+          },
+          character(1)
+        ),
+        "<br/>",
+
         "<button ",
         "onclick=\"Shiny.setInputValue('",
         ns("map_add_btn"),

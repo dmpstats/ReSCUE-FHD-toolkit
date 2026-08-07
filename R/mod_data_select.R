@@ -148,51 +148,59 @@ mod_data_select_ui <- function(id) {
 					bslib::card(
 						class = "overflow-visible",
 						bslib::card_body(
-							# Left-side: some text
-							bslib::layout_columns(
-								col_widths = c(8, 4),
-								HTML(
-									"<h4>Recommended Defaults</h4>
-									If you are running the analysis for a single species, and want to use the recommended defaults, you can do so here.
-									<br><br>
-									This will auto-load the recommended flight-height distribution for the selected species, and will override any other selections."
-								),
-								tagList(
-									# This selectizeInput should drop downwards, unlike the others
-									selectizeInput(
-										ns("default_region"),
-										label = "Select Region",
-										choices = c(
-											"North Sea",
-											"Norwegian Sea",
-											"Barents Sea",
-											"Atlantic Ocean"
-										)
-									),
-									selectizeInput(
-										ns("default_species"),
-										label = "Select Species",
-										choices = c(
-											"Puffin",
-											"Razorbill",
-											"Guillemot",
-											"Gannet",
-											"Shag",
-											"Kittiwake",
-											"Fulmar"
-										),
-										multiple = FALSE
-									),
-									actionButton(
-										ns("load_defaults"),
-										label = tagList(
-											bsicons::bs_icon("play-circle"),
-											"Load Defaults"
-										),
-										class = "not-arrow-btn"
-									)
-								)
+							# Some information on this page
+							tags$p(
+								"Select flight-height datasets from the map or the table below. You can filter the datasets by species, method, season, and other criteria. Once you have selected the datasets you want to analyze, click 'Start Analysis' to proceed."
+							),
+							tags$p(
+								"Note: You can select up to 10 datasets for analysis. If you select more than 10, only the first 10 will be analyzed."
 							)
+
+							# Left-side: some text
+							# bslib::layout_columns(
+							# 	col_widths = c(8, 4),
+							# 	HTML(
+							# 		"<h4>Recommended Defaults</h4>
+							# 		If you are running the analysis for a single species, and want to use the recommended defaults, you can do so here.
+							# 		<br><br>
+							# 		This will auto-load the recommended flight-height distribution for the selected species, and will override any other selections."
+							# 	),
+							# 	tagList(
+							# 		# This selectizeInput should drop downwards, unlike the others
+							# 		selectizeInput(
+							# 			ns("default_region"),
+							# 			label = "Select Region",
+							# 			choices = c(
+							# 				"North Sea",
+							# 				"Norwegian Sea",
+							# 				"Barents Sea",
+							# 				"Atlantic Ocean"
+							# 			)
+							# 		),
+							# 		selectizeInput(
+							# 			ns("default_species"),
+							# 			label = "Select Species",
+							# 			choices = c(
+							# 				"Puffin",
+							# 				"Razorbill",
+							# 				"Guillemot",
+							# 				"Gannet",
+							# 				"Shag",
+							# 				"Kittiwake",
+							# 				"Fulmar"
+							# 			),
+							# 			multiple = FALSE
+							# 		),
+							# 		actionButton(
+							# 			ns("load_defaults"),
+							# 			label = tagList(
+							# 				bsicons::bs_icon("play-circle"),
+							# 				"Load Defaults"
+							# 			),
+							# 			class = "not-arrow-btn"
+							# 		)
+							# 	)
+							# )
 						)
 					),
 					bslib::card(
@@ -287,31 +295,6 @@ mod_data_select_server <- function(
 		ready_to_download <- reactiveVal(FALSE)
 		have_downloaded <- reactiveVal(FALSE)
 
-		# ── Filter choices (data-driven) ────────────────────────────────────────
-		observe({
-			updateSelectizeInput(
-				session,
-				"species",
-				choices = unique(metadata_tbl$species_id),
-				selected = unique(metadata_tbl$species_id)[1],
-				server = TRUE
-			)
-			updateSelectizeInput(
-				session,
-				"method",
-				choices = unique(metadata_tbl$method),
-				selected = character(0),
-				server = TRUE
-			)
-			updateSelectizeInput(
-				session,
-				"region",
-				choices = unique(metadata_tbl$region),
-				selected = character(0),
-				server = TRUE
-			)
-		})
-
 		# ── Single source of truth: which fhd_ids are selected ──────────────────
 		selected_ids <- reactiveVal(character(0))
 
@@ -337,13 +320,49 @@ mod_data_select_server <- function(
 			data
 		})
 
+		# ── Filter choices (data-driven) ────────────────────────────────────────
+		observe({
+			updateSelectizeInput(
+				session,
+				"species",
+				choices = unique(metadata_tbl$species_id),
+				selected = unique(metadata_tbl$species_id)[1],
+				server = TRUE
+			)
+			updateSelectizeInput(
+				session,
+				"method",
+				choices = unique(metadata_tbl$method),
+				selected = character(0),
+				server = TRUE
+			)
+			updateSelectizeInput(
+				session,
+				"region",
+				choices = unique(metadata_tbl$region),
+				selected = character(0),
+				server = TRUE
+			)
+		})
+
+		# ── One-shot trigger: fires once filter defaults are populated ──────────
+		# renderLeaflet below depends on this instead of input$species directly,
+		# so later changes to input$species do not cause the map to re-render.
+		map_ready <- reactiveVal(FALSE)
+		observeEvent(
+			input$species,
+			{
+				map_ready(TRUE)
+			},
+			once = TRUE
+		)
+
 		# ── Map: initial render with all data markers ───────────────────────────
 		output$source_map <- leaflet::renderLeaflet({
-			req(input$species)
+			req(map_ready())
 
-			data <- filtered_data()
-
-			leaflet::leaflet(
+			# Use isolate() to prevent map re-rendering on filter changes
+			map <- leaflet::leaflet(
 				options = leaflet::leafletOptions(
 					attributionControl = FALSE,
 					zoomControl = FALSE,
@@ -351,9 +370,18 @@ mod_data_select_server <- function(
 				)
 			) |>
 				leaflet::addProviderTiles(leaflet::providers$CartoDB.DarkMatter) |>
-				leaflet::setView(lng = -3.5, lat = 56, zoom = 5) |>
-				# Initial render: selected IDs left empty to prevent re-rendering
-				add_fhd_polygons(data = data, selected_ids = c(), ns = ns)
+				leaflet::setView(lng = -3.5, lat = 56, zoom = 5)
+
+			# Populate with initial data (isolated from filter changes)
+			data <- isolate(filtered_data())
+			map <- map |>
+				add_fhd_polygons(
+					data = data,
+					selected_ids = isolate(selected_ids()),
+					ns = ns
+				)
+
+			map
 		})
 
 		# ── Map markers: redrawn whenever filters or selection changes ───────────
@@ -423,6 +451,7 @@ mod_data_select_server <- function(
 					user_uploads$metadata() |>
 						dplyr::bind_rows()
 				) |>
+				as.data.frame() |>
 				dplyr::select(
 					dplyr::all_of(
 						c(
@@ -452,6 +481,7 @@ mod_data_select_server <- function(
 			{
 				fhd_id <- input$map_details_btn
 				details <- metadata_tbl[metadata_tbl$fhd_id == fhd_id, ] |>
+					as.data.frame() |>
 					dplyr::mutate(
 						covariates = paste(names(covariates[[1]]), collapse = ", "),
 						covariates = ifelse(
