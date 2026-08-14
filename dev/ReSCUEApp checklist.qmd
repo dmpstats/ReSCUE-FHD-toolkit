@@ -1,0 +1,62 @@
+---
+title: "ReSCUEApp Requirements CheckList"
+format: html
+---
+
+## Landing Page
+- [x] Project background & App functionality
+- [x] Links to user guide document, FAQs, GitHub repo, issues reporting
+- [x] Version & logos
+
+
+## Data Selection & Upload
+
+- [x] Data selection for `{ReSCUETOOLS}`'s data-library, via interactive map
+    - [x] with selectable sea areas (e.g., BDMPS)
+    - [x] filters for species, method, season, sCRM suitability
+
+
+- [ ] Recommended Default Distributions (SNCB guidance & Johnston et al)
+    - UI functionality in place. Back-end implementation needing details/data on how to proceed/whether to implement in phase 1
+
+- [x] User-specific data upload
+
+
+## FHD Visualization and PCH Analysis
+
+- [ ] Visually compare selected FHDs, including:
+    - [x] Summary table with:
+        - [x] Data composition, model form and covariates (via metadata)
+        - [ ] Summary stats & sCRM implementation approach
+            - Is this provided with FHD as metadata? Needs further guidance.
+    - [ ] FHD plots (with CIs), displayed in group or individually, with and without defined risk height envelope
+        - Undergoing final refinements
+
+
+- [ ] PCH Comparison and mitigation assessment
+    - [x] Specify and include air-gap (or risk height envelope) in plot
+    - [ ] Display PCH change given 1m increments in air-gap, up to a maximum of 40 m (mitigation scenarios)
+        - Undergoing final refinements
+    - [ ] Summary table comparing proportions at incremental 1m intervals above the given air-gap, within the risk envelope. Option to show plots illustrating results in terms of reductions in theoretical collision rates for a given increase/decrease in air-gap.
+        - Is this identical to previous requirement? Needs clarification
+
+
+
+## Data Export and Session Restore
+
+- [ ] Save and Restore Session
+    - Under development
+- [ ] Feature to download summary package (FHDs, Plots, sumary tables, session info)
+    - Under development
+
+## Data Sources and Methods
+
+- [ ] Page describing data sources and methods/model description used in ReSCUE. Include links to relevant reports and online documentation
+    - awaiting for mock documents and links
+
+## In-app user guidance
+
+- [ ] App Tour (Tutorial)
+    - Undergoing final refinements
+- [ ] Info Boxes
+    - Undergoing final refinements
