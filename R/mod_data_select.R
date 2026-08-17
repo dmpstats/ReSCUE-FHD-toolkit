@@ -216,8 +216,8 @@ mod_data_select_ui <- function(id) {
 									bslib::tooltip(
 										"Clear all selected datasets.",
 										placement = "bottom"
-									),
-								mod_help_button_ui(ns("select_data"), type = "toolbar")
+									)
+								# mod_help_button_ui(ns("select_data"), type = "toolbar")
 							)
 						),
 						bslib::card_body(DT::DTOutput(ns("show_selected"))),
@@ -604,6 +604,9 @@ mod_data_select_server <- function(
 				)
 			}
 		)
+
+		# Help button servers -----
+		mod_help_button_server("select_data", help_file = "select_data", size = "xl")
 
 		return(list(
 			selected_data = outputs,
