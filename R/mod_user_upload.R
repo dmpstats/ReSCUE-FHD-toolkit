@@ -11,6 +11,10 @@ mod_user_upload_ui <- function(id) {
   ns <- NS(id)
   tagList(
     # Dataset Information Section
+    bslib::card(
+      "Use this popup to upload a flight-height distribution dataset. All fields marked with an asterisk (*) are required. Please note that all user-uploaded data must have been pre-prepared using the ReSCUETools R package. For more information, please refer to the ReSCUETools documentation.",
+      class = "card border-warning"
+    ),
     bslib::layout_column_wrap(
       widths = c(1, 1),
       textInput(

@@ -95,6 +95,9 @@ mod_data_analysis_ui <- function(id) {
 						bslib::card_header(
 							"Flight Height Distribution",
 							class = "text-bg-primary",
+							bslib::toolbar(
+								mod_help_button_ui(ns("help_fhd"), type = "toolbar")
+							),
 							bslib::toolbar_spacer(),
 							bslib::input_switch(
 								id = ns("hide_legend"),
@@ -114,7 +117,10 @@ mod_data_analysis_ui <- function(id) {
 					bslib::card(
 						bslib::card_header(
 							"Download Options",
-							class = "text-bg-primary"
+							class = "text-bg-primary",
+							bslib::toolbar(
+								mod_help_button_ui(ns("help_download"), type = "toolbar")
+							)
 						),
 						bslib::card_body(
 							# Add a drop-down to select the FHD to output
@@ -991,6 +997,14 @@ mod_data_analysis_server <- function(
 					)
 				)
 			}
+		)
+
+		# Help button servers -----
+		mod_help_button_server("help_fhd", help_file = "fhd_plot", size = "xl")
+		mod_help_button_server(
+			"help_download",
+			help_file = "download_options",
+			size = "xl"
 		)
 	})
 }

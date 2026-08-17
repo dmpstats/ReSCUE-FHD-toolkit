@@ -56,7 +56,7 @@ mod_data_select_ui <- function(id) {
 				bslib::card(
 					class = "card border-primary mb-3 bg-light",
 					bslib::card_header(
-						"Data Selection",
+						"Flight-Height Distributions",
 						class = "text-bg-primary",
 						bslib::toolbar(
 							mod_help_button_ui(ns("select_data"), type = "toolbar")
@@ -203,9 +203,20 @@ mod_data_select_ui <- function(id) {
 							# )
 						)
 					),
+
+					# TEMP: DUMMY DATA WARNING
+					bslib::card(
+						HTML(
+							"
+							This is a dummy version of the ReSCUEApp. The flight-height distributions shown here are not real data, and are only for demonstration purposes. Please do not use these data for any real analysis."
+						),
+						class = "card bg-warning",
+						max_height = "10vh"
+					),
+
 					bslib::card(
 						bslib::card_header(
-							"Selected Data",
+							"Selected Flight-Height Distributions",
 							class = "text-bg-primary",
 							bslib::toolbar(
 								actionButton(
@@ -606,7 +617,11 @@ mod_data_select_server <- function(
 		)
 
 		# Help button servers -----
-		mod_help_button_server("select_data", help_file = "select_data", size = "xl")
+		mod_help_button_server(
+			"select_data",
+			help_file = "select_data",
+			size = "xl"
+		)
 
 		return(list(
 			selected_data = outputs,
