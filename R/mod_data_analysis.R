@@ -336,56 +336,7 @@ mod_data_analysis_server <- function(
 						)
 					})
 
-					# Warning shown when some (but not all) covariates are
-					# switched on — the processing step only supports using
-					# NO covariates or ALL covariates; a partial selection
-					# will cause an error downstream.
-					partial_selection_warning <- if (length(switch_ids) > 1) {
-						switch_input_ids <- vapply(
-							switch_ids,
-							function(id) ns(id),
-							character(1)
-						)
-						js_array <- paste0(
-							"[",
-							paste0(
-								"input['",
-								switch_input_ids,
-								"']",
-								collapse = ", "
-							),
-							"]"
-						)
-						js_condition <- paste0(
-							"(function(vals) {",
-							"var any = vals.some(function(v) { return v === true; });",
-							"var all = vals.every(function(v) { return v === true; });",
-							"return any && !all;",
-							"})(",
-							js_array,
-							")"
-						)
-
-						conditionalPanel(
-							condition = js_condition,
-							tags$div(
-								class = "alert alert-warning small py-1 px-2 mt-2 mb-0",
-								style = paste(
-									"max-width: 75%;",
-									"overflow-wrap: break-word;",
-									"word-break: break-word;",
-									"box-sizing: border-box;"
-								),
-								bsicons::bs_icon("exclamation-triangle-fill"),
-								" Select either no covariates or all covariates. ",
-								"A partial selection will cause an error when processing."
-							)
-						)
-					} else {
-						NULL
-					}
-
-					tagList(!!!cov_blocks, partial_selection_warning)
+					tagList(!!!cov_blocks)
 				}
 
 				# ---- Popover content: covariates only --------------------------------
@@ -530,6 +481,8 @@ mod_data_analysis_server <- function(
 
 			purrr::imap(fhd_arrays(), function(arr, fhd_id) {
 				sel <- cov_selections()[[fhd_id]]
+
+				#browser()
 
 				sliced_df <- tryCatch(
 					{
