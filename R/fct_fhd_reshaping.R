@@ -32,7 +32,7 @@ fhd_df_to_array <- function(
   height_vals <- sort(unique(data[[height_col]]))
   draw_vals <- sort(unique(data[[draw_col]]))
 
-  # Distinct, sorted covariate combinations -> single "combo" dimension
+  # Distinct, sorted covariate combinations
   cov_combos <- data |>
     dplyr::distinct(across(all_of(cov_cols))) |>
     dplyr::arrange(across(all_of(cov_cols)))
@@ -40,13 +40,8 @@ fhd_df_to_array <- function(
   # get levels for each covariate
   cov_levels <- lapply(cov_combos, function(x) sort(unique(x)))
 
-  cov_labels <- cov_combos |>
-    tidyr::unite("cov_comb", everything(), sep = "_") |>
-    dplyr::pull("cov_comb")
-
   n_height <- length(height_vals)
   n_draws <- length(draw_vals)
-  n_combos <- nrow(cov_combos)
 
   # Full grid skeleton so any missing combinations become explicit NAs
   # rather than silently misaligning values in the array
@@ -58,7 +53,7 @@ fhd_df_to_array <- function(
 
   filled <- skeleton |>
     dplyr::left_join(data, by = c(height_col, draw_col, cov_cols)) |>
-    dplyr::arrange(across(all_of(c(cov_cols, draw_col, height_col))))
+    dplyr::arrange(across(all_of(c(rev(cov_cols), draw_col, height_col))))
 
   if (anyNA(filled[[prob_col]])) {
     warning(
@@ -72,29 +67,28 @@ fhd_df_to_array <- function(
     )
   }
 
+  # parse to array with dimensions height x draw x cov1 X cov2 X ...
   result <- array(
     filled[[prob_col]],
     dim = c(
       n_height = n_height,
       n_draws = n_draws,
-      n_covs_combinations = n_combos
+      lengths(cov_levels)
     ),
     dimnames = list(
       height = height_vals,
-      draw_id = draw_vals,
-      covs = cov_labels
-    )
+      draw_id = draw_vals
+    ) |>
+      append(cov_levels)
   )
 
   # drop last dimension in the absence of covars
   if (length(cov_cols) == 0) {
-    result <- result[,, 1, drop = TRUE]
+    result <- result[,, drop = TRUE]
   }
 
-  # Keep the original (unpasted) covariate combinations and column names as
-  # attributes, so `fhd_array_to_df()` can round-trip without having to parse
-  # the pasted `covs` dimnames (which would be ambiguous if a covariate value
-  # contains "_", or if there is more than one covariate column).
+  # Keep the original covariate combinations and column names as
+  # attributes, so `fhd_array_to_df()` can round-trip with minor attrition
   attr(result, "covs") <- list(
     levels = cov_levels,
     combos = cov_combos
@@ -106,19 +100,18 @@ fhd_df_to_array <- function(
     cov_cols = cov_cols
   )
 
-  # Assign a class for instant validation in `resample_fhd()`
-  class(result) <- "fhd_array_from_df"
+  # Assign a class for instant validation in `slice_fhd()`
+  class(result) <- "fhd_array"
 
   return(result)
 }
 
 
-#' Convert a 3D FHD array back to a long-format dataframe
+#' Convert a multidimensional FHD array back to a long-format dataframe
 #'
-#' Inverse of [fhd_df_to_array()]. Relies on the `cov_combos` and `col_names`
+#' Inverse of [fhd_df_to_array()]. Relies on the `covs` and `col_names`
 #' attributes attached by [fhd_df_to_array()] to recover the original
-#' covariate columns and column names, rather than parsing the pasted `covs`
-#' dimnames.
+#' covariate columns and column names
 #'
 #' @param arr A 3D array produced by [fhd_df_to_array()], with dimensions
 #'   `n_height x n_draws x n_covs_combinations`.
@@ -129,57 +122,56 @@ fhd_df_to_array <- function(
 #' @return A long-format tibble with one row per height x draw x
 #'   covariate-level combination: `height_col`, `draw_col`, the original
 #'   covariate columns, and `prob_col`.
-fhd_array_to_df <- function(arr) {
-  covs <- attr(arr, "covs")
-  col_names <- attr(arr, "col_names")
-
-  if (is.null(covs) || is.null(col_names)) {
-    stop(
-      "`arr` is missing `covs`/`col_names` attributes; it must be ",
-      "produced by `fhd_df_to_array()` to be converted back with ",
-      "`fhd_array_to_df()`."
+#'
+#' @importFrom rlang !!! :=
+fhd_array_to_df <- function(
+  arr,
+  height_col = NULL,
+  draw_col = NULL,
+  prob_col = NULL
+) {
+  if (!inherits(arr, "fhd_array")) {
+    cli::cli_abort(
+      "`arr` must be produced by `fhd_df_to_array()` to be converted back to a dataframe format."
     )
   }
 
-  # isolate combos
-  cov_combos <- covs$combos
+  covs <- attr(arr, "covs")
+  col_names <- attr(arr, "col_names")
 
-  height_col <- col_names$height_col
-  draw_col <- col_names$draw_col
-  prob_col <- col_names$prob_col
+  # sort main col names to match the original input, if not explicitly overridden
+  height_col <- height_col %||% col_names$height_col
+  draw_col <- draw_col %||% col_names$draw_col
+  prob_col <- prob_col %||% col_names$prob_col
 
   dims <- dim(arr)
 
-  # check for 3D array if covars are present
-  if (ncol(cov_combos) > 0) {
-    if (is.null(dims) || length(dims) != 3) {
+  # check that the array has more than 2 dimensions if covariates are present
+  if (length(covs$levels) > 1) {
+    if (!length(dims) > 2) {
       cli::cli_abort(
-        "`arr` must be a 3D array, as produced by `fhd_df_to_array()`."
+        "`arr` must have more than 2 dimensions, as covariates are expected."
       )
     }
   }
 
-  n_height <- dims[[1]]
-  n_draws <- dims[[2]]
-  n_combos <- if (length(dims) == 3) dims[[3]] else 1
-  #n_combos <- dims[[3]]
-
+  # get values for height and draw from the dimnames, converting to numeric
   dn <- dimnames(arr)
   height_vals <- as.numeric(dn[[1]])
   draw_vals <- type.convert(dn[[2]], as.is = TRUE)
 
-  # Array flattens with height fastest-varying, then draw, then covariate
-  # combination (dim 1, 2, 3 respectively) -- rebuild each column to match.
-  cov_rows <- cov_combos[
-    rep(seq_len(n_combos), each = n_height * n_draws),
-    ,
-    drop = FALSE
-  ]
+  # Array flattens with height fastest-varying, then draw, then covariate combinations
+  # (dim 1, 2, 3, ... respectively) -- rebuild by grid expansion with first column
+  # varying fastest for correct matching.
+  out <- tidyr::expand_grid(
+    {{ height_col }} := height_vals,
+    {{ draw_col }} := draw_vals,
+    !!!covs$levels,
+    .vary = "fastest"
+  )
 
-  out <- cov_rows
-  out[[draw_col]] <- rep(draw_vals, times = n_combos, each = n_height)
-  out[[height_col]] <- rep(height_vals, times = n_draws * n_combos)
+  # add flat probability values from the array
   out[[prob_col]] <- as.vector(arr)
 
-  tibble::as_tibble(out[c(height_col, draw_col, names(cov_combos), prob_col)])
+  out
 }

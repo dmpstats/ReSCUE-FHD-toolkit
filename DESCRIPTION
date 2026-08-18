@@ -38,7 +38,9 @@ Imports:
     shiny,
     shinybusy,
     shinyjs,
-    rlang
+    rlang,
+    tidyr,
+    abind
 Suggests:
     spelling,
     testthat (>= 3.0.0)
