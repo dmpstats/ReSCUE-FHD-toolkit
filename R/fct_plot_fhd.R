@@ -89,6 +89,70 @@ add_fhd <- function(
   plot
 }
 
+#' Build a faceted FHD plot using plotly subplots
+#'
+#' Each unique value of \code{unique_id_col} gets its own subplot panel.
+#'
+#' @param plot_data Data frame containing all FHD draws.
+#' @param id_col Column used as the FHD identifier for \code{add_fhd}.
+#' @param unique_id_col Column whose distinct values define the facets
+#'   (typically \code{"unique_fhd"}).
+#' @param height_col,draw_col,prob_col Column names for height, draw ID, and
+#'   probability respectively.
+#' @param risk_min,risk_max Risk-zone bounds passed to \code{fhd_baseplot}.
+#' @param show_legend Logical; whether to display the plotly legend.
+#'
+#' @return A plotly subplot figure.
+fhd_facet_plot <- function(
+  plot_data,
+  id_col = "fhd_id",
+  unique_id_col = "unique_fhd",
+  height_col = "height",
+  draw_col = "draw_id",
+  prob_col = "probability",
+  risk_min = 50,
+  risk_max = 100,
+  show_legend = TRUE
+) {
+  unique_ids <- unique(plot_data[[unique_id_col]])
+
+  plots <- lapply(unique_ids, function(uid) {
+    subset <- plot_data[plot_data[[unique_id_col]] == uid, ]
+    max_prob <- max(subset[[prob_col]], na.rm = TRUE)
+    p <- fhd_baseplot(risk_min = risk_min, risk_max = risk_max)
+    p <- add_fhd(
+      plot = p,
+      fhd_data = subset,
+      id_col = id_col,
+      height_col = height_col,
+      draw_col = draw_col,
+      prob_col = prob_col
+    )
+    # Subplot title via layout annotation (converted by subplot() automatically).
+    # Y-axis capped to actual data range to avoid empty space from the risk rectangle.
+    p |>
+      plotly::layout(
+        title = list(text = uid, font = list(size = 10)),
+        yaxis = list(range = c(0, max_prob * 1.1)),
+        showlegend = show_legend
+      )
+  })
+
+  n <- length(plots)
+  ncols <- min(n, 2L)
+  nrows <- ceiling(n / ncols)
+
+  plotly::subplot(
+    plots,
+    nrows = nrows,
+    shareX = FALSE,
+    shareY = FALSE,
+    titleX = TRUE,
+    titleY = TRUE,
+    margin = 0.07
+  )
+}
+
 fhd_baseplot <- function(
   risk_min = 50,
   risk_max = 100

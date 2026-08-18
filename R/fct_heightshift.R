@@ -27,7 +27,9 @@ heightshift <- function(
   draw_id_col = "draw_id",
   risk_min = 50,
   risk_max = 100,
-  round = c(4, 2)
+  round = c(4, 2),
+  restrict_bounds = TRUE,
+  condensed_table = FALSE
 ) {
   # Create a new .df with only the relevant columns
   fhd_data <- data.frame(
@@ -37,21 +39,23 @@ heightshift <- function(
     draw_id = fhd_data[[draw_id_col]]
   )
 
-  # Identify the max height in the data
   max_height <- max(fhd_data$height, na.rm = TRUE)
-  min_height <- 0
-
-  # Define height_shift_ids as a sequence of shifting heights
   turbine_height <- risk_max - risk_min
-  # The highest possible risk_max is the max height in the data (plus 1 for clarity),
-  # and the lowest possible risk_min is 0 (the ground level).
+  step <- if (condensed_table) 5 else 1
+
   heightshifts <- data.frame(
-    risk_min = seq(from = 0, to = max_height - turbine_height, by = 1),
-    risk_max = seq(from = turbine_height, to = max_height, by = 1)
-  ) |>
-    dplyr::mutate(
-      height_shift_id = dplyr::row_number()
-    )
+    risk_min = seq(from = 0, to = max_height - turbine_height, by = step),
+    risk_max = seq(from = turbine_height, to = max_height, by = step)
+  )
+
+  # Restrict to shifts within ±40 m of the true turbine position
+  if (restrict_bounds) {
+    heightshifts <- heightshifts[abs(heightshifts$risk_min - risk_min) <= 40, ]
+    rownames(heightshifts) <- NULL
+  }
+
+  # Positional index of the true turbine setting in the (possibly restricted) table
+  true_fhd_id <- which(heightshifts$risk_min == risk_min)
 
   # Pre-split data by fhd_id so we only subset the data frame once per FHD
   data_split <- split(fhd_data, fhd_data$fhd_id)
@@ -93,27 +97,13 @@ heightshift <- function(
 
   # vapply returns a n_shifts × n_fhds matrix; transpose to n_fhds × n_shifts
   fhd_prob_matrix <- t(fhd_prob_matrix)
-  dimnames(fhd_prob_matrix) <- list(fhd_ids, heightshifts$height_shift_id)
 
-  # Get the ID of the 'true' FHD (where the risk_min is equal to the true risk_min)
-  true_fhd_id <- heightshifts |>
-    dplyr::ungroup() |>
-    dplyr::filter(risk_min == !!risk_min) |>
-    dplyr::pull(height_shift_id)
+  # Label columns with the actual metre shift from the true turbine position
+  actual_shifts <- heightshifts$risk_min - risk_min
+  col_labels <- paste0(ifelse(actual_shifts >= 0, "+", ""), actual_shifts, "m")
+  dimnames(fhd_prob_matrix) <- list(fhd_ids, col_labels)
 
-  # Change the column names to + or - the height shift from the true FHD
-  colnames(fhd_prob_matrix) <- paste0(
-    ifelse(
-      heightshifts$height_shift_id < true_fhd_id,
-      "-",
-      "+"
-    ),
-    abs(heightshifts$height_shift_id - true_fhd_id),
-    "m"
-  )
-
-  # If the desired type is percentages, convert all values to
-  # percentage change from +0
+  # Percentage change relative to the true turbine position
   fhd_perc_matrix <- sweep(
     fhd_prob_matrix,
     1,
@@ -127,7 +117,7 @@ heightshift <- function(
     fhd_perc_matrix <- round(fhd_perc_matrix, round[2])
   }
 
-  # Add the FIDs to the LHS of the matrix
+  # Add the FHD IDs as the first column
   fhd_perc_matrix <- cbind(
     fhd_id = rownames(fhd_perc_matrix),
     fhd_perc_matrix
@@ -137,9 +127,9 @@ heightshift <- function(
     fhd_prob_matrix
   )
 
-  # Set the column of the true FHD as an attribute
-  attr(fhd_prob_matrix, "true_fhd_col") <- true_fhd_id + 1
-  attr(fhd_perc_matrix, "true_fhd_col") <- true_fhd_id + 1
+  # Store the column index of the true turbine setting (offset by 1 for fhd_id col)
+  attr(fhd_prob_matrix, "true_fhd_col") <- true_fhd_id + 1L
+  attr(fhd_perc_matrix, "true_fhd_col") <- true_fhd_id + 1L
 
   return(
     list(

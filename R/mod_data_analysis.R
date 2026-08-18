@@ -44,12 +44,19 @@ mod_data_analysis_ui <- function(id) {
 									id = ns("show_as_percentages"),
 									value = TRUE,
 									label = "Show as percentages",
-									width = "50%"
+									width = "40%"
+								),
+								bslib::input_switch(
+									id = ns("condensed_table"),
+									value = TRUE,
+									label = "Show condensed table",
+									width = "40%"
 								)
 							),
-							# p(
-							# 	"This table shows changes to the FHD risk-zone probabilities as the turbine height is increased or decreased. The first column shows the unique FHD identifiers, and the remaining columns show the probabilities of FHD risk for each height shift."
-							# ),
+							p(
+								"This table shows changes to the proportion of birds at collision-height 
+								if the turbine height is increased or decreased. The first column shows the unique FHD identifiers, and the remaining columns show the probabilities of FHD risk for each height shift."
+							),
 							div(
 								DT::DTOutput(ns("heightshift_table")),
 								style = "height: 25vh; overflow-y: auto; overflow-x: auto;"
@@ -102,6 +109,11 @@ mod_data_analysis_ui <- function(id) {
 							bslib::input_switch(
 								id = ns("hide_legend"),
 								label = "Hide legend",
+								value = FALSE
+							),
+							bslib::input_switch(
+								id = ns("facet_plot"),
+								label = "Facet plot",
 								value = FALSE
 							)
 						),
@@ -675,7 +687,8 @@ mod_data_analysis_server <- function(
 				draw_id_col = "draw_id",
 				risk_min = input$rotor_min,
 				risk_max = input$rotor_max,
-				round = c(4, 2)
+				round = c(4, 2),
+				condensed_table = input$condensed_table
 			)
 		})
 
@@ -809,30 +822,47 @@ mod_data_analysis_server <- function(
 		output$dummy_plot <- plotly::renderPlotly({
 			req(plot_ready_data())
 
-			# Identify covariates being *used* across any FHD
+			# Guard: return empty base plot if data is invalid
+			bad_data <- nrow(plot_ready_data()) == 0 ||
+				!all(
+					c("height", "probability", "unique_fhd", "draw_id") %in%
+						names(plot_ready_data())
+				)
+
+			if (bad_data) {
+				return(fhd_baseplot(
+					risk_min = input$rotor_min,
+					risk_max = input$rotor_max
+				))
+			}
+
+			# ── Faceted view ─────────────────────────────────────────────────────
+			if (isTRUE(input$facet_plot)) {
+				return(fhd_facet_plot(
+					plot_data = plot_ready_data(),
+					id_col = "fhd_id",
+					unique_id_col = "unique_fhd",
+					height_col = "height",
+					draw_col = "draw_id",
+					prob_col = "probability",
+					risk_min = input$rotor_min,
+					risk_max = input$rotor_max,
+					show_legend = !isTRUE(input$hide_legend)
+				))
+			}
+
+			# ── Combined view ────────────────────────────────────────────────────
 			used_covs <- cov_selections() |>
 				purrr::map(~ names(Filter(\(x) !is.null(x), .x))) |>
 				purrr::reduce(union, .init = character(0))
 
 			max_prob <- 0
-
+			meta <- selected_data$metadata
 			plt <- fhd_baseplot(
 				risk_min = input$rotor_min,
 				risk_max = input$rotor_max
 			)
 
-			# If the input data is bad, just return the empty plot
-			if (
-				nrow(plot_ready_data()) == 0 ||
-					!all(
-						c("height", "probability", "unique_fhd", "draw_id") %in%
-							names(plot_ready_data())
-					)
-			) {
-				return(plt)
-			}
-
-			meta <- selected_data$metadata
 			fhd_ids <- unique(plot_ready_data()$fhd_id)
 			for (id in fhd_ids) {
 				fhd_subset <- dplyr::filter(plot_ready_data(), fhd_id == id)
