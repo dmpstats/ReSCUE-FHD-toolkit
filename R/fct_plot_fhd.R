@@ -39,8 +39,8 @@ add_fhd <- function(
     dplyr::summarise(
       f_id = dplyr::first(f_id),
       lc = quantile(prob, 0.025, na.rm = TRUE),
-      prob = mean(prob, na.rm = TRUE),
       uc = quantile(prob, 0.975, na.rm = TRUE),
+      prob = mean(prob, na.rm = TRUE),
       .groups = "drop"
     )
 
