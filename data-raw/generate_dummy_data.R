@@ -146,7 +146,7 @@ generate_dummy_data <- function(
       "_",
       stringr::str_replace_all(bdmps_region, " ", "_"),
       "_",
-      i  # add index to ensure uniqueness if needed
+      i # add index to ensure uniqueness if needed
     )
 
     # ------------------------------------------------------------------
@@ -181,9 +181,22 @@ generate_dummy_data <- function(
     )
 
     draws <- merge(draws, iter_pars, by = "draw_id")
+
+    # Add a random meanlog shift per covariate level so that different levels
+    # produce visually distinct flight-height distributions.
+    total_shift <- numeric(nrow(draws))
+    for (cov in names(covariates)) {
+      lvls <- as.character(covariates[[cov]]$levels)
+      level_shifts <- stats::setNames(
+        rnorm(length(lvls), mean = 0, sd = 0.3),
+        lvls
+      )
+      total_shift <- total_shift + level_shifts[as.character(draws[[cov]])]
+    }
+
     draws$probability <- with(
       draws,
-      dlnorm(height, meanlog = meanlog, sdlog = sdlog)
+      dlnorm(height, meanlog = meanlog + total_shift, sdlog = sdlog)
     )
     draws$meanlog <- NULL
     draws$sdlog <- NULL
