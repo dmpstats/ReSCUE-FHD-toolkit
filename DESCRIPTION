@@ -45,7 +45,7 @@ Imports:
     zip,
     jsonlite,
     readr,
-    sf
+    sf,
     tidyr,
     abind
 Suggests:
