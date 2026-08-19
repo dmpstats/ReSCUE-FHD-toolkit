@@ -22,6 +22,7 @@ License: What license is it under?
 Imports:
     bsicons,
     bslib,
+    chromote,
     conductor,
     cli,
     config,
@@ -31,6 +32,7 @@ Imports:
     DT,
     golem,
     htmltools,
+    htmlwidgets,
     leaflet,
     lorem,
     markdown,
@@ -39,6 +41,11 @@ Imports:
     shinybusy,
     shinyjs,
     rlang,
+    webshot2,
+    zip,
+    jsonlite,
+    readr,
+    sf
     tidyr,
     abind
 Suggests:

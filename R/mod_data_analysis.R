@@ -119,7 +119,7 @@ mod_data_analysis_ui <- function(id) {
 						),
 						bslib::card_body(
 							# class = "card-body-white",
-							plotly::plotlyOutput(ns("dummy_plot")),
+							plotly::plotlyOutput(ns("fhd_plot")),
 							uiOutput(ns("debug"))
 						),
 						class = "card border-primary mb-3 card-body-white"
@@ -233,6 +233,36 @@ mod_data_analysis_server <- function(
 		# ── Helpers ───────────────────────────────────────────────────────────────
 		# Sanitise fhd_id into a valid Shiny input-ID fragment.
 		make_safe_id <- function(x) gsub("[^A-Za-z0-9]", "_", x)
+
+		# webshot2/chromote require a real Chromium-based browser. If Chrome
+		# isn't found (e.g. on Windows machines that only have Edge), point
+		# chromote at the first Chromium-based browser we can find so PNG
+		# export doesn't fail outright.
+		ensure_chromote_browser <- function() {
+			if (nzchar(Sys.getenv("CHROMOTE_CHROME"))) {
+				return(invisible(TRUE))
+			}
+
+			found <- tryCatch(chromote::find_chrome(), error = function(e) NULL)
+			if (!is.null(found) && nzchar(found)) {
+				return(invisible(TRUE))
+			}
+
+			candidates <- c(
+				"C:/Program Files/Google/Chrome/Application/chrome.exe",
+				"C:/Program Files (x86)/Google/Chrome/Application/chrome.exe",
+				"C:/Program Files/Microsoft/Edge/Application/msedge.exe",
+				"C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe"
+			)
+			available <- candidates[file.exists(candidates)]
+
+			if (length(available) > 0) {
+				Sys.setenv(CHROMOTE_CHROME = available[[1]])
+				return(invisible(TRUE))
+			}
+
+			invisible(FALSE)
+		}
 
 		# ── Error state ───────────────────────────────────────────────────────────
 		# Single reactive value used to surface processing errors as a toast.
@@ -772,7 +802,8 @@ mod_data_analysis_server <- function(
 		})
 
 		# ── FHD plot ──────────────────────────────────────────────────────────────
-		output$dummy_plot <- plotly::renderPlotly({
+		# Build the plot as a reactive so it can be reused for rendering and export
+		fhd_plot_object <- reactive({
 			req(plot_ready_data())
 
 			# Guard: return empty base plot if data is invalid
@@ -849,6 +880,11 @@ mod_data_analysis_server <- function(
 			}
 
 			plt
+		})
+
+		# Render the plot reactive to the UI
+		output$fhd_plot <- plotly::renderPlotly({
+			fhd_plot_object()
 		})
 
 		# ---- Track FHDs with covars -----------------------------------------------
@@ -971,13 +1007,114 @@ mod_data_analysis_server <- function(
 		observeEvent(
 			input$download_btn,
 			{
-				shiny::showModal(
-					shiny::modalDialog(
-						title = "Download Options",
-						"Download functionality is not yet implemented.",
-						easyClose = TRUE,
-						footer = shiny::modalButton("Close")
+				selected_fhd <- input$selected_fhd
+
+				# Extract this fhd data
+				fhd_data <- plot_ready_data() |>
+					dplyr::filter(unique_fhd == selected_fhd)
+
+				out <- prep_export(
+					fhd_draws = fhd_data
+				)
+				metadata <- selected_data$metadata |>
+					sf::st_drop_geometry() |>
+					dplyr::left_join(
+						plot_ready_data() |>
+							dplyr::select(dplyr::all_of(c("fhd_id", "unique_fhd"))) |>
+							dplyr::distinct(),
+						by = "fhd_id"
+					) |>
+					dplyr::filter(
+						unique_fhd == selected_fhd
 					)
+
+				# Create a temporary directory for export files
+				temp_export_dir <- file.path(
+					tempdir(),
+					paste0("fhd_export_", Sys.time() |> format("%s"))
+				)
+				dir.create(temp_export_dir, showWarnings = FALSE, recursive = TRUE)
+
+				# Save metadata to tempdir
+				metadata_path <- file.path(temp_export_dir, "metadata.json")
+				jsonlite::write_json(metadata, metadata_path, pretty = TRUE)
+
+				# Save draws to tempdir
+				data_path <- file.path(temp_export_dir, "fhd_data.csv")
+				readr::write_csv(out, data_path)
+
+				# Export the current plot to PNG using the reactive plot object.
+				# We render to a temporary HTML widget and screenshot it with
+				# webshot2 (headless Chrome) rather than plotly::save_image(),
+				# which depends on the Python "kaleido" package via reticulate
+				# and is fragile/unavailable in many R environments.
+				if (!ensure_chromote_browser()) {
+					set_error(paste0(
+						"Could not find a Chromium-based browser (Chrome or Edge) ",
+						"to render the plot image. The FHD data and metadata will ",
+						"still be exported, but the PNG plot will be omitted."
+					))
+				} else {
+					plot_html_path <- file.path(temp_export_dir, "fhd_plot.html")
+					htmlwidgets::saveWidget(
+						fhd_plot_object(),
+						file = plot_html_path,
+						selfcontained = TRUE
+					)
+
+					plot_path <- file.path(temp_export_dir, "fhd_plot.png")
+					tryCatch(
+						webshot2::webshot(
+							url = plot_html_path,
+							file = plot_path,
+							vwidth = 1000,
+							vheight = 700,
+							zoom = 2
+						),
+						error = function(e) {
+							cli::cli_alert_warning(
+								"Failed to export FHD plot to PNG: {.val {e$message}}"
+							)
+							set_error(paste0(
+								"Exporting the plot image failed: ",
+								e$message,
+								". The FHD data and metadata will still be exported."
+							))
+						}
+					)
+
+					# The intermediate HTML isn't part of the deliverable
+					unlink(plot_html_path)
+				}
+
+				zip_path <- file.path(
+					tempdir(),
+					paste0(make.names(selected_fhd), ".zip")
+				)
+
+				# Zip the files in the export directory. Use relative paths to
+				# avoid issues with zip::zip() and Windows path separators.
+				# Change to the temp dir, zip relative to it, then restore.
+				old_wd <- getwd()
+				on.exit(setwd(old_wd), add = TRUE)
+				setwd(temp_export_dir)
+
+				zip::zip(
+					zipfile = zip_path,
+					files = list.files(full.names = FALSE)
+				)
+
+				# Clean up the export directory
+				unlink(temp_export_dir, recursive = TRUE)
+
+				output$download_fhd <- downloadHandler(
+					filename = function() {
+						paste0(make.names(input$selected_fhd), ".zip")
+					},
+					content = function(file) {
+						# All the steps above, then:
+						file.copy(zip_path, file)
+					}
 				)
 			}
 		)
