@@ -46,6 +46,8 @@ Imports:
     jsonlite,
     readr,
     sf
+    tidyr,
+    abind
 Suggests:
     spelling,
     testthat (>= 3.0.0)

@@ -2,9 +2,9 @@
 % Please edit documentation in R/fct_fhd_reshaping.R
 \name{fhd_array_to_df}
 \alias{fhd_array_to_df}
-\title{Convert a 3D FHD array back to a long-format dataframe}
+\title{Convert a multidimensional FHD array back to a long-format dataframe}
 \usage{
-fhd_array_to_df(arr)
+fhd_array_to_df(arr, height_col = NULL, draw_col = NULL, prob_col = NULL)
 }
 \arguments{
 \item{arr}{A 3D array produced by [fhd_df_to_array()], with dimensions
@@ -20,8 +20,7 @@ A long-format tibble with one row per height x draw x
   covariate columns, and `prob_col`.
 }
 \description{
-Inverse of [fhd_df_to_array()]. Relies on the `cov_combos` and `col_names`
+Inverse of [fhd_df_to_array()]. Relies on the `covs` and `col_names`
 attributes attached by [fhd_df_to_array()] to recover the original
-covariate columns and column names, rather than parsing the pasted `covs`
-dimnames.
+covariate columns and column names
 }
