@@ -57,6 +57,8 @@ rsconnect::deployApp(
 		"R/",
 		"inst/",
 		"data/",
+		"data-raw/",
+		"data-dummy/",
 		"NAMESPACE",
 		"DESCRIPTION",
 		"app.R"
