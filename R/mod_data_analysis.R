@@ -248,19 +248,6 @@ mod_data_analysis_server <- function(
 				return(invisible(TRUE))
 			}
 
-			candidates <- c(
-				"C:/Program Files/Google/Chrome/Application/chrome.exe",
-				"C:/Program Files (x86)/Google/Chrome/Application/chrome.exe",
-				"C:/Program Files/Microsoft/Edge/Application/msedge.exe",
-				"C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe"
-			)
-			available <- candidates[file.exists(candidates)]
-
-			if (length(available) > 0) {
-				Sys.setenv(CHROMOTE_CHROME = available[[1]])
-				return(invisible(TRUE))
-			}
-
 			invisible(FALSE)
 		}
 
@@ -1026,6 +1013,10 @@ mod_data_analysis_server <- function(
 				)
 				metadata <- selected_data$metadata |>
 					sf::st_drop_geometry() |>
+					dplyr::mutate(
+						ReSCUE_version = golem::get_golem_version(),
+						export_time = Sys.time()
+					) |>
 					dplyr::left_join(
 						plot_ready_data() |>
 							dplyr::select(dplyr::all_of(c("fhd_id", "unique_fhd"))) |>
