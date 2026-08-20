@@ -53,9 +53,31 @@ mod_data_analysis_ui <- function(id) {
 									width = "40%"
 								)
 							),
-							p(
-								"This table shows changes to the proportion of birds at collision-height 
-								if the turbine height is increased or decreased. The first column shows the unique FHD identifiers, and the remaining columns show the probabilities of FHD risk for each height shift."
+							# p(
+							# 	"This table shows changes to the proportion of birds at collision-height
+							# 	if the turbine height is increased or decreased. The first column shows the unique FHD identifiers, and the remaining columns show the probabilities of FHD risk for each height shift."
+							# ),
+							# Add a conditionalPanel that changes description based on input$show_as_percentages
+							conditionalPanel(
+								condition = paste0(
+									"input['",
+									ns("show_as_percentages"),
+									"'] === true"
+								),
+								p(
+									"This table shows changes to the percentage of birds at collision-height 
+									compared to your turbine height for increases/decreases to the risk-height window. The first column shows the unique FHD identifiers, and the remaining columns show the percentage change in FHD risk for each height shift."
+								)
+							),
+							conditionalPanel(
+								condition = paste0(
+									"input['",
+									ns("show_as_percentages"),
+									"'] === false"
+								),
+								p(
+									"This table shows the raw proportion of birds at collision-height if the turbine height is increased or decreased. The first column shows the unique FHD identifiers, and the remaining columns show the change in FHD risk for each height shift."
+								)
 							),
 							div(
 								DT::DTOutput(ns("heightshift_table")),
