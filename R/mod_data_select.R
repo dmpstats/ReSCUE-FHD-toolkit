@@ -483,6 +483,12 @@ mod_data_select_server <- function(
 							"season"
 						)
 					)
+				) |>
+				dplyr::rename(
+					"FHD ID" = fhd_id,
+					"Species" = species_id,
+					"Method" = method,
+					"Season" = season
 				)
 			DT::datatable(
 				data,
