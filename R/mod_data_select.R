@@ -345,10 +345,10 @@ mod_data_select_server <- function(
 				"species",
 				# choices = unique(metadata_tbl$species_id),
 				choices = setNames(
-					object = unique(metadata_tbl$species_id),
-					nm = unique(metadata_tbl$name_common)
+					unique(metadata_tbl$species_id),
+					unique(metadata_tbl$name_common)
 				),
-				selected = unique(metadata_tbl$name_common)[1],
+				selected = unique(metadata_tbl$species_id)[1],
 				server = TRUE
 			)
 			updateSelectizeInput(
