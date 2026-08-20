@@ -9,9 +9,22 @@
 app_ui <- function(request) {
 	tagList(
 		golem_add_external_resources(),
-		shinybusy::use_busy_spinner(
-			position = "bottom-right"
+		shinybusy::add_busy_spinner(
+			spin = "spring",
+			position = "bottom-right",
+			height = "150px",
+			width = "150px",
+			timeout = 200,
+			onstart = TRUE,
+			color = "#ffa134"
 		),
+		# shinybusy::use_busy_gif(
+		# 	# use 'birdflap.gif' in the www folder
+		# 	src = "www/birdflap.gif",
+		# 	position = "bottom-right",
+		# 	height = "150px",
+		# 	width = "150px"
+		# ),
 		bslib::page_navbar(
 			title = span("ReSCUEApp", style = "color: #ffffff;"),
 			id = "main-nav",
