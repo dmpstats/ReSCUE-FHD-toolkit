@@ -144,7 +144,7 @@ mod_data_analysis_ui <- function(id) {
 										choices = NULL,
 										width = "100%"
 									),
-									actionButton(
+									downloadButton(
 										ns("download_btn"),
 										"Download",
 										icon = bsicons::bs_icon("download"),
@@ -1004,9 +1004,17 @@ mod_data_analysis_server <- function(
 		)
 
 		# Download button handler --------------------------------------------------
-		observeEvent(
-			input$download_btn,
-			{
+		# Note: this must be a `downloadHandler()` bound to a `downloadButton()`
+		# in the UI (not an `actionButton()` + separately-created output). Shiny
+		# only triggers a browser download when the UI element is a
+		# downloadButton/downloadLink whose outputId matches a downloadHandler;
+		# defining the handler from inside an observeEvent on a plain
+		# actionButton never gets requested by the browser, so nothing happens.
+		output$download_btn <- downloadHandler(
+			filename = function() {
+				paste0(make.names(input$selected_fhd), ".zip")
+			},
+			content = function(file) {
 				selected_fhd <- input$selected_fhd
 
 				# Extract this fhd data
@@ -1034,6 +1042,7 @@ mod_data_analysis_server <- function(
 					paste0("fhd_export_", Sys.time() |> format("%s"))
 				)
 				dir.create(temp_export_dir, showWarnings = FALSE, recursive = TRUE)
+				on.exit(unlink(temp_export_dir, recursive = TRUE), add = TRUE)
 
 				# Save metadata to tempdir
 				metadata_path <- file.path(temp_export_dir, "metadata.json")
@@ -1087,34 +1096,21 @@ mod_data_analysis_server <- function(
 					unlink(plot_html_path)
 				}
 
-				zip_path <- file.path(
-					tempdir(),
-					paste0(make.names(selected_fhd), ".zip")
-				)
-
 				# Zip the files in the export directory. Use relative paths to
 				# avoid issues with zip::zip() and Windows path separators.
-				# Change to the temp dir, zip relative to it, then restore.
+				# Change to the temp dir, zip relative to it, then restore —
+				# restore explicitly (via tryCatch/finally) *before* the
+				# temp-dir cleanup on.exit above runs, since Windows can
+				# refuse to delete a directory that is still the process's
+				# working directory.
 				old_wd <- getwd()
-				on.exit(setwd(old_wd), add = TRUE)
 				setwd(temp_export_dir)
-
-				zip::zip(
-					zipfile = zip_path,
-					files = list.files(full.names = FALSE)
-				)
-
-				# Clean up the export directory
-				unlink(temp_export_dir, recursive = TRUE)
-
-				output$download_fhd <- downloadHandler(
-					filename = function() {
-						paste0(make.names(input$selected_fhd), ".zip")
-					},
-					content = function(file) {
-						# All the steps above, then:
-						file.copy(zip_path, file)
-					}
+				tryCatch(
+					zip::zip(
+						zipfile = file,
+						files = list.files(full.names = FALSE)
+					),
+					finally = setwd(old_wd)
 				)
 			}
 		)
