@@ -146,11 +146,15 @@ mod_data_select_ui <- function(id) {
 				# Right-hand side: show selected data and go to analysis button
 				tagList(
 					bslib::card(
-						class = "overflow-visible",
+						class = "card border-primary mb-3 bg-light",
+						max_height = "15vh",
+						bslib::card_header(
+							"How to Select Data"
+						),
 						bslib::card_body(
 							# Some information on this page
 							tags$p(
-								"Select flight-height datasets from the map or the table below. You can filter the datasets by species, method, season, and other criteria. Once you have selected the datasets you want to analyze, click 'Start Analysis' to proceed."
+								"Select flight-height datasets from the map You can filter the datasets by species, method, season, and other criteria. Once you have selected the datasets you want to analyze, click 'Start Analysis' to proceed."
 							),
 							tags$p(
 								"Note: You can select up to 10 datasets for analysis. If you select more than 10, only the first 10 will be analyzed."
@@ -206,9 +210,12 @@ mod_data_select_ui <- function(id) {
 
 					# TEMP: DUMMY DATA WARNING
 					bslib::card(
-						HTML(
+						bslib::card_header(
+							"Warning!"
+						),
+						tags$strong(
 							"
-							This is a dummy version of the ReSCUEApp. The flight-height distributions shown here are not real data, and are only for demonstration purposes. Please do not use these data for any real analysis."
+							This is a beta-testing version of the ReSCUEApp. The flight-height distributions shown here are not real data, and are only for demonstration purposes. Please do not use these data for any real analysis."
 						),
 						class = "card bg-warning",
 						max_height = "10vh"
@@ -336,8 +343,12 @@ mod_data_select_server <- function(
 			updateSelectizeInput(
 				session,
 				"species",
-				choices = unique(metadata_tbl$species_id),
-				selected = unique(metadata_tbl$species_id)[1],
+				# choices = unique(metadata_tbl$species_id),
+				choices = setNames(
+					object = unique(metadata_tbl$species_id),
+					nm = unique(metadata_tbl$name_common)
+				),
+				selected = unique(metadata_tbl$name_common)[1],
 				server = TRUE
 			)
 			updateSelectizeInput(

@@ -195,36 +195,32 @@ mod_landing_page_ui <- function(id) {
 							class = "card border-primary bg-secondary"
 						)
 					),
-					bslib::layout_columns(
+					div(
+						class = "d-flex flex-column align-items-center justify-content-center gap-4 my-3",
+						# User Guide
 						div(
-							class = "d-flex flex-column align-items-center gap-2 my-3",
+							class = "d-flex flex-column align-items-center gap-2",
 							actionButton(
 								ns("link_guide"),
 								label = tagList(
 									bsicons::bs_icon("info-circle"),
 									"User Guide"
 								),
-								# Make font bold
 								class = "not-arrow-btn",
 								style = "width:18vw;"
-							),
-							actionButton(
-								ns("restore_session"),
-								label = tagList(
-									bsicons::bs_icon("arrow-counterclockwise"),
-									"Restore Session"
-								),
-								class = "not-arrow-btn",
-								style = "width:18vw;"
-							),
+							)
 						),
+						# Start Tutorial
 						div(
-							class = "d-flex flex-column align-items-center gap-2 my-3",
-							# tour guide module
+							class = "d-flex flex-column align-items-center gap-2",
 							mod_app_tour_ui(
 								ns("app_tour"),
 								style = "width:18vw;"
-							),
+							)
+						),
+						# Select Data
+						div(
+							class = "d-flex flex-column align-items-center gap-2",
 							div(
 								id = ns("tutorial_selectdata"),
 								actionButton(
