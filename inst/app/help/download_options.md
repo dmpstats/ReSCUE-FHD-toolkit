@@ -1,7 +1,5 @@
 # Download Options
 
-**Note: Download functionality not yet implemented.**
-
 This section allows you to export your analysis results in various formats.
 
 ## Features
@@ -21,4 +19,3 @@ This section allows you to export your analysis results in various formats.
 ## Warnings
 
 If the selected FHD has covariate selections active, a warning will appear. FHDs with active covariate filters are not suitable for use in Seabird Collision Risk Model (SCRM) analyses. You can still download the outputs, but they should not be used in SCRM applications.
-
