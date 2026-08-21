@@ -138,6 +138,11 @@ mod_data_select_ui <- function(id) {
 										),
 										placement = "top"
 									)
+							),
+							fluidRow(
+								tags$small(
+									"The map provides BDMPS [Biological Defined Minimum Population Scale] regions for each individual species. Each region represents a single flight-height distribution."
+								)
 							)
 						)
 					)
