@@ -149,7 +149,10 @@ mod_data_select_ui <- function(id) {
 						class = "card border-primary mb-3 bg-light",
 						max_height = "15vh",
 						bslib::card_header(
-							"How to Select Data"
+							tags$span(
+								bsicons::bs_icon("question-circle-fill"),
+								"  How to Select Data"
+							)
 						),
 						bslib::card_body(
 							# Some information on this page
@@ -211,7 +214,11 @@ mod_data_select_ui <- function(id) {
 					# TEMP: DUMMY DATA WARNING
 					bslib::card(
 						bslib::card_header(
-							"Warning!"
+							# Add warning icon and text "Warning!"
+							tags$span(
+								bsicons::bs_icon("exclamation-triangle-fill"),
+								"Warning!"
+							),
 						),
 						tags$strong(
 							"
