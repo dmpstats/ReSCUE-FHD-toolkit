@@ -451,7 +451,13 @@ mod_data_analysis_server <- function(
 							tags$span(
 								class = "text-muted",
 								style = "font-size: 0.72rem;",
-								paste0(row$method, " \u00b7 ", row$season, " \u00b7 ", row$region)
+								paste0(
+									row$method,
+									" \u00b7 ",
+									row$season,
+									" \u00b7 ",
+									row$region
+								)
 							)
 						)
 					),
@@ -820,19 +826,23 @@ mod_data_analysis_server <- function(
 				height_col = "height",
 				prob_col = "probability",
 				draw_col = "draw_id",
-				risk_min = input$rotor_min,
-				risk_max = input$rotor_max
-			) |>
-				# Add a % to all cols except the first
-				dplyr::mutate(
-					dplyr::across(
-						-1,
-						~ paste0(.x, "%")
-					)
-				)
+				risk_min = input$airgap,
+				risk_max = input$airgap + (2 * input$rotor_radius)
+			) #|>
+			# # Add a % to all cols except the first
+			# dplyr::mutate(
+			# 	dplyr::across(
+			# 		-1,
+			# 		~ paste0(.x, "%")
+			# 	)
+			# )
+
 			DT::datatable(
 				sumdat,
-				# Add a % digit to the columns and prevent horizontal overrun
+				caption = htmltools::tags$caption(
+					style = "caption-side: top; text-align: left;",
+					"Proportion of birds at collision height (CRH) for each unique FHD, with 50% confidence intervals."
+				),
 				rownames = FALSE,
 				extensions = c("FixedHeader"),
 				options = list(
@@ -844,7 +854,8 @@ mod_data_analysis_server <- function(
 					scrollX = TRUE,
 					scrollY = "30vh"
 				),
-			)
+			) |>
+				DT::formatRound(columns = 2:ncol(sumdat), digits = 3)
 		})
 
 		# ── FHD plot ──────────────────────────────────────────────────────────────

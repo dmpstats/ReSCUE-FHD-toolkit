@@ -53,20 +53,18 @@ make_fhd_summary <- function(
     ) |>
     dplyr::group_by(fhd_id) |>
     dplyr::summarise(
-      q25_risk = (100 *
-        quantile(riskzone_prob, probs = 0.25, na.rm = TRUE)) |>
-        round(2),
-      q50_risk = (100 *
-        quantile(riskzone_prob, probs = 0.50, na.rm = TRUE)) |>
-        round(2),
-      q75_risk = (100 *
-        quantile(riskzone_prob, probs = 0.75, na.rm = TRUE)) |>
-        round(2)
+      q50_risk = quantile(riskzone_prob, probs = 0.50, na.rm = TRUE) |>
+        round(3),
+      q25_risk = quantile(riskzone_prob, probs = 0.25, na.rm = TRUE) |>
+        round(3),
+      q75_risk = quantile(riskzone_prob, probs = 0.75, na.rm = TRUE) |>
+        round(3)
     ) |>
     dplyr::rename(
-      "Risk perc. (25%)" = q25_risk,
-      "Risk perc. (50%)" = q50_risk,
-      "Risk perc. (75%)" = q75_risk
+      "Flight Height Distribution ID" = fhd_id,
+      "Median" = q50_risk,
+      "25 %tile" = q25_risk,
+      "75 %tile" = q75_risk
     )
 
   return(fhd_summary)
