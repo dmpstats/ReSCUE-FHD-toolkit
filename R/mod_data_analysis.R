@@ -31,7 +31,7 @@ mod_data_analysis_ui <- function(id) {
 					),
 					# Second card: analysis results
 					bslib::navset_card_underline(
-						title = "Analysis",
+						title = "Explore Data",
 						bslib::nav_spacer(),
 						bslib::nav_panel(
 							title = "Summary",
@@ -84,9 +84,9 @@ mod_data_analysis_ui <- function(id) {
 								style = "height: 25vh; overflow-y: auto; overflow-x: auto;"
 							)
 						),
-						bslib::nav_panel(
-							title = "Compare Distributions"
-						),
+						# bslib::nav_panel(
+						# 	title = "Compare Distributions"
+						# ),
 						bslib::nav_item(
 							actionButton(
 								ns("test"),
@@ -425,7 +425,13 @@ mod_data_analysis_server <- function(
 							tags$span(
 								class = "text-muted",
 								style = "font-size: 0.72rem;",
-								paste0(row$method, " \u00b7 ", row$season, " \u00b7 ", row$region)
+								paste0(
+									row$method,
+									" \u00b7 ",
+									row$season,
+									" \u00b7 ",
+									row$region
+								)
 							)
 						)
 					),
@@ -993,10 +999,17 @@ mod_data_analysis_server <- function(
 					" ",
 					row$name_common
 				),
+				# Add a warning that data is dummy
+				bslib::card(
+					tags$strong(
+						"Warning: This is dummy data for demonstration purposes only. Obvious scientific errors may be present in the data."
+					),
+					class = "card bg-warning"
+				),
 				details_table,
 				easyClose = TRUE,
 				footer = modalButton("Close"),
-				size = "m"
+				size = "l"
 			))
 		})
 
