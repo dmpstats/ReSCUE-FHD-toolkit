@@ -31,7 +31,7 @@ mod_data_analysis_ui <- function(id) {
 					),
 					# Second card: analysis results
 					bslib::navset_card_underline(
-						title = "Analysis",
+						title = "Proportion at CRH",
 						bslib::nav_spacer(),
 						bslib::nav_panel(
 							title = "Summary",
@@ -43,14 +43,28 @@ mod_data_analysis_ui <- function(id) {
 								bslib::input_switch(
 									id = ns("show_as_percentages"),
 									value = TRUE,
-									label = "Show as percentages",
+									label = "Percentage change",
 									width = "40%"
 								),
 								bslib::input_switch(
 									id = ns("condensed_table"),
 									value = TRUE,
-									label = "Show condensed table",
+									label = "5m increments",
 									width = "40%"
+								),
+								shinyWidgets::radioGroupButtons(
+									ns("heightshift_output_type"),
+									label = NULL,
+									choiceNames = list(
+										bsicons::bs_icon("table"),
+										bsicons::bs_icon("graph-up")
+									),
+									choiceValues = list("table", "plot"),
+									selected = "table",
+									direction = "horizontal",
+									size = "sm",
+									justified = TRUE,
+									width = "20%"
 								)
 							),
 							# p(
@@ -65,8 +79,8 @@ mod_data_analysis_ui <- function(id) {
 									"'] === true"
 								),
 								p(
-									"This table shows changes to the percentage of birds at collision-height 
-									compared to your turbine height for increases/decreases to the risk-height window. The first column shows the unique FHD identifiers, and the remaining columns show the percentage change in FHD risk for each height shift."
+									"This table shows changes to the percentage of birds at collision-height
+									compared to the rotor sweapt area of your turbine for increases/decreases to the risk-height window. The first column shows the unique FHD identifiers, and the remaining columns show the percentage change in FHD risk for each height shift."
 								)
 							),
 							conditionalPanel(
@@ -79,13 +93,25 @@ mod_data_analysis_ui <- function(id) {
 									"This table shows the raw proportion of birds at collision-height if the turbine height is increased or decreased. The first column shows the unique FHD identifiers, and the remaining columns show the change in FHD risk for each height shift."
 								)
 							),
-							div(
-								DT::DTOutput(ns("heightshift_table")),
-								style = "height: 25vh; overflow-y: auto; overflow-x: auto;"
+							conditionalPanel(
+								condition = paste0(
+									"input['",
+									ns("heightshift_output_type"),
+									"'] === 'table'"
+								),
+								div(
+									DT::DTOutput(ns("heightshift_table")),
+									style = "height: 25vh; overflow-y: auto; overflow-x: auto;"
+								)
+							),
+							conditionalPanel(
+								condition = paste0(
+									"input['",
+									ns("heightshift_output_type"),
+									"'] === 'plot'"
+								),
+								plotly::plotlyOutput(ns("heightshift_plot"), height = "25vh")
 							)
-						),
-						bslib::nav_panel(
-							title = "Compare Distributions"
 						),
 						bslib::nav_item(
 							actionButton(
@@ -750,6 +776,16 @@ mod_data_analysis_server <- function(
 				"}"
 			)
 		)
+
+		# ---- Step 5b: Heightshift plot ----
+		output$heightshift_plot <- plotly::renderPlotly({
+			req(heightshift_data())
+			req(nrow(heightshift_data()[["perc"]]) > 0)
+			heightshift_plot(
+				heightshift_data = heightshift_data(),
+				show_as_percentages = input$show_as_percentages
+			)
+		})
 
 		# ---- Step 6: Generate the FHD summaries ----
 		output$fhd_summaries <- DT::renderDataTable({

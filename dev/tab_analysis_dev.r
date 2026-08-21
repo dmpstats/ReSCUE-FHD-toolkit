@@ -69,8 +69,8 @@ tab_analysis_app <- function() {
       setNames(fhd_id)
 
     selected_data <- reactiveValues(
-      metadata = mtdt |> dplyr::slice(1, 3, 5),
-      draws = draws[c(1, 3, 5)]
+      metadata = mtdt |> dplyr::slice(1, 2),
+      draws = draws[c(1, 2)]
     )
 
     # call the module server function for the data analysis module, passing in the "selected" data
