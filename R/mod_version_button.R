@@ -42,29 +42,27 @@ mod_version_button_ui <- function(id) {
 #' @noRd
 mod_version_button_server <- function(id) {
   moduleServer(id, function(input, output, session) {
-
     observeEvent(input$version, {
       news_path <- app_sys("NEWS.md")
 
       if (!file.exists(news_path)) {
         showModal(modalDialog(
-          title     = "Changelog not found",
+          title = "Changelog not found",
           tags$p("No NEWS.md file found."),
           easyClose = TRUE,
-          footer    = modalButton("Close"),
-          size      = "m"
+          footer = modalButton("Close"),
+          size = "m"
         ))
         return()
       }
 
       showModal(modalDialog(
-        title     = NULL,
+        title = NULL,
         shiny::includeMarkdown(news_path),
         easyClose = TRUE,
-        footer    = modalButton("Close"),
-        size      = "xl"
+        footer = modalButton("Close"),
+        size = "l"
       ))
     })
-
   })
 }

@@ -1,5 +1,16 @@
 # ReSCUEApp News
 
+## ReSCUEApp 0.9.1 (Beta Release)
+
+**Release Date:** August 2026
+
+Some small modifications have been made in preparation for the user-testing phase. This includes, but is not limited to:
+
+- **Data Clarifications:** Further text has been added clarifying that the data is dummy, and should not be considered too deeply.
+- **Improved Plotter:** The plotter window has been reworked to look cleaner and allow disabling plots.
+
+The changes in this version are entirely visual, intended to streamline the user experience and provide clarifications.
+
 ## ReSCUEApp 0.9.0 (First Release)
 
 **Release Date**: August 2026
