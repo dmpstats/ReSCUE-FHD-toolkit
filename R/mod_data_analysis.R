@@ -25,6 +25,11 @@ mod_data_analysis_ui <- function(id) {
 						bslib::card_body(
 							uiOutput(ns("fhd_config_table"))
 						),
+						bslib::card_footer(
+							tags$small(
+								"To remove an FHD, go back to the Data Selection tab. You can also hide them on the plot by clicking on the legend."
+							)
+						),
 						# Ensure this card doesn't cover more than 40% of the page height
 						style = "height: 35vh; overflow-y: auto;",
 						class = "card border-primary mb-3 bg-light"
@@ -125,19 +130,23 @@ mod_data_analysis_ui <- function(id) {
 							"Flight Height Distribution",
 							class = "text-bg-primary",
 							bslib::toolbar(
-								mod_help_button_ui(ns("help_fhd"), type = "toolbar")
+								mod_help_button_ui(ns("help_fhd"), type = "toolbar"),
+								bslib::toolbar_spacer(),
+								bslib::input_switch(
+									id = ns("hide_legend"),
+									label = "Hide legend",
+									value = FALSE
+								),
+								# a small spacer
+								span(
+									style = "width: 10px; display: inline-block;"
+								),
+								bslib::input_switch(
+									id = ns("facet_plot"),
+									label = "Facet plot",
+									value = FALSE
+								)
 							),
-							bslib::toolbar_spacer(),
-							bslib::input_switch(
-								id = ns("hide_legend"),
-								label = "Hide legend",
-								value = FALSE
-							),
-							bslib::input_switch(
-								id = ns("facet_plot"),
-								label = "Facet plot",
-								value = FALSE
-							)
 						),
 						bslib::card_body(
 							# class = "card-body-white",
@@ -179,14 +188,22 @@ mod_data_analysis_ui <- function(id) {
 									ns("download_contents"),
 									"Select contents to download",
 									choices = c(
-										"FHD Data" = "data",
+										"SCRM Data" = "data",
 										"FHD Plot" = "plot",
 										"Metadata" = "metadata"
 									),
 									width = "100%",
 									selected = c("data", "plot", "metadata"),
 									status = "success"
-								)
+								) |>
+									bslib::tooltip(
+										tagList(
+											"Downloading the FHD plot requires a Chromium-based browser. Otherwise, you can snapshot manually using ",
+											bsicons::bs_icon("camera"),
+											" on the plot toolbar above."
+										),
+										placement = "top"
+									)
 								# checkboxGroupInput(
 								# 	ns("download_contents"),
 								# 	"Select contents to download",
@@ -351,6 +368,7 @@ mod_data_analysis_server <- function(
 						)
 						cov_label <- cov_meta$label %||% cov_name
 						cov_levels <- cov_meta$levels %||% character(0)
+						cov_blurb <- cov_meta$blurb %||% ""
 
 						tagList(
 							# Separator between covariate blocks (skip before first)
@@ -369,6 +387,14 @@ mod_data_analysis_server <- function(
 									)
 								)
 							),
+							# Show blurb
+							if (nzchar(cov_blurb)) {
+								tags$div(
+									class = "small text-muted mb-1",
+									style = "width: 250px;",
+									cov_blurb
+								)
+							},
 							# Level checkboxes — indented with a left border when visible
 							conditionalPanel(
 								condition = paste0(
@@ -393,12 +419,21 @@ mod_data_analysis_server <- function(
 						)
 					})
 
-					tagList(!!!cov_blocks)
+					tagList(
+						# Some small text explaining what's going on
+						tags$small(
+							class = "text-muted small mb-0 py-1 d-block",
+							style = "word-wrap: break-word; overflow-wrap: break-word;  width: 250px; line-height: 1.4;",
+							"Select which levels of this covariate to inspect. If a covariate is not selected, all levels will be averaged over."
+						),
+						tags$hr(class = "my-2"),
+						!!!cov_blocks,
+					)
 				}
 
 				# ---- Popover content: covariates only --------------------------------
 				popover_content <- tags$div(
-					style = "min-width: 320px;",
+					style = "width: 380px; max-height: 400px; overflow-y: auto; word-wrap: break-word; overflow-wrap: break-word;",
 					covariates_tab
 				)
 
@@ -454,7 +489,7 @@ mod_data_analysis_server <- function(
 							inputId = ns(paste0("cfg_btn_", safe_id)),
 							label = tagList(
 								bsicons::bs_icon("sliders"),
-								" Configure"
+								" Covariates"
 							),
 							class = "btn btn-sm btn-outline-secondary flex-shrink-0"
 						) |>
@@ -886,7 +921,7 @@ mod_data_analysis_server <- function(
 
 				plt <- plt |>
 					plotly::layout(
-						yaxis = list(range = c(0, max_prob * 1.1))
+						yaxis = list(range = c(0, max_prob * 0.9))
 					)
 			}
 
