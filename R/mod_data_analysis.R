@@ -122,15 +122,15 @@ mod_data_analysis_ui <- function(id) {
 							) |>
 								bslib::popover(
 									numericInput(
-										ns("rotor_min"),
-										"Minimum Rotor Height (m)",
+										ns("airgap"),
+										strong("Air Gap (m)"),
 										value = 50,
 										min = 0
 									),
 									numericInput(
-										ns("rotor_max"),
-										"Maximum Rotor Height (m)",
-										value = 70,
+										ns("rotor_radius"),
+										strong("Rotor Radius (m)"),
+										value = 10,
 										min = 0
 									)
 								)
@@ -703,8 +703,9 @@ mod_data_analysis_server <- function(
 				prob_col = "probability",
 				id_col = "unique_fhd",
 				draw_id_col = "draw_id",
-				risk_min = input$rotor_min,
-				risk_max = input$rotor_max,
+				# converted from airgap and rotor radius to min and max risk heights
+				risk_min = input$airgap,
+				risk_max = input$airgap + 2 * input$rotor_radius,
 				round = c(4, 2),
 				condensed_table = input$condensed_table
 			)
@@ -860,8 +861,8 @@ mod_data_analysis_server <- function(
 
 			if (bad_data) {
 				return(fhd_baseplot(
-					risk_min = input$rotor_min,
-					risk_max = input$rotor_max
+					risk_min = input$airgap,
+					risk_max = input$airgap + (2 * input$rotor_radius)
 				))
 			}
 
@@ -874,8 +875,8 @@ mod_data_analysis_server <- function(
 					height_col = "height",
 					draw_col = "draw_id",
 					prob_col = "probability",
-					risk_min = input$rotor_min,
-					risk_max = input$rotor_max,
+					risk_min = input$airgap,
+					risk_max = input$airgap + (2 * input$rotor_radius),
 					show_legend = !isTRUE(input$hide_legend)
 				))
 			}
@@ -888,8 +889,8 @@ mod_data_analysis_server <- function(
 			max_prob <- 0
 			meta <- selected_data$metadata
 			plt <- fhd_baseplot(
-				risk_min = input$rotor_min,
-				risk_max = input$rotor_max
+				risk_min = input$airgap,
+				risk_max = input$airgap + (2 * input$rotor_radius)
 			)
 
 			fhd_ids <- unique(plot_ready_data()$fhd_id)
