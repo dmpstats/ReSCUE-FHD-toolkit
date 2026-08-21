@@ -62,12 +62,12 @@ add_fhd <- function(
       text = ~ paste(
         "fhd_id:",
         f_id,
-        "<br>Group:",
-        group_col,
+        # "<br>Group:",
+        # group_col,
         "<br>Height:",
         height,
         "<br>Probability:",
-        prob
+        round(prob, 4)
       ),
       showlegend = FALSE
     ) |>
@@ -83,12 +83,12 @@ add_fhd <- function(
       text = ~ paste(
         "fhd_id:",
         f_id,
-        "<br>Group:",
-        group_col,
+        # "<br>Group:",
+        # group_col,
         "<br>Height:",
         height,
         "<br>Probability:",
-        prob
+        round(prob, 4)
       )
     )
 

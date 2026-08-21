@@ -157,7 +157,7 @@ generate_dummy_data <- function(
 
     grid_list <- list(
       draw_id = 1:n_iter,
-      height = seq(0, max_height, length.out = 100) + 0.5
+      height = seq(0, max_height) + 0.5
     )
 
     # for (cov in cov_names) {
