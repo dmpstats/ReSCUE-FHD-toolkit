@@ -451,7 +451,7 @@ mod_data_analysis_server <- function(
 							tags$span(
 								class = "text-muted",
 								style = "font-size: 0.72rem;",
-								paste0(row$method, " \u00b7 ", row$season)
+								paste0(row$method, " \u00b7 ", row$season, " \u00b7 ", row$region)
 							)
 						)
 					),

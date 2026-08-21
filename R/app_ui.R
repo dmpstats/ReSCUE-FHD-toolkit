@@ -9,9 +9,22 @@
 app_ui <- function(request) {
 	tagList(
 		golem_add_external_resources(),
-		shinybusy::use_busy_spinner(
-			position = "bottom-right"
+		shinybusy::add_busy_spinner(
+			spin = "spring",
+			position = "bottom-right",
+			height = "150px",
+			width = "150px",
+			timeout = 200,
+			onstart = TRUE,
+			color = "#ffa134"
 		),
+		# shinybusy::use_busy_gif(
+		# 	# use 'birdflap.gif' in the www folder
+		# 	src = "www/birdflap.gif",
+		# 	position = "bottom-right",
+		# 	height = "150px",
+		# 	width = "150px"
+		# ),
 		bslib::page_navbar(
 			title = span("ReSCUEApp", style = "color: #ffffff;"),
 			id = "main-nav",
@@ -152,27 +165,27 @@ app_ui <- function(request) {
 						),
 					bslib::page_fixed(
 						# bslib::layout_columns(
-							# col_widths = c(10, 2),
-							bslib::card(
-								bslib::card_body(
-									shiny::includeMarkdown(app_sys(
-										"app",
-										"md",
-										"userguide.md"
-									))
-								),
-								class = "card border-primary bg-light",
+						# col_widths = c(10, 2),
+						bslib::card(
+							bslib::card_body(
+								shiny::includeMarkdown(app_sys(
+									"app",
+									"md",
+									"userguide.md"
+								))
 							),
-							# Sidebar with logos
-							# bslib::card(
-							# 	class = "d-flex flex-column align-items-center gap-3 h-100",
-							# 	logolink("dmp", height = 9),
-							# 	logolink("ne", height = 9),
-							# 	logolink("bto", height = 9),
-							# 	logolink("blackbawks", height = 9),
-							# 	logolink("niras", height = 9)
-							# )
-						)
+							class = "card border-primary bg-light",
+						),
+						# Sidebar with logos
+						# bslib::card(
+						# 	class = "d-flex flex-column align-items-center gap-3 h-100",
+						# 	logolink("dmp", height = 9),
+						# 	logolink("ne", height = 9),
+						# 	logolink("bto", height = 9),
+						# 	logolink("blackbawks", height = 9),
+						# 	logolink("niras", height = 9)
+						# )
+					)
 					# )
 				),
 
@@ -205,24 +218,24 @@ app_ui <- function(request) {
 						"Settings"
 					),
 				align = "right",
-				bslib::nav_item(
-					shiny::actionLink(
-						"save_session",
-						label = tagList(
-							bsicons::bs_icon("download"),
-							"Save Session"
-						)
-					)
-				),
-				bslib::nav_item(
-					shiny::actionLink(
-						"restore_session",
-						label = tagList(
-							bsicons::bs_icon("upload"),
-							"Restore Session"
-						)
-					)
-				),
+				# bslib::nav_item(
+				# 	shiny::actionLink(
+				# 		"save_session",
+				# 		label = tagList(
+				# 			bsicons::bs_icon("download"),
+				# 			"Save Session"
+				# 		)
+				# 	)
+				# ),
+				# bslib::nav_item(
+				# 	shiny::actionLink(
+				# 		"restore_session",
+				# 		label = tagList(
+				# 			bsicons::bs_icon("upload"),
+				# 			"Restore Session"
+				# 		)
+				# 	)
+				# ),
 				# bslib::nav_item(
 				# 	shiny::actionLink(
 				# 		"switch_mode",
