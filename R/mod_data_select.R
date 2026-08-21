@@ -101,7 +101,7 @@ mod_data_select_ui <- function(id) {
 									label = "Season",
 									choices = c(
 										"Any" = "any",
-										"Both" = "nonbreeding, breeding",
+										"Both" = "both",
 										"Breeding" = "breeding",
 										"Non-breeding" = "nonbreeding"
 									),
@@ -345,7 +345,16 @@ mod_data_select_server <- function(
 				data <- dplyr::filter(data, method %in% input$method)
 			}
 			if (length(input$season) > 0 && input$season != "any") {
-				data <- dplyr::filter(data, season %in% input$season)
+				# Split the season string on commas to handle "breeding, nonbreeding"
+				# or "nonbreeding, breeding" (order-insensitive)
+				if (input$season == "both") {
+					data <- dplyr::filter(
+						data,
+						season %in% c("nonbreeding, breeding", "breeding, nonbreeding")
+					)
+				} else {
+					data <- dplyr::filter(data, season == input$season)
+				}
 			}
 			if (length(input$crm_recommended) > 0) {
 				data <- dplyr::filter(data, crm_recommended %in% input$crm_recommended)
@@ -627,7 +636,7 @@ mod_data_select_server <- function(
 						actionButton(
 							ns("confirm_clear"),
 							"Yes, clear selected",
-							class = "btn btn-outline-danger"
+							class = "btn btn-danger"
 						),
 						modalButton("Cancel")
 					),
