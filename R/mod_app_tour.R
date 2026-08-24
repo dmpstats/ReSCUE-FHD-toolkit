@@ -96,28 +96,28 @@ mod_app_tour_server <- function(id) {
       tab = "nav-home"
     )$step(
       el = paste0("#", data_tab_ns("map_selection_card")),
-      title = "FHD Selection",
+      title = "Selection tool",
       text = "This interactive map allows you to select FHDs for visualisation. Each shaded region is a Flight Height Distribution for a given species, measuring method, season, etc.
       <br><br>Have a go! Click on a region to see its details and add it to your selection.",
       position = "right-start",
       tabId = "main-nav",
       tab = "nav-data-select"
     )$step(
+      el = paste0("#", data_tab_ns("selected_fhd_card")),
+      title = "Your current selection",
+      text = "FHDs you've added from the map appear here. Click a row to highlight an FHD, then click the trash icon to remove it from your selection.
+      <br><br> You can select up to 10 FHDs for analysis at a time.
+      <br><br><small style='color: #999;'> Haven't selected an FHD yet? Go back to the previous step to select one from the map.</small>",
+      position = "left-start"
+    )$step(
       el = paste0("#", data_tab_ns("map_filters")),
       title = "Filter FHDs",
       text = "Use these filters to narrow down the available FHDs based on your criteria. <br><br>For example, you can filter by species and season to find the FHDs that are most relevant to your analysis.",
       position = "right-start"
     )$step(
-      el = paste0("#", data_tab_ns("selected_fhd_card")),
-      title = "Your Selection(s)",
-      text = "FHDs you've added from the map appear here. Click a row to highlight an FHD, then click the trash icon to remove it from your selection.
-      <br><br> You can select up to 10 FHDs for analysis at a time.
-      <br><br><small style='color: #999;'> Haven't selected an FHD yet? Go back two steps to select one from the map.</small>",
-      position = "left-start"
-    )$step(
       el = paste0("#", data_tab_ns("upload_data")),
-      title = "Upload Your Own FHD",
-      text = "Optionally, upload your own flight-height distribution to include it alongside the built-in FHDs for comparison.",
+      title = "Upload your own FHD",
+      text = "Optionally, upload your own flight-height distribution to include it alongside the built-in FHDs, for comparison.",
       position = "top",
       canClickTarget = FALSE
     )$step(
