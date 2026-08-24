@@ -16,18 +16,25 @@
 #' )
 #'
 #' @noRd
-mod_help_button_ui <- function(id, type = c("button-only", "button-text", "toolbar")) {
+mod_help_button_ui <- function(
+  id,
+  type = c("button-only", "button-text", "toolbar")
+) {
   ns <- NS(id)
 
   if (type == "button-only") {
     return(
       actionButton(
         ns("help"),
-        label        = NULL,
-        icon         = bsicons::bs_icon("info-circle"),
-        class        = "btn-help",
+        label = NULL,
+        icon = bsicons::bs_icon("info-circle"),
+        class = "btn-help",
         `aria-label` = "Help"
-      )
+      ) |>
+        bslib::tooltip(
+          placement = "bottom",
+          "Help"
+        )
     )
   }
 
@@ -35,9 +42,9 @@ mod_help_button_ui <- function(id, type = c("button-only", "button-text", "toolb
     return(
       actionButton(
         ns("help"),
-        label        = "Help",
-        icon         = bsicons::bs_icon("info-circle"),
-        class        = "btn-help",
+        label = "Help",
+        icon = bsicons::bs_icon("info-circle"),
+        class = "btn-help",
         `aria-label` = "Help"
       )
     )
@@ -91,29 +98,27 @@ mod_help_button_ui <- function(id, type = c("button-only", "button-text", "toolb
 #' @noRd
 mod_help_button_server <- function(id, help_file, title = NULL, size = "m") {
   moduleServer(id, function(input, output, session) {
-
     observeEvent(input$help, {
       help_path <- app_sys("app", "help", paste0(help_file, ".md"))
 
       if (!file.exists(help_path)) {
         showModal(modalDialog(
-          title     = "Help not found",
+          title = "Help not found",
           tags$p(paste0("No help file found for '", help_file, "'.")),
           easyClose = TRUE,
-          footer    = modalButton("Close"),
-          size      = size
+          footer = modalButton("Close"),
+          size = size
         ))
         return()
       }
 
       showModal(modalDialog(
-        title     = title,
+        title = title,
         shiny::includeMarkdown(help_path),
         easyClose = TRUE,
-        footer    = modalButton("Close"),
-        size      = size
+        footer = modalButton("Close"),
+        size = size
       ))
     })
-
   })
 }

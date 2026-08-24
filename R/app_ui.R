@@ -349,18 +349,18 @@ golem_add_external_resources <- function() {
         border: none !important;
         box-shadow: none !important;
         padding: 0 0 0 4px;
-        color: var(--bs-success);
+        color: white;
         font-size: 0.9em;
         line-height: 1;
         vertical-align: middle;
-        opacity: 0.6;
+        opacity: 0.7;
         transition: opacity 0.2s, color 0.2s;#
       }
       .btn.btn-help:hover,
       .btn.btn-help:focus {
         background: none !important;
         box-shadow: none !important;
-        color: var(--bs-primary) !important;
+        color: var(--bs-success) !important;
         opacity: 1;
       }
 
