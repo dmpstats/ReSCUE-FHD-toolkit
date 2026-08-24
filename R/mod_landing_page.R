@@ -215,7 +215,7 @@ mod_landing_page_ui <- function(id) {
 							class = "d-flex flex-column align-items-center gap-2",
 							mod_app_tour_ui(
 								ns("app_tour"),
-								style = "width:18vw;"
+								style = "width:25vw;"
 							)
 						),
 						# Select Data
@@ -227,10 +227,10 @@ mod_landing_page_ui <- function(id) {
 									ns("go_data"),
 									label = tagList(
 										bsicons::bs_icon("play-circle"),
-										"Select Data"
+										"Select Flight-Height Distributions"
 									),
 									class = "arrow-btn",
-									style = "width:18vw;"
+									style = "width:30vw;"
 								)
 							)
 						)

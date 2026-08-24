@@ -148,7 +148,11 @@ mod_user_upload_ui <- function(id) {
 #' user_upload Server Functions
 #'
 #' @noRd
-mod_user_upload_server <- function(id, clear_trigger = reactive(NULL)) {
+mod_user_upload_server <- function(
+  id,
+  clear_trigger = reactive(NULL),
+  remove_ids = reactive(NULL)
+) {
   moduleServer(
     id,
     function(input, output, session) {
@@ -287,6 +291,25 @@ mod_user_upload_server <- function(id, clear_trigger = reactive(NULL)) {
           # Clear the reactive lists
           metadata(list())
           draws(list())
+        }
+      )
+
+      # Remove specific uploaded datasets by fhd_id, e.g. when a user selects
+      # specific rows in the parent module's "show_selected" table and clears
+      # just those.
+      observeEvent(
+        remove_ids(),
+        {
+          ids <- remove_ids()
+          req(length(ids) > 0)
+
+          current_metadata <- metadata()
+          current_metadata[ids] <- NULL
+          metadata(current_metadata)
+
+          current_draws <- draws()
+          current_draws[ids] <- NULL
+          draws(current_draws)
         }
       )
 

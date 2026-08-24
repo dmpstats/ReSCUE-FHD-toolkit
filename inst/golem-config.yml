@@ -1,6 +1,6 @@
 default:
   golem_name: ReSCUEApp
-  golem_version: 0.9.0
+  golem_version: 0.9.1
   app_prod: no
 production:
   app_prod: yes

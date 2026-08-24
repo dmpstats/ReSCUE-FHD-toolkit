@@ -101,7 +101,7 @@ mod_data_select_ui <- function(id) {
 									label = "Season",
 									choices = c(
 										"Any" = "any",
-										"Both" = "nonbreeding, breeding",
+										"Both" = "both",
 										"Breeding" = "breeding",
 										"Non-breeding" = "nonbreeding"
 									),
@@ -138,6 +138,11 @@ mod_data_select_ui <- function(id) {
 										),
 										placement = "top"
 									)
+							),
+							fluidRow(
+								tags$small(
+									"The map provides BDMPS [Biological Defined Minimum Population Scale] regions for each individual species. Each region represents a single flight-height distribution."
+								)
 							)
 						)
 					)
@@ -147,7 +152,7 @@ mod_data_select_ui <- function(id) {
 				tagList(
 					bslib::card(
 						class = "card border-primary mb-3 bg-light",
-						max_height = "15vh",
+						# max_height = "15vh",
 						bslib::card_header(
 							tags$span(
 								bsicons::bs_icon("question-circle-fill"),
@@ -224,8 +229,8 @@ mod_data_select_ui <- function(id) {
 							"
 							This is a beta-testing version of the ReSCUEApp. The flight-height distributions shown here are not real data, and are only for demonstration purposes. Please do not use these data for any real analysis."
 						),
-						class = "card bg-warning",
-						max_height = "10vh"
+						class = "card bg-warning"
+						# max_height = "10vh"
 					),
 
 					bslib::card(
@@ -239,16 +244,24 @@ mod_data_select_ui <- function(id) {
 									class = "btn btn-sm btn-light"
 								) |>
 									bslib::tooltip(
-										"Clear all selected datasets.",
+										"Clear the datasets selected (highlighted) in the table below.",
 										placement = "bottom"
 									)
 								# mod_help_button_ui(ns("select_data"), type = "toolbar")
 							)
 						),
 						bslib::card_body(DT::DTOutput(ns("show_selected"))),
+						bslib::card_footer(
+							# Some light-grey text to explain the table
+							tags$small(
+								"Click on a row to highlight it, then click the trash icon to remove it from the selection."
+							)
+						),
 						class = "card border-primary mb-3 bg-light",
 						full_screen = TRUE,
-						height = "30vh"
+						# height = "30vh",
+						# Keep horizontal and vertical scroll internal to the card
+						style = "overflow-y: auto; overflow-x: auto;"
 					),
 					bslib::layout_columns(
 						col_widths = c(6, 6),
@@ -278,7 +291,7 @@ mod_data_select_ui <- function(id) {
 							ns("go_analysis"),
 							label = tagList(
 								bsicons::bs_icon("play-circle"),
-								"Start Analysis"
+								"Visualise & Export"
 							),
 							full_screen = TRUE,
 							class = "arrow-btn"
@@ -309,10 +322,13 @@ mod_data_select_server <- function(
 	moduleServer(id, function(input, output, session) {
 		ns <- session$ns
 
+		# ── Row-level clearing: fhd_ids of user uploads to remove ───────────────
+		remove_upload_ids <- reactiveVal(character(0))
+
 		# Continuously run the user-upload module within this -------
 		user_uploads <- mod_user_upload_server(
 			id = "user_upload",
-			clear_trigger = reactive(input$confirm_clear)
+			remove_ids = reactive(remove_upload_ids())
 		)
 
 		# ---- Track some states -----------
@@ -334,7 +350,16 @@ mod_data_select_server <- function(
 				data <- dplyr::filter(data, method %in% input$method)
 			}
 			if (length(input$season) > 0 && input$season != "any") {
-				data <- dplyr::filter(data, season %in% input$season)
+				# Split the season string on commas to handle "breeding, nonbreeding"
+				# or "nonbreeding, breeding" (order-insensitive)
+				if (input$season == "both") {
+					data <- dplyr::filter(
+						data,
+						season %in% c("nonbreeding, breeding", "breeding, nonbreeding")
+					)
+				} else {
+					data <- dplyr::filter(data, season == input$season)
+				}
 			}
 			if (length(input$crm_recommended) > 0) {
 				data <- dplyr::filter(data, crm_recommended %in% input$crm_recommended)
@@ -342,6 +367,22 @@ mod_data_select_server <- function(
 			if (length(input$region) > 0) {
 				data <- dplyr::filter(data, region %in% input$region)
 			}
+			if (nrow(data) == 0) {
+				bslib::show_toast(
+					bslib::toast(
+						header = "Warning",
+						"No datasets match the selected filters. Please adjust your filters to see available datasets.",
+						icon = bsicons::bs_icon("exclamation-triangle-fill"),
+						type = "warning",
+						duration_s = 0,
+						id = "filter_warning",
+						position = "bottom-right"
+					)
+				)
+			} else {
+				bslib::hide_toast("filter_warning")
+			}
+
 			data
 		})
 
@@ -473,14 +514,20 @@ mod_data_select_server <- function(
 			selected_ids(ids)
 		})
 
-		# Show selected data ----
-		output$show_selected <- DT::renderDT({
-			data <- metadata_tbl[metadata_tbl$fhd_id %in% selected_ids(), ] |>
+		# ── Combined selected data (main + user uploads), row order matches the
+		# ── "show_selected" DT, so DT row indices can be mapped back to fhd_id.
+		selected_data_combined <- reactive({
+			metadata_tbl[metadata_tbl$fhd_id %in% selected_ids(), ] |>
 				dplyr::bind_rows(
 					user_uploads$metadata() |>
 						dplyr::bind_rows()
 				) |>
-				as.data.frame() |>
+				as.data.frame()
+		})
+
+		# Show selected data ----
+		output$show_selected <- DT::renderDT({
+			data <- selected_data_combined() |>
 				dplyr::select(
 					dplyr::all_of(
 						c(
@@ -499,6 +546,7 @@ mod_data_select_server <- function(
 				)
 			DT::datatable(
 				data,
+				selection = "multiple",
 				options = list(
 					pageLength = 5,
 					lengthChange = FALSE,
@@ -529,6 +577,13 @@ mod_data_select_server <- function(
 				showModal(
 					modalDialog(
 						title = "Flight Height Dataset Details",
+						# Add a warning that data is dummy
+						bslib::card(
+							tags$strong(
+								"Warning: This is dummy data for demonstration purposes only. Obvious scientific errors may be present in the data."
+							),
+							class = "card bg-warning"
+						),
 						# Display details in a table format
 						tags$table(
 							class = "table table-striped",
@@ -550,21 +605,43 @@ mod_data_select_server <- function(
 		)
 
 		# ---- Clear selection button ----
+		# Clears only the rows currently selected (highlighted) in the
+		# "show_selected" DT, whether they originate from the main dataset or
+		# from user uploads. If no rows are highlighted, prompt the user via
+		# a toast rather than clearing anything.
 		observeEvent(input$clear_selection, {
+			rows <- input$show_selected_rows_selected
+
+			if (length(rows) == 0) {
+				bslib::show_toast(
+					bslib::toast(
+						header = "Nothing to clear",
+						"No datasets are selected in the table. Highlight one or more rows first.",
+						icon = bsicons::bs_icon("exclamation-triangle-fill"),
+						type = "warning",
+						id = "no_rows_selected_toast",
+						position = "bottom-right"
+					)
+				)
+				return(invisible(NULL))
+			}
+
 			# Modal to confirm and then clear
 			showModal(
 				modalDialog(
-					title = "Clear Selection",
+					title = "Clear Selected Datasets",
 					tags$p(
-						"Are you sure you want to clear all selected datasets? ",
-						br(),
-						tags$strong("This will include any user-uploaded datasets.")
+						sprintf(
+							"Are you sure you want to clear the %d dataset%s selected in the table?",
+							length(rows),
+							if (length(rows) == 1) "" else "s"
+						)
 					),
 					footer = tagList(
 						actionButton(
 							ns("confirm_clear"),
-							"Yes, clear selection",
-							class = "btn btn-outline-danger"
+							"Yes, clear selected",
+							class = "btn btn-danger"
 						),
 						modalButton("Cancel")
 					),
@@ -574,7 +651,19 @@ mod_data_select_server <- function(
 			)
 		})
 		observeEvent(input$confirm_clear, {
-			selected_ids(character(0))
+			rows <- input$show_selected_rows_selected
+			ids_to_remove <- selected_data_combined()$fhd_id[rows]
+
+			# Datasets from the main metadata table
+			selected_ids(setdiff(selected_ids(), ids_to_remove))
+
+			# Datasets from user uploads
+			upload_ids <- names(user_uploads$metadata())
+			ids_to_remove_uploads <- intersect(ids_to_remove, upload_ids)
+			if (length(ids_to_remove_uploads) > 0) {
+				remove_upload_ids(ids_to_remove_uploads)
+			}
+
 			removeModal()
 		})
 
@@ -582,7 +671,7 @@ mod_data_select_server <- function(
 		# If over 10 datasets are selected, show a warning toast that the analysis will only analyze the first 10 datasets.
 		observeEvent(selected_ids(), {
 			if (length(selected_ids()) > 10) {
-				bslib::showToast(
+				bslib::show_toast(
 					bslib::toast(
 						header = "Too many datasets selected",
 						icon = bsicons::bs_icon("exclamation-triangle-fill"),

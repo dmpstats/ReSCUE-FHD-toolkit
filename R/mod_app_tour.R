@@ -64,16 +64,16 @@ mod_app_tour_server <- function(id) {
     guide <- guide$step(
       el = "#app-version-container",
       title = "App Version",
-      text = "The app version is displayed here.",
+      text = "The app version is displayed here.<br><small style='color: #999; margin-top: 10px;'>Tip: Press Esc to exit the tour</small>",
       position = "bottom-start"
     )$step(
       el = "[data-value='nav-home']", # using data-value as selector
       title = "Navigation Bar",
-      text = "This allows you to navigate between different sections of the app. You can click on the icons to go to the desired section."
+      text = "This allows you to navigate between different sections of the app. You can click on the icons to go to the desired section.<br><small style='color: #999; margin-top: 10px;'>Tip: Press Esc to exit the tour</small>"
     )$step(
       el = paste0("#", land_tab_ns("tutorial_selectdata")),
       title = "Select Data",
-      text = "Click this button to go to the Data Selection tab, where you can choose the data you want to analyze. This is the first step in using the app.",
+      text = "Click this button to go to the Data Selection tab, where you can choose the data you want to analyze. This is the first step in using the app.<br><small style='color: #999; margin-top: 10px;'>Tip: Press Esc to exit the tour</small>",
       canClickTarget = FALSE,
       position = "left-start",
       tabId = "main-nav",
@@ -82,21 +82,21 @@ mod_app_tour_server <- function(id) {
     )$step(
       el = paste0("#", data_tab_ns("card_data_select")),
       title = "Data Selection",
-      text = "This is the Data Selection tab. Here, you can select the data you want to analyze.",
+      text = "This is the Data Selection tab. Here, you can select the data you want to analyze.<br><small style='color: #999; margin-top: 10px;'>Tip: Press Esc to exit the tour</small>",
       position = "left",
       tabId = "main-nav",
       tab = "nav-data-select"
     )$step(
       el = paste0("#", data_tab_ns("go_analysis")),
       title = "Go to Analysis",
-      text = "Once you have selected your data, click this button to go to the Data Analysis tab, where you can visualize and analyze the selected data.",
+      text = "Once you have selected your data, click this button to go to the Data Analysis tab, where you can visualize and analyze the selected data.<br><small style='color: #999; margin-top: 10px;'>Tip: Press Esc to exit the tour</small>",
       position = "left-start",
       tabId = "main-nav",
       tab = "nav-data-select"
     )$step(
       el = paste0("#", analysis_tab_ns("card_fhdplot")),
       title = "Selected FHDs",
-      text = "Here you can vizualise the selected flight height distributions (FHDs) based on your data selection.",
+      text = "Here you can vizualise the selected flight height distributions (FHDs) based on your data selection.<br><small style='color: #999; margin-top: 10px;'>Tip: Press Esc to exit the tour</small>",
       position = "right-start",
       tabId = "main-nav",
       tab = "nav-analysis"

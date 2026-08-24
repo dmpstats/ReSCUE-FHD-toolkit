@@ -52,17 +52,22 @@ add_fhd <- function(
       ymax = ~uc,
       color = ~ as.factor(group_col),
       colors = "Set1",
+      # Share a legendgroup with the matching line trace (below) so that,
+      # combined with `legend$groupclick = "togglegroup"` in fhd_baseplot(),
+      # toggling the line's legend entry also hides/shows its ribbon —
+      # without adding a second legend entry for the ribbon itself.
+      legendgroup = ~group_col,
       opacity = 0.2,
       hoverinfo = "text",
       text = ~ paste(
         "fhd_id:",
         f_id,
-        "<br>Group:",
-        group_col,
+        # "<br>Group:",
+        # group_col,
         "<br>Height:",
         height,
         "<br>Probability:",
-        prob
+        round(prob, 4)
       ),
       showlegend = FALSE
     ) |>
@@ -72,17 +77,18 @@ add_fhd <- function(
       y = ~prob,
       color = ~ as.factor(group_col),
       colors = "Set1",
+      legendgroup = ~group_col,
       line = list(width = 2),
       hoverinfo = "text",
       text = ~ paste(
         "fhd_id:",
         f_id,
-        "<br>Group:",
-        group_col,
+        # "<br>Group:",
+        # group_col,
         "<br>Height:",
         height,
         "<br>Probability:",
-        prob
+        round(prob, 4)
       )
     )
 
@@ -162,7 +168,22 @@ fhd_baseplot <- function(
       title = "Flight Height Distributions",
       xaxis = list(title = "Height"),
       yaxis = list(title = "Probability"),
-      legend = list(title = list(text = "fhd_id"))
+      legend = list(
+        title = list(text = "FHD"),
+        # Draw the legend inside the top-right of the plotting area, rather
+        # than in the (wide) margin to the right of the plot.
+        x = 0.99,
+        y = 0.99,
+        xanchor = "right",
+        yanchor = "top",
+        bgcolor = "rgba(255, 255, 255, 0.7)",
+        bordercolor = "rgba(0, 0, 0, 0.2)",
+        borderwidth = 1,
+        # Clicking a legend entry toggles every trace sharing its
+        # legendgroup, so a line's ribbon (same group, showlegend = FALSE)
+        # hides/shows together with the line — without a duplicate entry.
+        groupclick = "togglegroup"
+      )
     )
 
   if (
