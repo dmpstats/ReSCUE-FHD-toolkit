@@ -28,9 +28,13 @@ mod_data_select_ui <- function(id) {
 				bottom: auto !important;
 				top: 100% !important;
 			}
-			.bslib-card, .tab-content, .tab-pane, .card-body {
-      overflow: visible !important;
-    }
+			/* Scoped to the map card only, so its footer selectize dropdowns can
+			 * escape the card/tab boundaries without disabling overflow
+			 * clipping/scrolling on other cards (e.g. the help text card). */
+			.map-card, .map-card .card-body,
+			.tab-content:has(.map-card), .tab-pane:has(.map-card) {
+				overflow: visible !important;
+			}
 			/*
 			 * When a selectize is open, elevate its entire control as a stacking context
 			 * so the dropdown paints above sibling selectize inputs (z-index: 1) in the
@@ -54,7 +58,7 @@ mod_data_select_ui <- function(id) {
 				col_widths = c(6, 6),
 				class = "h-100",
 				bslib::card(
-					class = "card border-primary mb-3 bg-light",
+					class = "card map-card border-primary mb-3 bg-light",
 					bslib::card_header(
 						"Flight-Height Distributions",
 						class = "text-bg-primary",
@@ -160,12 +164,15 @@ mod_data_select_ui <- function(id) {
 							)
 						),
 						bslib::card_body(
-							# Some information on this page
-							tags$p(
-								"Select flight-height distributions from the map You can filter the FHDs by species, method, season, and other criteria. Once you have selected the datasets you want to analyze, click 'Start Analysis' to proceed."
-							),
-							tags$p(
-								"Note: You can select up to 10 FHDs for analysis. If you select more than 10, only the first 10 will be analyzed."
+							div(
+								style = "font-size: 14px;",
+								# Some information on this page
+								tags$p(
+									"Select flight-height distributions from the map You can filter the FHDs by species, method, season, and other criteria. Once you have selected the datasets you want to analyze, click 'Start Analysis' to proceed.",
+								),
+								tags$p(
+									"Note: You can select up to 10 FHDs for analysis. If you select more than 10, only the first 10 will be analyzed."
+								)
 							)
 
 							# Left-side: some text
@@ -227,7 +234,8 @@ mod_data_select_ui <- function(id) {
 						),
 						tags$strong(
 							"
-							This is a beta-testing version of the ReSCUEApp. The flight-height distributions shown here are not real data, and are only for demonstration purposes. Please do not use these data for any real analysis."
+							This is a beta-testing version of the ReSCUEApp. The flight-height distributions shown here are not real data, and are only for demonstration purposes. Please do not use these data for any real analysis.",
+							style = "font-size: 14px;"
 						),
 						class = "card bg-warning"
 						# max_height = "10vh"
