@@ -164,19 +164,19 @@ mod_app_tour_server <- function(id) {
     )$step(
       el = "[data-value='nav-home']",
       #title = "Home",
-      text = "The <strong>Home</strong> button gets you back to the starting point.",
+      text = "This button gets you back to the starting point.",
       position = "bottom",
       canClickTarget = FALSE
     )$step(
       el = "[data-value='nav-data-select']",
       #title = "FHD Selection",
-      text = "The <strong>Visualisation & Download</strong> button takes you to the section where you can explore and download your selected FHDs.",
+      text = "This one takes you back to the FHD selection section.",
       position = "bottom",
       canClickTarget = FALSE
     )$step(
       el = "[data-value='nav-analysis']",
       #title = "Visualisation & Export",
-      text = "The <strong>Visualisation & Export</strong> button jumps to the FHD visualisation and download section.",
+      text = "While clicking here sends you to the FHD visualisation and download section.",
       position = "bottom",
       canClickTarget = FALSE
     )$step(
