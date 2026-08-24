@@ -162,10 +162,10 @@ mod_data_select_ui <- function(id) {
 						bslib::card_body(
 							# Some information on this page
 							tags$p(
-								"Select flight-height datasets from the map You can filter the datasets by species, method, season, and other criteria. Once you have selected the datasets you want to analyze, click 'Start Analysis' to proceed."
+								"Select flight-height distributions from the map You can filter the FHDs by species, method, season, and other criteria. Once you have selected the datasets you want to analyze, click 'Start Analysis' to proceed."
 							),
 							tags$p(
-								"Note: You can select up to 10 datasets for analysis. If you select more than 10, only the first 10 will be analyzed."
+								"Note: You can select up to 10 FHDs for analysis. If you select more than 10, only the first 10 will be analyzed."
 							)
 
 							# Left-side: some text
