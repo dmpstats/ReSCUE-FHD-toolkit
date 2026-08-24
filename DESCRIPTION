@@ -1,6 +1,6 @@
 Package: ReSCUEApp
 Title: ReSCUE Flight Height Distribution Toolkit App
-Version: 0.0.0.9000
+Version: 0.9.1
 Authors@R: c(
     person("Bruno", "Caneco", , "bruno@dmpstats.co.uk", role = c("aut", "cre")),
     person("Callum", "Clarke", , "callum@dmpstats.co.uk", role = "aut"),
@@ -47,7 +47,8 @@ Imports:
     readr,
     sf,
     tidyr,
-    abind
+    abind,
+    RColorBrewer
 Suggests:
     spelling,
     testthat (>= 3.0.0)

@@ -161,7 +161,7 @@ add_fhd_polygons <- function(map, data, selected_ids, ns) {
           "class='btn btn-sm btn-primary' "
         ),
         "style='margin-top:8px;width:100%;'>",
-        ifelse(fhd_id %in% selected_ids, "Deselect Dataset", "Select Dataset"),
+        ifelse(fhd_id %in% selected_ids, "Deselect FHD", "Select FHD"),
         "</button>",
         # Add a button for 'More Details'
         "<button ",

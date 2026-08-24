@@ -9,9 +9,22 @@
 app_ui <- function(request) {
 	tagList(
 		golem_add_external_resources(),
-		shinybusy::use_busy_spinner(
-			position = "bottom-right"
+		shinybusy::add_busy_spinner(
+			spin = "spring",
+			position = "bottom-right",
+			height = "150px",
+			width = "150px",
+			timeout = 200,
+			onstart = TRUE,
+			color = "#ffa134"
 		),
+		# shinybusy::use_busy_gif(
+		# 	# use 'birdflap.gif' in the www folder
+		# 	src = "www/birdflap.gif",
+		# 	position = "bottom-right",
+		# 	height = "150px",
+		# 	width = "150px"
+		# ),
 		bslib::page_navbar(
 			title = span("ReSCUEApp", style = "color: #ffffff;"),
 			id = "main-nav",
@@ -208,24 +221,24 @@ app_ui <- function(request) {
 						"Settings"
 					),
 				align = "right",
-				bslib::nav_item(
-					shiny::actionLink(
-						"save_session",
-						label = tagList(
-							bsicons::bs_icon("download"),
-							"Save Session"
-						)
-					)
-				),
-				bslib::nav_item(
-					shiny::actionLink(
-						"restore_session",
-						label = tagList(
-							bsicons::bs_icon("upload"),
-							"Restore Session"
-						)
-					)
-				),
+				# bslib::nav_item(
+				# 	shiny::actionLink(
+				# 		"save_session",
+				# 		label = tagList(
+				# 			bsicons::bs_icon("download"),
+				# 			"Save Session"
+				# 		)
+				# 	)
+				# ),
+				# bslib::nav_item(
+				# 	shiny::actionLink(
+				# 		"restore_session",
+				# 		label = tagList(
+				# 			bsicons::bs_icon("upload"),
+				# 			"Restore Session"
+				# 		)
+				# 	)
+				# ),
 				# bslib::nav_item(
 				# 	shiny::actionLink(
 				# 		"switch_mode",
@@ -338,18 +351,18 @@ golem_add_external_resources <- function() {
         border: none !important;
         box-shadow: none !important;
         padding: 0 0 0 4px;
-        color: var(--bs-success);
+        color: white;
         font-size: 0.9em;
         line-height: 1;
         vertical-align: middle;
-        opacity: 0.6;
+        opacity: 0.7;
         transition: opacity 0.2s, color 0.2s;#
       }
       .btn.btn-help:hover,
       .btn.btn-help:focus {
         background: none !important;
         box-shadow: none !important;
-        color: var(--bs-primary) !important;
+        color: var(--bs-success) !important;
         opacity: 1;
       }
 

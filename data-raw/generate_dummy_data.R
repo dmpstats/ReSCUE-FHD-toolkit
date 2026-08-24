@@ -103,7 +103,7 @@ generate_dummy_data <- function(
     # ------------------------------------------------------------------
     # Sample data-source descriptors (plaintext, doesn't matter later)
     # ------------------------------------------------------------------
-    method <- sample(c("LiDAR-DAS", "GPS", "Altimeter"), 1)
+    method <- sample(c("LiDAR-DAS", "GPS", "Altimeter", "LRF", "Visual"), 1)
     spatial_scale <- sample(c("site-specific", "regional", "national"), 1)
     temporal_scale <- sample(c("monthly", "seasonal", "annual"), 1)
     month <- sample(1:12, 1)
@@ -157,7 +157,7 @@ generate_dummy_data <- function(
 
     grid_list <- list(
       draw_id = 1:n_iter,
-      height = seq(0, max_height, length.out = 100) + 0.5
+      height = seq(0, max_height) + 0.5
     )
 
     # for (cov in cov_names) {

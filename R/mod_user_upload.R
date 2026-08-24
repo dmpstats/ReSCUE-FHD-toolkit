@@ -12,8 +12,36 @@ mod_user_upload_ui <- function(id) {
   tagList(
     # Dataset Information Section
     bslib::card(
-      "Use this popup to upload a flight-height distribution dataset. All fields marked with an asterisk (*) are required. Please note that all user-uploaded data must have been pre-prepared using the ReSCUETools R package. For more information, please refer to the ReSCUETools documentation.",
-      class = "card border-warning"
+      bslib::card_body(
+        bslib::layout_columns(
+          col_widths = c(9, 3),
+          tagList(
+            tags$h6(tags$b("Upload Instructions")),
+            p(
+              "Upload your flight-height distribution datasets by completing the required fields below."
+            ),
+            tags$hr(),
+            tags$small(
+              tags$i(
+                "Note: All uploaded data must be pre-prepared using the ReSCUETools R package, which is not yet publicly availab. Alternatively, you can populate the CSV schema provided on the right-hand side."
+              )
+            )
+          ),
+          # Right side: Square button, centered
+          div(
+            class = "d-flex align-items-center justify-content-center",
+            style = "height: 100%; min-height: 150px;",
+            actionButton(
+              ns("download_schema"),
+              "Download CSV Schema",
+              class = "btn-success",
+              icon = bsicons::bs_icon("download"),
+              style = "width: 140px; height: 140px; border-radius: 8px; padding: 10px; line-height: 1.2;"
+            )
+          )
+        )
+      ),
+      class = "card border-warning mb-3"
     ),
     bslib::layout_column_wrap(
       widths = c(1, 1),
@@ -86,8 +114,10 @@ mod_user_upload_ui <- function(id) {
     br(),
 
     # Action Buttons
-    bslib::layout_column_wrap(
+    bslib::layout_columns(
       widths = c(1, 1, 1),
+      min_height = "75px",
+
       actionButton(
         ns("clear_all_uploads"),
         "Clear All Uploads",
@@ -118,7 +148,11 @@ mod_user_upload_ui <- function(id) {
 #' user_upload Server Functions
 #'
 #' @noRd
-mod_user_upload_server <- function(id, clear_trigger = reactive(NULL)) {
+mod_user_upload_server <- function(
+  id,
+  clear_trigger = reactive(NULL),
+  remove_ids = reactive(NULL)
+) {
   moduleServer(
     id,
     function(input, output, session) {
@@ -257,6 +291,25 @@ mod_user_upload_server <- function(id, clear_trigger = reactive(NULL)) {
           # Clear the reactive lists
           metadata(list())
           draws(list())
+        }
+      )
+
+      # Remove specific uploaded datasets by fhd_id, e.g. when a user selects
+      # specific rows in the parent module's "show_selected" table and clears
+      # just those.
+      observeEvent(
+        remove_ids(),
+        {
+          ids <- remove_ids()
+          req(length(ids) > 0)
+
+          current_metadata <- metadata()
+          current_metadata[ids] <- NULL
+          metadata(current_metadata)
+
+          current_draws <- draws()
+          current_draws[ids] <- NULL
+          draws(current_draws)
         }
       )
 
