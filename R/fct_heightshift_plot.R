@@ -1,21 +1,30 @@
 #' Plot heightshift results as an interactive line chart
 #'
 #' @description Renders a plotly line chart from the output of [heightshift()],
-#'   with one line per FHD. When `show_as_percentages = TRUE`, markers are
-#'   coloured green (risk decrease) or red (risk increase) to mirror the table
-#'   colour-coding. A dotted reference line and annotation mark the current
-#'   turbine position (shift = 0).
+#'   with one line per FHD. A dotted reference line and annotation mark the
+#'   current turbine position (shift = 0).
 #'
 #' @param heightshift_data Named list with elements `prob` and `perc`, as
 #'   returned by [heightshift()]. Each element is a character matrix with an
 #'   `fhd_id` column and one column per height shift (e.g. `"-40m"`, `"+5m"`).
-#' @param show_as_percentages Logical. If `TRUE`, uses the `perc` matrix and
-#'   labels the y-axis as percentage change; if `FALSE`, uses `prob`.
+#' @param metric Character. Controls which matrix is plotted and how the y-axis
+#'   is labelled. One of:
+#'   \describe{
+#'     \item{`"prob"`}{Raw proportion of birds at collision-risk height (CRH).}
+#'     \item{`"perc_change"`}{Percentage change in CRH proportion relative to
+#'       the current turbine position (shift = 0).}
+#'   }
 #'
 #' @return A plotly figure object.
 #' @noRd
-heightshift_plot <- function(heightshift_data, show_as_percentages = TRUE) {
-  type <- if (show_as_percentages) "perc" else "prob"
+plot_heightshift <- function(
+  heightshift_data,
+  metric = c("prop", "perc_change"),
+  airgap,
+  rotor_radius
+) {
+  metric <- match.arg(metric)
+  type <- if (metric == "perc_change") "perc" else "prob"
   mat <- heightshift_data[[type]]
 
   df <- as.data.frame(mat, stringsAsFactors = FALSE)
@@ -29,10 +38,10 @@ heightshift_plot <- function(heightshift_data, show_as_percentages = TRUE) {
   # parse "+40m" / "-40m" -> numeric
   df_long$shift_m <- as.numeric(gsub("m", "", df_long$shift))
 
-  ylab <- if (show_as_percentages) {
-    "Change in proportion at CRH (%)"
+  ylab <- if (metric == "perc_change") {
+    "Change in average<br>proportion at CRH (%)"
   } else {
-    "Proportion at CRH"
+    "Average proportion at CRH"
   }
 
   fhd_ids <- unique(df_long$fhd_id)
@@ -45,16 +54,6 @@ heightshift_plot <- function(heightshift_data, show_as_percentages = TRUE) {
     fid <- fhd_ids[i]
     sub <- df_long[df_long$fhd_id == fid, ]
     line_col <- palette[i]
-
-    # Mirror table colour-coding: green = risk down, red = risk up (% mode only)
-    marker_cols <- if (show_as_percentages) {
-      ifelse(
-        sub$value < 0, "#2ca02c",
-        ifelse(sub$value > 0, "#d62728", "#888888")
-      )
-    } else {
-      line_col
-    }
 
     plt <- plt |>
       plotly::add_lines(
@@ -70,46 +69,70 @@ heightshift_plot <- function(heightshift_data, show_as_percentages = TRUE) {
         x = ~shift_m,
         y = ~value,
         marker = list(
-          color = marker_cols,
+          color = paste0(line_col, "80"),
           size = 6,
           line = list(color = line_col, width = 1)
         ),
         showlegend = FALSE,
         hoverinfo = "text",
-        text = ~paste0(
-          "<b>", fhd_id, "</b><br>",
-          "Shift: ", shift_m, " m<br>",
-          "Value: ", value
+        text = ~ paste0(
+          "<b>",
+          fhd_id,
+          "</b><br>",
+          "Shift: ",
+          shift_m,
+          " m<br>",
+          "Value: ",
+          value
         )
       )
   }
 
   plt |>
     plotly::layout(
-      xaxis = list(title = "Height shift (m)"),
+      xaxis = list(title = "Air Gap Shift (m)"),
       yaxis = list(title = ylab),
-      legend = list(title = list(text = "FHD")),
-      shapes = list(
-        list(
-          type = "line",
-          x0 = 0, x1 = 0,
-          y0 = 0, y1 = 1,
-          yref = "paper",
-          line = list(color = "grey", dash = "dot", width = 1)
-        )
-      ),
+      legend = list(title = list(text = "FHD ID")),
+      # shapes = list(
+      #   list(
+      #     type = "line",
+      #     x0 = 0,
+      #     x1 = 0,
+      #     y0 = 0,
+      #     y1 = 1,
+      #     yref = "paper",
+      #     line = list(color = "grey", dash = "dot", width = 1)
+      #   )
+      # ),
       annotations = list(
+        # list(
+        #   x = 0,
+        #   y = 1,
+        #   xref = "x",
+        #   yref = "paper",
+        #   text = paste0("current specification"),
+        #   showarrow = FALSE,
+        #   textangle = -90,
+        #   xanchor = "left",
+        #   yanchor = "top",
+        #   font = list(color = "grey", size = 10)
+        # ),
         list(
-          x = 0,
+          x = 0.95,
           y = 1,
-          xref = "x",
+          xref = "paper",
           yref = "paper",
-          text = "current position",
+          xanchor = "right",
+          yanchor = "bottom",
+          text = paste0(
+            "<b>Air gap</b>: ",
+            airgap,
+            " m | <b>Rotor radius</b>: ",
+            rotor_radius,
+            " m"
+          ),
           showarrow = FALSE,
-          textangle = -90,
-          xanchor = "left",
-          yanchor = "top",
-          font = list(color = "grey", size = 10)
+          font = list(color = "grey", size = 11)
         )
       )
     )

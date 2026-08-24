@@ -31,30 +31,51 @@ mod_data_analysis_ui <- function(id) {
 					),
 					# Second card: analysis results
 					bslib::navset_card_underline(
-						title = "Proportion at CRH",
+						title = tags$div(
+							class = "d-flex align-items-center gap-2",
+							"Proportion at Collision Risk Height",
+							mod_help_button_ui(
+								ns("help_prop_crh"),
+								type = "button-only"
+							)
+						),
 						bslib::nav_spacer(),
 						bslib::nav_panel(
-							title = "Summary",
+							title = "Summaries",
 							DT::DTOutput(ns("fhd_summaries"))
 						),
 						bslib::nav_panel(
-							title = "Risk Height",
+							title = "Air Gap Sensitivity",
 							fluidRow(
-								bslib::input_switch(
-									id = ns("show_as_percentages"),
-									value = TRUE,
-									label = "Percentage change",
-									width = "40%"
+								shinyWidgets::radioGroupButtons(
+									inputId = ns("airgap_shift_metric"),
+									label = "Metric",
+									choices = c(
+										"% Change" = "perc_change",
+										"Proportion" = "prop"
+									),
+									width = "30%",
+									selected = "perc_change",
+									justified = FALSE,
+									size = "sm",
+									status = "default"
 								),
-								bslib::input_switch(
-									id = ns("condensed_table"),
-									value = TRUE,
-									label = "5m increments",
-									width = "40%"
+								shinyWidgets::radioGroupButtons(
+									inputId = ns("airgap_shift_incr"),
+									label = "Increments",
+									choices = c(
+										"1m" = "1m",
+										"5m" = "5m"
+									),
+									width = "30%",
+									selected = "5m",
+									justified = FALSE,
+									size = "sm",
+									status = "default"
 								),
 								shinyWidgets::radioGroupButtons(
 									ns("heightshift_output_type"),
-									label = NULL,
+									label = "View Mode",
 									choiceNames = list(
 										bsicons::bs_icon("table"),
 										bsicons::bs_icon("graph-up")
@@ -63,34 +84,8 @@ mod_data_analysis_ui <- function(id) {
 									selected = "table",
 									direction = "horizontal",
 									size = "sm",
-									justified = TRUE,
+									justified = FALSE,
 									width = "20%"
-								)
-							),
-							# p(
-							# 	"This table shows changes to the proportion of birds at collision-height
-							# 	if the turbine height is increased or decreased. The first column shows the unique FHD identifiers, and the remaining columns show the probabilities of FHD risk for each height shift."
-							# ),
-							# Add a conditionalPanel that changes description based on input$show_as_percentages
-							conditionalPanel(
-								condition = paste0(
-									"input['",
-									ns("show_as_percentages"),
-									"'] === true"
-								),
-								p(
-									"This table shows changes to the percentage of birds at collision-height
-									compared to the rotor sweapt area of your turbine for increases/decreases to the risk-height window. The first column shows the unique FHD identifiers, and the remaining columns show the percentage change in FHD risk for each height shift."
-								)
-							),
-							conditionalPanel(
-								condition = paste0(
-									"input['",
-									ns("show_as_percentages"),
-									"'] === false"
-								),
-								p(
-									"This table shows the raw proportion of birds at collision-height if the turbine height is increased or decreased. The first column shows the unique FHD identifiers, and the remaining columns show the change in FHD risk for each height shift."
 								)
 							),
 							conditionalPanel(
@@ -110,7 +105,12 @@ mod_data_analysis_ui <- function(id) {
 									ns("heightshift_output_type"),
 									"'] === 'plot'"
 								),
-								plotly::plotlyOutput(ns("heightshift_plot"), height = "25vh")
+								style = "height: 100%; min-height: 25vh;",
+								plotly::plotlyOutput(
+									ns("heightshift_plot"),
+									height = "100%",
+									fill = TRUE
+								)
 							)
 						),
 						bslib::nav_item(
@@ -151,7 +151,10 @@ mod_data_analysis_ui <- function(id) {
 							"Flight Height Distribution",
 							class = "text-bg-primary",
 							bslib::toolbar(
-								mod_help_button_ui(ns("help_fhd"), type = "toolbar")
+								mod_help_button_ui(
+									ns("help_fhd"),
+									type = "button-only"
+								)
 							),
 							bslib::toolbar_spacer(),
 							bslib::input_switch(
@@ -173,13 +176,16 @@ mod_data_analysis_ui <- function(id) {
 						class = "card border-primary mb-3 card-body-white"
 					),
 
-					# Second card will contain download options
+					# Forth card will contain download options
 					bslib::card(
 						bslib::card_header(
 							"Download Options",
 							class = "text-bg-primary",
 							bslib::toolbar(
-								mod_help_button_ui(ns("help_download"), type = "toolbar")
+								mod_help_button_ui(
+									ns("help_download"),
+									type = "button-only"
+								)
 							)
 						),
 						bslib::card_body(
@@ -315,7 +321,9 @@ mod_data_analysis_server <- function(
 						bslib::toast(
 							header = "Warning",
 							error_state(),
-							icon = bsicons::bs_icon("exclamation-triangle-fill"),
+							icon = bsicons::bs_icon(
+								"exclamation-triangle-fill"
+							),
 							type = "warning",
 							duration_s = 0,
 							id = "fhd_processing_warning",
@@ -384,7 +392,10 @@ mod_data_analysis_server <- function(
 							tags$div(
 								# Row: covariate name on left, "Use" label + switch on right
 								class = "d-flex align-items-center justify-content-between gap-2",
-								tags$span(class = "small fw-semibold", cov_label),
+								tags$span(
+									class = "small fw-semibold",
+									cov_label
+								),
 								tags$div(
 									class = "d-flex align-items-center gap-1",
 									# tags$span(class = "small text-muted", "Use"),
@@ -637,7 +648,9 @@ mod_data_analysis_server <- function(
 							apply(
 								dplyr::pick(dplyr::all_of(unexpected_cols)),
 								1,
-								function(x) paste(na.omit(x), collapse = " \u00b7 ")
+								function(x) {
+									paste(na.omit(x), collapse = " \u00b7 ")
+								}
 							),
 							"]"
 						)
@@ -713,18 +726,22 @@ mod_data_analysis_server <- function(
 				risk_min = input$airgap,
 				risk_max = input$airgap + 2 * input$rotor_radius,
 				round = c(4, 2),
-				condensed_table = input$condensed_table
+				condensed_table = input$airgap_shift_incr == "5m"
 			)
 		})
 
 		# Make the table
 		output$heightshift_table <- DT::renderDataTable(
 			{
-				type <- ifelse(input$show_as_percentages, "perc", "prob")
+				type <- if (input$airgap_shift_metric == "perc_change") {
+					"perc"
+				} else {
+					"prob"
+				}
 				req(heightshift_data())
 				req(nrow(heightshift_data()[[type]]) > 0)
 
-				percjs <- if (input$show_as_percentages) {
+				percjs <- if (input$airgap_shift_metric == "perc_change") {
 					"function(data, type, row) {
 						if(type === 'display' && data !== null) {
 							var num = parseFloat(data);
@@ -740,9 +757,33 @@ mod_data_analysis_server <- function(
 				}
 
 				num_cols <- ncol(heightshift_data()[[type]])
+
+				caption_text <- if (input$airgap_shift_metric == "perc_change") {
+					paste0(
+						"Percentage change in average proportion of birds at CRH for ± incremental shifts in specified air gap (",
+						input$airgap,
+						"m), given rotor radius (",
+						input$rotor_radius,
+						" m)"
+					)
+				} else {
+					paste0(
+						"Average proportion of birds at CRH for ± incremental shifts in specified air gap (",
+						input$airgap,
+						" m), given rotor radius (",
+						input$rotor_radius,
+						" m)"
+					)
+				}
+
 				out <- DT::datatable(
 					heightshift_data()[[type]],
+					caption = htmltools::tags$caption(
+						style = "caption-side: top; text-align: left; font-size: 0.9rem;",
+						caption_text
+					),
 					rownames = FALSE,
+					colnames = c("FHD ID" = "fhd_id"),
 					extensions = c("FixedHeader"),
 					options = list(
 						dom = "Bfrt",
@@ -761,7 +802,7 @@ mod_data_analysis_server <- function(
 					)
 				)
 
-				if (input$show_as_percentages) {
+				if (input$airgap_shift_metric == "perc_change") {
 					out <- out |>
 						DT::formatStyle(
 							columns = 2:ncol(heightshift_data()[[type]]),
@@ -788,9 +829,11 @@ mod_data_analysis_server <- function(
 		output$heightshift_plot <- plotly::renderPlotly({
 			req(heightshift_data())
 			req(nrow(heightshift_data()[["perc"]]) > 0)
-			heightshift_plot(
+			plot_heightshift(
 				heightshift_data = heightshift_data(),
-				show_as_percentages = input$show_as_percentages
+				metric = input$airgap_shift_metric,
+				airgap = input$airgap,
+				rotor_radius = input$rotor_radius
 			)
 		})
 
@@ -840,8 +883,24 @@ mod_data_analysis_server <- function(
 			DT::datatable(
 				sumdat,
 				caption = htmltools::tags$caption(
-					style = "caption-side: top; text-align: left;",
-					"Proportion of birds at collision height (CRH) for each unique FHD, with 50% confidence intervals."
+					style = "caption-side: top; width: 100%;",
+					htmltools::tags$div(
+						style = "display: flex; justify-content: space-between; align-items: baseline;",
+						htmltools::tags$span(
+							style = "font-size: 0.9rem;",
+							"Percentiles of the proportion of birds at CRH"
+						),
+						htmltools::tags$span(
+							style = "font-size: 0.85rem;",
+							paste0(
+								"Risk Height Envelope: ",
+								input$airgap,
+								" - ",
+								input$airgap + (2 * input$rotor_radius),
+								" m"
+							)
+						)
+					)
 				),
 				rownames = FALSE,
 				extensions = c("FixedHeader"),
@@ -913,7 +972,10 @@ mod_data_analysis_server <- function(
 				# are active so entries from different FHDs never collide (e.g. "1.cold.low")
 				fhd_index <- match(id, meta$fhd_id)
 
-				max_prob <- max(max_prob, max(fhd_subset$probability, na.rm = TRUE))
+				max_prob <- max(
+					max_prob,
+					max(fhd_subset$probability, na.rm = TRUE)
+				)
 
 				plt <- add_fhd(
 					plot = plt,
@@ -922,7 +984,11 @@ mod_data_analysis_server <- function(
 					height_col = "height",
 					draw_col = "draw_id",
 					prob_col = "probability",
-					plot_by_cov = if (length(plot_by_cov) > 0) plot_by_cov else NULL,
+					plot_by_cov = if (length(plot_by_cov) > 0) {
+						plot_by_cov
+					} else {
+						NULL
+					},
 					index = if (length(plot_by_cov) > 0) fhd_index else NULL
 				)
 
@@ -1089,7 +1155,10 @@ mod_data_analysis_server <- function(
 					) |>
 					dplyr::left_join(
 						plot_ready_data() |>
-							dplyr::select(dplyr::all_of(c("fhd_id", "unique_fhd"))) |>
+							dplyr::select(dplyr::all_of(c(
+								"fhd_id",
+								"unique_fhd"
+							))) |>
 							dplyr::distinct(),
 						by = "fhd_id"
 					) |>
@@ -1102,7 +1171,11 @@ mod_data_analysis_server <- function(
 					tempdir(),
 					paste0("fhd_export_", Sys.time() |> format("%s"))
 				)
-				dir.create(temp_export_dir, showWarnings = FALSE, recursive = TRUE)
+				dir.create(
+					temp_export_dir,
+					showWarnings = FALSE,
+					recursive = TRUE
+				)
 				on.exit(unlink(temp_export_dir, recursive = TRUE), add = TRUE)
 
 				# Save metadata to tempdir
@@ -1125,7 +1198,10 @@ mod_data_analysis_server <- function(
 						"still be exported, but the PNG plot will be omitted."
 					))
 				} else {
-					plot_html_path <- file.path(temp_export_dir, "fhd_plot.html")
+					plot_html_path <- file.path(
+						temp_export_dir,
+						"fhd_plot.html"
+					)
 					htmlwidgets::saveWidget(
 						fhd_plot_object(),
 						file = plot_html_path,
@@ -1177,6 +1253,11 @@ mod_data_analysis_server <- function(
 		)
 
 		# Help button servers -----
+		mod_help_button_server(
+			"help_prop_crh",
+			help_file = "prop_crh",
+			size = "xl"
+		)
 		mod_help_button_server("help_fhd", help_file = "fhd_plot", size = "xl")
 		mod_help_button_server(
 			"help_download",
