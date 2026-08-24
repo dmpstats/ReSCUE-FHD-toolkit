@@ -54,6 +54,8 @@ mod_app_tour_server <- function(id) {
 
     # construt guide
     guide <- Conductor$new(
+      exitOnEsc = TRUE,
+      keyboardNavigation = TRUE,
       defaultStepOptions = list(
         floatingUIOptions = list()
       ) #,
@@ -62,6 +64,19 @@ mod_app_tour_server <- function(id) {
 
     # Add guide steps
     guide <- guide$step(
+      title = "Welcome to ReSCUEApp!",
+      text = "This short guided tour will walk you through the main steps of the app, from selecting your flight-height distributions to visualise, compare and download your results ans session details.
+        <br><br>
+        Press <strong>Esc</strong> at any time to close the tour. You can also use your <strong>arrow keys</strong> to to move backward and forward through the steps.",
+      buttons = list(
+        list(text = "Next", action = "next")
+      )
+    )$step(
+      el = paste0("#", land_tab_ns("proj_overview_panel")),
+      title = "The ReSCUE Toolkit",
+      text = "Start here for an overview of the ReSCUE Project and this toolkit app. Click any section heading to expand it and learn more about the app, its objectives, and the team behind it.",
+      arrow = FALSE
+    )$step(
       el = "#app-version-container",
       title = "App Version",
       text = "The app version is displayed here.",

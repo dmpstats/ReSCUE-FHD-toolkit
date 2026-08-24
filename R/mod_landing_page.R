@@ -40,6 +40,7 @@ mod_landing_page_ui <- function(id) {
 				# ),
 				# bslib::card_body(
 				bslib::accordion(
+					id = ns("proj_overview_panel"),
 					multiple = FALSE,
 					class = "card border-primary mb-3 bg-light",
 					height = "95%",
