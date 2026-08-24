@@ -153,13 +153,16 @@ mod_data_analysis_ui <- function(id) {
 					bslib::card(
 						id = ns("card_fhdplot"),
 						bslib::card_header(
-							"Flight Height Distribution",
-							class = "text-bg-primary",
-							bslib::toolbar(
+							tags$div(
+								class = "d-flex align-items-center gap-2",
+								"Flight Height Distribution",
 								mod_help_button_ui(
 									ns("help_fhd"),
 									type = "button-only"
-								),
+								)
+							),
+							class = "text-bg-primary",
+							bslib::toolbar(
 								bslib::toolbar_spacer(),
 								bslib::input_switch(
 									id = ns("hide_legend"),
