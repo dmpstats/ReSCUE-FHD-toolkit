@@ -110,9 +110,12 @@ app_ui <- function(request) {
 				align = "right",
 				icon = bsicons::bs_icon(
 					"book-fill",
-					size = "1.5em",
-					title = "Documents"
-				),
+					size = "1.5em"
+				) |>
+					bslib::tooltip(
+						placement = "bottom",
+						"Documentation"
+					),
 
 				# Tab 4: Data Sources ============================
 
@@ -152,27 +155,27 @@ app_ui <- function(request) {
 						),
 					bslib::page_fixed(
 						# bslib::layout_columns(
-							# col_widths = c(10, 2),
-							bslib::card(
-								bslib::card_body(
-									shiny::includeMarkdown(app_sys(
-										"app",
-										"md",
-										"userguide.md"
-									))
-								),
-								class = "card border-primary bg-light",
+						# col_widths = c(10, 2),
+						bslib::card(
+							bslib::card_body(
+								shiny::includeMarkdown(app_sys(
+									"app",
+									"md",
+									"userguide.md"
+								))
 							),
-							# Sidebar with logos
-							# bslib::card(
-							# 	class = "d-flex flex-column align-items-center gap-3 h-100",
-							# 	logolink("dmp", height = 9),
-							# 	logolink("ne", height = 9),
-							# 	logolink("bto", height = 9),
-							# 	logolink("blackbawks", height = 9),
-							# 	logolink("niras", height = 9)
-							# )
-						)
+							class = "card border-primary bg-light",
+						),
+						# Sidebar with logos
+						# bslib::card(
+						# 	class = "d-flex flex-column align-items-center gap-3 h-100",
+						# 	logolink("dmp", height = 9),
+						# 	logolink("ne", height = 9),
+						# 	logolink("bto", height = 9),
+						# 	logolink("blackbawks", height = 9),
+						# 	logolink("niras", height = 9)
+						# )
+					)
 					# )
 				),
 
@@ -271,7 +274,6 @@ golem_add_external_resources <- function() {
 
 	tags$head(
 		favicon(ext = "png"),
-		useConductor(),
 		useConductor(),
 		bundle_resources(
 			path = app_sys("app/www"),
