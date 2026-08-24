@@ -51,48 +51,101 @@ mod_data_analysis_ui <- function(id) {
 						),
 						bslib::nav_panel(
 							title = "Air Gap Sensitivity",
-							fluidRow(
-								shinyWidgets::radioGroupButtons(
-									inputId = ns("airgap_shift_metric"),
-									label = "Metric",
-									choices = c(
-										"% Change" = "perc_change",
-										"Proportion" = "prop"
-									),
-									width = "30%",
-									selected = "perc_change",
-									justified = FALSE,
-									size = "sm",
-									status = "default"
+							bslib::layout_columns(
+								max_height = "100px",
+								col_widths = c(6, 2, 2),
+								div(
+									class = "d-flex align-items-center h-100",
+									shinyWidgets::radioGroupButtons(
+										inputId = ns("airgap_shift_metric"),
+										label = "Metric",
+										choices = c(
+											"% Change" = "perc_change",
+											"Proportion" = "prop"
+										),
+										width = "100%",
+										selected = "perc_change",
+										justified = FALSE,
+										size = "sm",
+										status = "default"
+									)
 								),
-								shinyWidgets::radioGroupButtons(
-									inputId = ns("airgap_shift_incr"),
-									label = "Increments",
-									choices = c(
-										"1m" = "1m",
-										"5m" = "5m"
-									),
-									width = "30%",
-									selected = "5m",
-									justified = FALSE,
-									size = "sm",
-									status = "default"
+								div(
+									class = "d-flex align-items-center justify-content-center h-100",
+									shinyWidgets::radioGroupButtons(
+										inputId = ns("airgap_shift_incr"),
+										label = "Increments",
+										choices = c(
+											"1m" = "1m",
+											"5m" = "5m"
+										),
+										width = "100%",
+										selected = "5m",
+										justified = FALSE,
+										size = "sm",
+										status = "default"
+									)
 								),
-								shinyWidgets::radioGroupButtons(
-									ns("heightshift_output_type"),
-									label = "View Mode",
-									choiceNames = list(
-										bsicons::bs_icon("table"),
-										bsicons::bs_icon("graph-up")
-									),
-									choiceValues = list("table", "plot"),
-									selected = "table",
-									direction = "horizontal",
-									size = "sm",
-									justified = FALSE,
-									width = "20%"
+								div(
+									class = "d-flex align-items-center justify-content-center h-100",
+									shinyWidgets::radioGroupButtons(
+										ns("heightshift_output_type"),
+										label = "View Mode",
+										choiceNames = list(
+											bsicons::bs_icon("table"),
+											bsicons::bs_icon("graph-up")
+										),
+										choiceValues = list("table", "plot"),
+										selected = "table",
+										direction = "horizontal",
+										size = "sm",
+										justified = FALSE,
+										width = "100%"
+									)
 								)
 							),
+							# fluidRow(
+							# 	shinyWidgets::radioGroupButtons(
+							# 		inputId = ns("airgap_shift_metric"),
+							# 		label = "Metric",
+							# 		choices = c(
+							# 			"% Change" = "perc_change",
+							# 			"Proportion" = "prop"
+							# 		),
+							# 		width = "30%",
+							# 		selected = "perc_change",
+							# 		justified = FALSE,
+							# 		size = "sm",
+							# 		status = "default"
+							# 	),
+							# 	shinyWidgets::radioGroupButtons(
+							# 		inputId = ns("airgap_shift_incr"),
+							# 		label = "Increments",
+							# 		choices = c(
+							# 			"1m" = "1m",
+							# 			"5m" = "5m"
+							# 		),
+							# 		width = "30%",
+							# 		selected = "5m",
+							# 		justified = FALSE,
+							# 		size = "sm",
+							# 		status = "default"
+							# 	),
+							# 	shinyWidgets::radioGroupButtons(
+							# 		ns("heightshift_output_type"),
+							# 		label = "View Mode",
+							# 		choiceNames = list(
+							# 			bsicons::bs_icon("table"),
+							# 			bsicons::bs_icon("graph-up")
+							# 		),
+							# 		choiceValues = list("table", "plot"),
+							# 		selected = "table",
+							# 		direction = "horizontal",
+							# 		size = "sm",
+							# 		justified = FALSE,
+							# 		width = "20%"
+							# 	)
+							# ),
 							conditionalPanel(
 								condition = paste0(
 									"input['",

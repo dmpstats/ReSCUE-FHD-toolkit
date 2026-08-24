@@ -197,41 +197,43 @@ mod_landing_page_ui <- function(id) {
 					),
 					div(
 						class = "d-flex flex-column align-items-center justify-content-center gap-4 my-3",
-						# User Guide
+						# User Guide and Start Tutorial in a row
 						div(
-							class = "d-flex flex-column align-items-center gap-2",
-							actionButton(
-								ns("link_guide"),
-								label = tagList(
-									bsicons::bs_icon("info-circle"),
-									"User Guide"
-								),
-								class = "not-arrow-btn",
-								style = "width:18vw;"
-							)
-						),
-						# Start Tutorial
-						div(
-							class = "d-flex flex-column align-items-center gap-2",
-							mod_app_tour_ui(
-								ns("app_tour"),
-								style = "width:25vw;"
-							)
-						),
-						# Select Data
-						div(
-							class = "d-flex flex-column align-items-center gap-2",
+							class = "d-flex gap-3",
+							style = "width: 100%; max-width: 600px;",
+							# User Guide
 							div(
-								id = ns("tutorial_selectdata"),
+								class = "flex-grow-1",
 								actionButton(
-									ns("go_data"),
+									ns("link_guide"),
 									label = tagList(
-										bsicons::bs_icon("play-circle"),
-										"Select Flight-Height Distributions"
+										bsicons::bs_icon("info-circle"),
+										"User Guide"
 									),
-									class = "arrow-btn",
-									style = "width:30vw;"
+									class = "not-arrow-btn",
+									style = "width: 100%;"
 								)
+							),
+							# Start Tutorial
+							div(
+								class = "flex-grow-1",
+								mod_app_tour_ui(
+									ns("app_tour"),
+									style = "width: 100%;"
+								)
+							)
+						),
+						# Select Data - centered below
+						div(
+							id = ns("tutorial_selectdata"),
+							actionButton(
+								ns("go_data"),
+								label = tagList(
+									bsicons::bs_icon("play-circle"),
+									"Select Flight-Height Distributions"
+								),
+								class = "arrow-btn",
+								style = "width: 100%; max-width: 600px;"
 							)
 						)
 					)

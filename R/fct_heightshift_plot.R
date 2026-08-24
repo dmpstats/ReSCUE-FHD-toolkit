@@ -103,8 +103,22 @@ plot_heightshift <- function(
     plotly::layout(
       xaxis = list(title = "Air Gap Shift (m)"),
       yaxis = list(title = ylab),
-      legend = list(title = list(text = "FHD ID")),
-      # shapes = list(
+      legend = list(
+        title = list(text = "FHD"),
+        # Draw the legend inside the top-right of the plotting area, rather
+        # than in the (wide) margin to the right of the plot.
+        x = 0.99,
+        y = 0.99,
+        xanchor = "right",
+        yanchor = "top",
+        bgcolor = "rgba(255, 255, 255, 0.7)",
+        bordercolor = "rgba(0, 0, 0, 0.2)",
+        borderwidth = 1,
+        # Clicking a legend entry toggles every trace sharing its
+        # legendgroup, so a line's ribbon (same group, showlegend = FALSE)
+        # hides/shows together with the line — without a duplicate entry.
+        groupclick = "togglegroup"
+      ),
       #   list(
       #     type = "line",
       #     x0 = 0,
