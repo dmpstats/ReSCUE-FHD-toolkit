@@ -18,6 +18,7 @@ mod_data_analysis_ui <- function(id) {
 					# 12,
 					# First card: selected data
 					bslib::card(
+						id = ns("card_selected_fhds"),
 						# bslib::card_header(
 						# 	"Selected Data",
 						# 	class = "text-bg-primary"
@@ -35,116 +36,116 @@ mod_data_analysis_ui <- function(id) {
 						class = "card border-primary mb-3 bg-light"
 					),
 					# Second card: analysis results
-					bslib::navset_card_underline(
-						title = tags$div(
-							class = "d-flex align-items-center gap-2",
-							"Proportion at Collision Risk Height",
-							mod_help_button_ui(
-								ns("help_prop_crh"),
-								type = "button-only"
-							)
-						),
-						bslib::nav_spacer(),
-						bslib::nav_panel(
-							title = "Summaries",
-							DT::DTOutput(ns("fhd_summaries"))
-						),
-						bslib::nav_panel(
-							title = "Air Gap Sensitivity",
-							fluidRow(
-								shinyWidgets::radioGroupButtons(
-									inputId = ns("airgap_shift_metric"),
-									label = "Metric",
-									choices = c(
-										"% Change" = "perc_change",
-										"Proportion" = "prop"
-									),
-									width = "30%",
-									selected = "perc_change",
-									justified = FALSE,
-									size = "sm",
-									status = "default"
-								),
-								shinyWidgets::radioGroupButtons(
-									inputId = ns("airgap_shift_incr"),
-									label = "Increments",
-									choices = c(
-										"1m" = "1m",
-										"5m" = "5m"
-									),
-									width = "30%",
-									selected = "5m",
-									justified = FALSE,
-									size = "sm",
-									status = "default"
-								),
-								shinyWidgets::radioGroupButtons(
-									ns("heightshift_output_type"),
-									label = "View Mode",
-									choiceNames = list(
-										bsicons::bs_icon("table"),
-										bsicons::bs_icon("graph-up")
-									),
-									choiceValues = list("table", "plot"),
-									selected = "table",
-									direction = "horizontal",
-									size = "sm",
-									justified = FALSE,
-									width = "20%"
+					div(
+						id = ns("card_prop_crh"),
+						bslib::navset_card_underline(
+							title = tags$div(
+								class = "d-flex align-items-center gap-2",
+								"Proportion at Collision Risk Height",
+								mod_help_button_ui(
+									ns("help_prop_crh"),
+									type = "button-only"
 								)
 							),
-							conditionalPanel(
-								condition = paste0(
-									"input['",
-									ns("heightshift_output_type"),
-									"'] === 'table'"
-								),
-								div(
-									DT::DTOutput(ns("heightshift_table")),
-									style = "height: 25vh; overflow-y: auto; overflow-x: auto;"
-								)
+							bslib::nav_spacer(),
+							bslib::nav_panel(
+								title = "Summaries",
+								DT::DTOutput(ns("fhd_summaries"))
 							),
-							conditionalPanel(
-								condition = paste0(
-									"input['",
-									ns("heightshift_output_type"),
-									"'] === 'plot'"
-								),
-								style = "height: 100%; min-height: 25vh;",
-								plotly::plotlyOutput(
-									ns("heightshift_plot"),
-									height = "100%",
-									fill = TRUE
-								)
-							)
-						),
-						bslib::nav_item(
-							actionButton(
-								ns("test"),
-								icon = bsicons::bs_icon("gear"),
-								label = "Turbine Parameters",
-								class = "btn-success"
-							) |>
-								bslib::popover(
-									numericInput(
-										ns("airgap"),
-										strong("Air Gap (m)"),
-										value = 50,
-										min = 0
+							bslib::nav_panel(
+								title = "Air Gap Sensitivity",
+								fluidRow(
+									shinyWidgets::radioGroupButtons(
+										inputId = ns("airgap_shift_metric"),
+										label = "Metric",
+										choices = c(
+											"% Change" = "perc_change",
+											"Proportion" = "prop"
+										),
+										width = "30%",
+										selected = "perc_change",
+										justified = FALSE,
+										size = "sm",
+										status = "default"
 									),
-									numericInput(
-										ns("rotor_radius"),
-										strong("Rotor Radius (m)"),
-										value = 10,
-										min = 0
+									shinyWidgets::radioGroupButtons(
+										inputId = ns("airgap_shift_incr"),
+										label = "Increments",
+										choices = c(
+											"1m" = "1m",
+											"5m" = "5m"
+										),
+										width = "30%",
+										selected = "5m",
+										justified = FALSE,
+										size = "sm",
+										status = "default"
+									),
+									shinyWidgets::radioGroupButtons(
+										ns("heightshift_output_type"),
+										label = "View Mode",
+										choiceNames = list(
+											bsicons::bs_icon("table"),
+											bsicons::bs_icon("graph-up")
+										),
+										choiceValues = list("table", "plot"),
+										selected = "table",
+										direction = "horizontal",
+										size = "sm",
+										justified = FALSE,
+										width = "20%"
+									)
+								),
+								conditionalPanel(
+									condition = paste0(
+										"input['",
+										ns("heightshift_output_type"),
+										"'] === 'table'"
+									),
+									div(
+										DT::DTOutput(ns("heightshift_table")),
+										style = "height: 25vh; overflow-y: auto; overflow-x: auto;"
+									)
+								),
+								conditionalPanel(
+									condition = paste0(
+										"input['",
+										ns("heightshift_output_type"),
+										"'] === 'plot'"
+									),
+									style = "height: 100%; min-height: 25vh;",
+									plotly::plotlyOutput(
+										ns("heightshift_plot"),
+										height = "100%",
+										fill = TRUE
 									)
 								)
-						),
-						full_screen = TRUE
-					) |>
-						htmltools::tagAppendAttributes(
-							class = "border-success mb-3 bg-light header-primary"
+							),
+							bslib::nav_item(
+								actionButton(
+									ns("test"),
+									icon = bsicons::bs_icon("gear"),
+									label = "Turbine Parameters",
+									class = "btn-success"
+								) |>
+									bslib::popover(
+										numericInput(
+											ns("airgap"),
+											strong("Air Gap (m)"),
+											value = 50,
+											min = 0
+										),
+										numericInput(
+											ns("rotor_radius"),
+											strong("Rotor Radius (m)"),
+											value = 10,
+											min = 0
+										)
+									)
+							),
+							full_screen = TRUE
 						)
+					)
 				),
 
 				# Second column will contain the plot and output distributions
@@ -190,6 +191,7 @@ mod_data_analysis_ui <- function(id) {
 
 					# Forth card will contain download options
 					bslib::card(
+						id = ns("card_download"),
 						bslib::card_header(
 							"Download Options",
 							class = "text-bg-primary",
@@ -675,7 +677,9 @@ mod_data_analysis_server <- function(
 				dplyr::distinct() |>
 				dplyr::group_by(fhd_id) |>
 				dplyr::mutate(
-					unique_fhd = if (length(unexpected_cols) == 0 || dplyr::n() == 1L) {
+					unique_fhd = if (
+						length(unexpected_cols) == 0 || dplyr::n() == 1L
+					) {
 						# No covariates, or only one combination — use fhd_id directly
 						fhd_id
 					} else {
@@ -796,7 +800,9 @@ mod_data_analysis_server <- function(
 
 				num_cols <- ncol(heightshift_data()[[type]])
 
-				caption_text <- if (input$airgap_shift_metric == "perc_change") {
+				caption_text <- if (
+					input$airgap_shift_metric == "perc_change"
+				) {
 					paste0(
 						"Percentage change in average proportion of birds at CRH for ± incremental shifts in specified air gap (",
 						input$airgap,

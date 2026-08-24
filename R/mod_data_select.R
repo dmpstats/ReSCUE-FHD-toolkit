@@ -58,6 +58,7 @@ mod_data_select_ui <- function(id) {
 				col_widths = c(6, 6),
 				class = "h-100",
 				bslib::card(
+					id = ns("map_selection_card"),
 					class = "card map-card border-primary mb-3 bg-light",
 					bslib::card_header(
 						"Flight-Height Distributions",
@@ -74,7 +75,9 @@ mod_data_select_ui <- function(id) {
 						),
 						class = "p-0"
 					),
+
 					bslib::card_footer(
+						id = ns("map_filters"),
 						fluidRow(
 							column(
 								3,
@@ -242,6 +245,7 @@ mod_data_select_ui <- function(id) {
 					),
 
 					bslib::card(
+						id = ns("selected_fhd_card"),
 						bslib::card_header(
 							"Selected Flight-Height Distributions",
 							class = "text-bg-primary",

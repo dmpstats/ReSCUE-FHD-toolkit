@@ -65,56 +65,150 @@ mod_app_tour_server <- function(id) {
     # Add guide steps
     guide <- guide$step(
       title = "Welcome to ReSCUEApp!",
-      text = "This short guided tour will walk you through the main steps of the app, from selecting your flight-height distributions to visualise, compare and download your results ans session details.
-        <br><br>
-        Press <strong>Esc</strong> at any time to close the tour. You can also use your <strong>arrow keys</strong> to to move backward and forward through the steps.",
+      text = "This short guided tour will walk you through the main steps of the app, from selecting your flight-height distributions to visualise, compare and download your results and session details.
+
+      <br><br><small style='color: #999;'>
+      Tip 1: Use either the <strong>Next/Previous</strong> buttons or your <strong>arrow keys</strong> to to move backward and forward through the tour steps. </small>
+
+      <br><br><small style='color: #999;'>
+      Tip 2: Press <strong>Esc</strong> at any time exit the tour.
+      ",
       buttons = list(
         list(text = "Next", action = "next")
       )
     )$step(
       el = paste0("#", land_tab_ns("proj_overview_panel")),
       title = "The ReSCUE Toolkit",
-      text = "Start here for an overview of the ReSCUE Project and this toolkit app. Click any section heading to expand it and learn more about the app, its objectives, and the team behind it.",
-      arrow = FALSE
+      text = "Start here for an overview of the ReSCUE Project and this toolkit app. Click any section heading to expand it and learn more about the app, its objectives, and the team behind it."
     )$step(
-      el = "#app-version-container",
-      title = "App Version",
-      text = "The app version is displayed here.<br><small style='color: #999; margin-top: 10px;'>Tip: Press Esc to exit the tour</small>",
-      position = "bottom-start"
-    )$step(
-      el = "[data-value='nav-home']", # using data-value as selector
-      title = "Navigation Bar",
-      text = "This allows you to navigate between different sections of the app. You can click on the icons to go to the desired section.<br><small style='color: #999; margin-top: 10px;'>Tip: Press Esc to exit the tour</small>"
+      el = paste0("#", land_tab_ns("link_guide")),
+      title = "User Guide",
+      text = "For further detailed instructions on how to use the app and its features, click the 'User Guide' button.<br><br>The User Guide is a comprehensive resource for understanding the app's functionality and will provide you with step-by-step instructions.",
+      position = "auto",
+      canClickTarget = FALSE
     )$step(
       el = paste0("#", land_tab_ns("tutorial_selectdata")),
-      title = "Select Data",
-      text = "Click this button to go to the Data Selection tab, where you can choose the data you want to analyze. This is the first step in using the app.<br><small style='color: #999; margin-top: 10px;'>Tip: Press Esc to exit the tour</small>",
+      title = "Ready to start?",
+      text = "Click this button to go to the Selection tab, where you can choose the Flight Height Distributions (FHDs) you want to explore. <br><br>This is the first step in using the app.",
       canClickTarget = FALSE,
       position = "left-start",
       tabId = "main-nav",
-      tab = "nav-home",
-      #cancelIcon = list(enabled = TRUE, label = "Close")
+      tab = "nav-home"
     )$step(
-      el = paste0("#", data_tab_ns("card_data_select")),
-      title = "Data Selection",
-      text = "This is the Data Selection tab. Here, you can select the data you want to analyze.<br><small style='color: #999; margin-top: 10px;'>Tip: Press Esc to exit the tour</small>",
-      position = "left",
+      el = paste0("#", data_tab_ns("map_selection_card")),
+      title = "FHD Selection",
+      text = "This interactive map allows you to select FHDs for visualisation. Each shaded region is a Flight Height Distribution for a given species, measuring method, season, etc.
+      <br><br>Have a go! Click on a region to see its details and add it to your selection.",
+      position = "right-start",
       tabId = "main-nav",
       tab = "nav-data-select"
     )$step(
+      el = paste0("#", data_tab_ns("map_filters")),
+      title = "Filter FHDs",
+      text = "Use these filters to narrow down the available FHDs based on your criteria. <br><br>For example, you can filter by species and season to find the FHDs that are most relevant to your analysis.",
+      position = "right-start"
+    )$step(
+      el = paste0("#", data_tab_ns("selected_fhd_card")),
+      title = "Your Selection(s)",
+      text = "FHDs you've added from the map appear here. Click a row to highlight an FHD, then click the trash icon to remove it from your selection.
+      <br><br> You can select up to 10 FHDs for analysis at a time.
+      <br><br><small style='color: #999;'> Haven't selected an FHD yet? Go back two steps to select one from the map.</small>",
+      position = "left-start"
+    )$step(
+      el = paste0("#", data_tab_ns("upload_data")),
+      title = "Upload Your Own FHD",
+      text = "Optionally, upload your own flight-height distribution to include it alongside the built-in FHDs for comparison.",
+      position = "top",
+      canClickTarget = FALSE
+    )$step(
       el = paste0("#", data_tab_ns("go_analysis")),
-      title = "Go to Analysis",
-      text = "Once you have selected your data, click this button to go to the Data Analysis tab, where you can visualize and analyze the selected data.<br><small style='color: #999; margin-top: 10px;'>Tip: Press Esc to exit the tour</small>",
+      title = "Explore your selection",
+      text = "When you're ready, click here to navigate to the Visualisation tab, where you can explore, compare and export your selected FHDs.",
       position = "left-start",
       tabId = "main-nav",
       tab = "nav-data-select"
     )$step(
-      el = paste0("#", analysis_tab_ns("card_fhdplot")),
+      el = paste0("#", analysis_tab_ns("card_selected_fhds")),
       title = "Selected FHDs",
-      text = "Here you can vizualise the selected flight height distributions (FHDs) based on your data selection.<br><small style='color: #999; margin-top: 10px;'>Tip: Press Esc to exit the tour</small>",
+      text = "The FHDs you selected are listed here.<br><br>Click <strong>Details</strong> to see an FHD's metadata, or <strong>Covariates</strong> to inspect it by specific covariate levels.",
       position = "right-start",
       tabId = "main-nav",
       tab = "nav-analysis"
+    )$step(
+      el = paste0("#", analysis_tab_ns("card_prop_crh")),
+      title = "Proportion at Collision Risk Height",
+      text = "This card shows the proportion of birds at collision risk height (CRH) across your selected FHDs under a pre-defined air gap and rotor radius.      <br><br>Use <strong>Turbine Parameters</strong> to change the default settings, and thus update the risk height envelope.
+      <br><br>The <strong>Summaries</strong> tab provides percentile summaries.
+      <br><br>The <strong>Air Gap Sensitivity</strong> tab shows how the proportion changes with incremental shifts in selected air gap.",
+      position = "right-start"
+    )$step(
+      el = paste0("#", analysis_tab_ns("card_fhdplot")),
+      title = "FHD Visualisation",
+      text = "This section plots your selected FHDs, with the collision risk height envelope shaded based on the specified air gap and rotor radius.
+      <br><br>Use <strong>Hide legend</strong> or <strong>Facet plot</strong> to adjust the display. You can also click legend entries to show or hide individual FHDs.",
+      position = "left-start"
+    )$step(
+      el = paste0("#", analysis_tab_ns("card_download")),
+      title = "Download Options",
+      text = "Select an FHD from the dropdown and choose which outputs to include - SCRM data, the FHD plot, and/or metadata - then click <strong>Download</strong> to export them as a zip file.",
+      position = "left-start",
+      canClickTarget = FALSE,
+      tabId = "main-nav",
+      tab = "nav-analysis"
+    )$step(
+      el = "#main-nav",
+      title = "Navigation bar",
+      text = "The navigation bar lets you move between the main sections of the app. You can also access the documentation, settings and app version from here.",
+      position = "bottom",
+      canClickTarget = FALSE
+    )$step(
+      el = "[data-value='nav-home']",
+      #title = "Home",
+      text = "The <strong>Home</strong> button gets you back to the starting point.",
+      position = "bottom",
+      canClickTarget = FALSE
+    )$step(
+      el = "[data-value='nav-data-select']",
+      #title = "FHD Selection",
+      text = "The <strong>Visualisation & Download</strong> button takes you to the section where you can explore and download your selected FHDs.",
+      position = "bottom",
+      canClickTarget = FALSE
+    )$step(
+      el = "[data-value='nav-analysis']",
+      #title = "Visualisation & Export",
+      text = "The <strong>Visualisation & Export</strong> button jumps to the FHD visualisation and download section.",
+      position = "bottom",
+      canClickTarget = FALSE
+    )$step(
+      el = "li.nav-item.dropdown:has(.bi-book-fill)",
+      #title = "Documentation",
+      text = "The <strong>Documentation</strong> menu gives you access to <strong>Data Sources</strong>, which provides information about the FHD database and its provenance, the full <strong>User Guide</strong>, and the <strong>Metadata Builder</strong> tool.",
+      position = "bottom",
+      canClickTarget = FALSE
+    )$step(
+      el = "li.nav-item.dropdown:has(.bi-gear-fill)",
+      #title = "Settings",
+      text = "The <strong>Settings</strong> menu lets you report a bug or reset your session to start fresh.",
+      position = "bottom",
+      canClickTarget = FALSE
+    )$step(
+      title = "You're all set!",
+      text = paste0(
+        "That's the full walkthrough. From here, you can:
+      <br><br>&bull; Go straight to the <strong>Select Flight Height Distributions</strong> tab to tweak your selection.
+      <br>&bull; Adjust <strong>Turbine Parameters</strong> or covariate selections to explore different scenarios.
+      <br>&bull; Use the info buttons ",
+        as.character(bsicons::bs_icon("info-circle")),
+        " on each card for more detail.
+      <br>&bull; <strong>Download</strong> your results once you're happy with your selection.
+      <br><br><small style='color: #999;'>You can restart this tour at any time from the 'Start Tutorial' button on the home page.</small>"
+      ),
+      tabId = "main-nav",
+      tab = "nav-home",
+      buttons = list(
+        list(action = "back", secondary = TRUE, text = "Previous"),
+        list(action = "next", text = "Finish")
+      )
     )
 
     # initialize and start the guided tour when the button is clicked
