@@ -58,7 +58,7 @@ add_fhd <- function(
       ymin = ~lc,
       ymax = ~uc,
       fillcolor = ~unique_colour,
-      line = list(color = NA),
+      line = list(color = ~unique_colour, opacity = 0, width = 0),
       # Share a legendgroup with the matching line trace (below) so that,
       # combined with `legend$groupclick = "togglegroup"` in fhd_baseplot(),
       # toggling the line's legend entry also hides/shows its ribbon —
@@ -207,9 +207,8 @@ fhd_baseplot <- function(
         y = c(0, 0, 1, 1, 0),
         type = 'scatter',
         mode = 'lines',
-        fill = 'toself',
-        fillcolor = 'rgba(255, 0, 0, 0.2)',
-        line = list(color = 'rgba(255, 0, 0, 0)'),
+        fill = 'none',
+        line = list(color = 'red', dash = 'dot'),
         name = 'Risk Zone'
       )
   }
