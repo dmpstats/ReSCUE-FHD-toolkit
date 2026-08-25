@@ -57,8 +57,11 @@ mod_data_select_ui <- function(id) {
 			bslib::layout_columns(
 				col_widths = c(6, 6),
 				class = "h-100",
+				tagList(
 				bslib::card(
 					class = "card map-card border-primary mb-3 bg-light",
+					height = "75vh",
+
 					bslib::card_header(
 						"Flight-Height Distributions",
 						class = "text-bg-primary",
@@ -151,6 +154,25 @@ mod_data_select_ui <- function(id) {
 						)
 					)
 				),
+				
+					# TEMP: DUMMY DATA WARNING
+					bslib::card(
+						bslib::card_header(
+							# Add warning icon and text "Warning!"
+							tags$span(
+								bsicons::bs_icon("exclamation-triangle-fill"),
+								"Warning!"
+							),
+						),
+						tags$strong(
+							"
+							This is a beta-testing version of the ReSCUEApp. The flight-height distributions shown here are not real data, and are only for demonstration purposes. Please do not use these data for any real analysis.",
+							style = "font-size: 14px;"
+						),
+						class = "card bg-warning"
+						# max_height = "10vh"
+					)
+			),
 
 				# Right-hand side: show selected data and go to analysis button
 				tagList(
@@ -221,24 +243,6 @@ mod_data_select_ui <- function(id) {
 							# 	)
 							# )
 						)
-					),
-
-					# TEMP: DUMMY DATA WARNING
-					bslib::card(
-						bslib::card_header(
-							# Add warning icon and text "Warning!"
-							tags$span(
-								bsicons::bs_icon("exclamation-triangle-fill"),
-								"Warning!"
-							),
-						),
-						tags$strong(
-							"
-							This is a beta-testing version of the ReSCUEApp. The flight-height distributions shown here are not real data, and are only for demonstration purposes. Please do not use these data for any real analysis.",
-							style = "font-size: 14px;"
-						),
-						class = "card bg-warning"
-						# max_height = "10vh"
 					),
 
 					bslib::card(

@@ -22,6 +22,7 @@ mod_data_analysis_ui <- function(id) {
 						# 	"Selected Data",
 						# 	class = "text-bg-primary"
 						# ),
+						full_screen = TRUE,
 						bslib::card_body(
 							uiOutput(ns("fhd_config_table"))
 						),
@@ -38,7 +39,10 @@ mod_data_analysis_ui <- function(id) {
 					bslib::navset_card_underline(
 						title = tags$div(
 							class = "d-flex align-items-center gap-2",
-							"Proportion at Collision Risk Height",
+							bslib::tooltip(
+								"PCRH",
+								"Proportion at Collision Risk Height",
+							),							
 							mod_help_button_ui(
 								ns("help_prop_crh"),
 								type = "button-only"
@@ -166,7 +170,7 @@ mod_data_analysis_ui <- function(id) {
 								style = "height: 100%; min-height: 25vh;",
 								plotly::plotlyOutput(
 									ns("heightshift_plot"),
-									height = "100%",
+									height = "75%",
 									fill = TRUE
 								)
 							)
