@@ -23,6 +23,7 @@ mod_data_analysis_ui <- function(id) {
 						# 	"Selected Data",
 						# 	class = "text-bg-primary"
 						# ),
+						full_screen = TRUE,
 						bslib::card_body(
 							uiOutput(ns("fhd_config_table"))
 						),
@@ -41,7 +42,10 @@ mod_data_analysis_ui <- function(id) {
 						bslib::navset_card_underline(
 							title = tags$div(
 								class = "d-flex align-items-center gap-2",
-								"Proportion at Collision Risk Height",
+								bslib::tooltip(
+									"PCRH",
+									"Proportion at Collision Risk Height",
+								),
 								mod_help_button_ui(
 									ns("help_prop_crh"),
 									type = "button-only"
@@ -172,7 +176,7 @@ mod_data_analysis_ui <- function(id) {
 									style = "height: 100%; min-height: 25vh;",
 									plotly::plotlyOutput(
 										ns("heightshift_plot"),
-										height = "100%",
+										height = "75%",
 										fill = TRUE
 									)
 								)
@@ -181,7 +185,7 @@ mod_data_analysis_ui <- function(id) {
 								actionButton(
 									ns("test"),
 									icon = bsicons::bs_icon("gear"),
-									label = "Turbine Parameters",
+									label = "Turbines",
 									class = "btn-success"
 								) |>
 									bslib::popover(
@@ -733,9 +737,7 @@ mod_data_analysis_server <- function(
 				dplyr::distinct() |>
 				dplyr::group_by(fhd_id) |>
 				dplyr::mutate(
-					unique_fhd = if (
-						length(unexpected_cols) == 0 || dplyr::n() == 1L
-					) {
+					unique_fhd = if (length(unexpected_cols) == 0 || dplyr::n() == 1L) {
 						# No covariates, or only one combination — use fhd_id directly
 						fhd_id
 					} else {
@@ -867,9 +869,7 @@ mod_data_analysis_server <- function(
 
 				num_cols <- ncol(heightshift_data()[[type]])
 
-				caption_text <- if (
-					input$airgap_shift_metric == "perc_change"
-				) {
+				caption_text <- if (input$airgap_shift_metric == "perc_change") {
 					paste0(
 						"Percentage change in average proportion of birds at CRH for ± incremental shifts in specified air gap (",
 						input$airgap,

@@ -146,21 +146,25 @@ mod_landing_page_ui <- function(id) {
 							class = "d-flex justify-content-center align-items-center",
 							logolink("owec", height = 35)
 						),
+						height = "22vh",
 						class = "card border-primary mb-3 bg-secondary"
 					),
 					bslib::layout_columns(
 						col_widths = c(4, 4, 4),
+						# height = "22vh",
 						bslib::card(
 							bslib::card_body(
 								class = "d-flex justify-content-center align-items-center",
 								logolink("dmp")
 							),
+							# Disable scrolling
+							style = "overflow-x: hidden; overflow-y: hidden;",
 							class = "card border-primary bg-secondary"
 						),
 						bslib::card(
 							bslib::card_body(
 								class = "d-flex justify-content-center align-items-center",
-								logolink("ne", height = 9)
+								logolink("ne", height = 7)
 							),
 							class = "card border-primary bg-secondary"
 						),
@@ -173,6 +177,7 @@ mod_landing_page_ui <- function(id) {
 						)
 					),
 					bslib::layout_columns(
+						# height = "22vh",
 						col_widths = c(4, 4, 4),
 						bslib::card(
 							bslib::card_body(
@@ -184,7 +189,7 @@ mod_landing_page_ui <- function(id) {
 						bslib::card(
 							bslib::card_body(
 								class = "d-flex justify-content-center align-items-center",
-								logolink("bto", height = 8)
+								logolink("bto", height = 6)
 							),
 							class = "card border-primary bg-secondary"
 						),
@@ -196,48 +201,72 @@ mod_landing_page_ui <- function(id) {
 							class = "card border-primary bg-secondary"
 						)
 					),
-					div(
-						class = "d-flex flex-column align-items-center justify-content-center gap-4 my-3",
-						# User Guide and Start Tutorial in a row
-						div(
-							class = "d-flex gap-3",
-							style = "width: 100%; max-width: 600px;",
-							# User Guide
-							div(
-								class = "flex-grow-1",
-								actionButton(
-									ns("link_guide"),
-									label = tagList(
-										bsicons::bs_icon("info-circle"),
-										"User Guide"
-									),
-									class = "not-arrow-btn",
-									style = "width: 100%;"
-								)
-							),
-							# Start Tutorial
-							div(
-								class = "flex-grow-1",
-								mod_app_tour_ui(
-									ns("app_tour"),
-									style = "width: 100%;"
-								)
-							)
-						),
-						# Select Data - centered below
-						div(
-							id = ns("tutorial_selectdata"),
-							actionButton(
-								ns("go_data"),
-								label = tagList(
-									bsicons::bs_icon("play-circle"),
-									"Select Flight-Height Distributions"
-								),
-								class = "arrow-btn",
-								style = "width: 100%; max-width: 600px;"
-							)
-						)
-					)
+					bslib::layout_columns(
+						col_widths = c(4, 4, 4),
+									actionButton(
+											ns("link_guide"),
+											label = tagList(
+												bsicons::bs_icon("info-circle"),
+												"Guide"
+											),
+											class = "not-arrow-btn",
+											style = "width: 100%;"
+										),
+													mod_app_tour_ui(
+															ns("app_tour"),
+															style = "width: 100%;"
+														),
+																actionButton(
+																		ns("go_data"),
+																		label = tagList(
+																			bsicons::bs_icon("play-circle"),
+																			"Start"
+																		),
+																		class = "arrow-btn"
+																	)
+
+					),
+					# div(
+					# 	class = "d-flex flex-column align-items-center justify-content-center gap-4 my-3",
+					# 	# User Guide and Start Tutorial in a row
+					# 	div(
+					# 		class = "d-flex gap-3",
+					# 		style = "width: 100%; max-width: 600px;",
+					# 		# User Guide
+					# 		div(
+					# 			class = "flex-grow-1",
+					# 			actionButton(
+					# 				ns("link_guide"),
+					# 				label = tagList(
+					# 					bsicons::bs_icon("info-circle"),
+					# 					"Guide"
+					# 				),
+					# 				class = "not-arrow-btn",
+					# 				style = "width: 100%;"
+					# 			)
+					# 		),
+					# 		# Start Tutorial
+					# 		div(
+					# 			class = "flex-grow-1",
+					# 			mod_app_tour_ui(
+					# 				ns("app_tour"),
+					# 				style = "width: 100%;"
+					# 			)
+					# 		)
+					# 	),
+					# 	# Select Data - centered below
+					# 	div(
+					# 		id = ns("tutorial_selectdata"),
+					# 		actionButton(
+					# 			ns("go_data"),
+					# 			label = tagList(
+					# 				bsicons::bs_icon("play-circle"),
+					# 				"Select Flight-Height Distributions"
+					# 			),
+					# 			class = "arrow-btn",
+					# 			style = "width: 100%; max-width: 600px;"
+					# 		)
+					# 	)
 				)
 			)
 		)

@@ -14,7 +14,7 @@ mod_app_tour_ui <- function(id, style = "width:18vw; height: 5vh;") {
       ns("start_guide"),
       label = tagList(
         bsicons::bs_icon("play-circle"),
-        "Start Tutorial"
+        "Tutorial"
       ),
       class = "not-arrow-btn",
       style = style
