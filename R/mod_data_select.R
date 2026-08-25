@@ -58,106 +58,106 @@ mod_data_select_ui <- function(id) {
 				col_widths = c(6, 6),
 				class = "h-100",
 				tagList(
-				bslib::card(
-					id = ns("map_selection_card"),
-					class = "card map-card border-primary mb-3 bg-light",
-					height = "75vh",
+					bslib::card(
+						id = ns("map_selection_card"),
+						class = "card map-card border-primary mb-3 bg-light",
+						height = "75vh",
 
-					bslib::card_header(
-						"Flight-Height Distributions",
-						class = "text-bg-primary",
-						bslib::toolbar(
-							mod_help_button_ui(ns("select_data"), type = "toolbar")
-						)
-					),
-					bslib::card_body(
-						leaflet::leafletOutput(
-							ns("source_map"),
-							# Fill the remainder of the space
-							height = "75vh"
+						bslib::card_header(
+							"Flight-Height Distributions",
+							class = "text-bg-primary",
+							bslib::toolbar(
+								mod_help_button_ui(ns("select_data"), type = "toolbar")
+							)
 						),
-						class = "p-0"
-					),
+						bslib::card_body(
+							leaflet::leafletOutput(
+								ns("source_map"),
+								# Fill the remainder of the space
+								height = "75vh"
+							),
+							class = "p-0"
+						),
 
-					bslib::card_footer(
-						id = ns("map_filters"),
-						fluidRow(
-							column(
-								3,
-								selectizeInput(
-									ns("species"),
-									label = "Species",
-									choices = NULL,
-									multiple = FALSE,
-									options = list(
-										hideSelected = FALSE,
-										remove_button = TRUE
-									)
-								)
-							),
-							column(
-								3,
-								selectizeInput(
-									ns("method"),
-									label = "Method",
-									choices = NULL,
-									multiple = TRUE
-								)
-							),
-							column(
-								3,
-								selectizeInput(
-									ns("season"),
-									label = "Season",
-									choices = c(
-										"Any" = "any",
-										"Both" = "both",
-										"Breeding" = "breeding",
-										"Non-breeding" = "nonbreeding"
-									),
-									multiple = FALSE
-								)
-							),
-							column(
-								3,
-								class = "d-flex align-items-center justify-content-center",
-								actionButton(
-									ns("advanced_filters"),
-									label = tagList(
-										bsicons::bs_icon("funnel"),
-										"Advanced Filters"
-									),
-									class = "btn btn-dark w-100"
-								) |>
-									bslib::popover(
-										# Add some additional filters
-										selectizeInput(
-											ns("crm_recommended"),
-											label = "Recommended for CRM?",
-											choices = c(
-												"Yes" = TRUE,
-												"No" = FALSE
-											),
-											multiple = TRUE
-										),
-										selectizeInput(
-											ns("region"),
-											label = "Region",
-											choices = NULL,
-											multiple = TRUE
-										),
-										placement = "top"
-									)
-							),
+						bslib::card_footer(
+							id = ns("map_filters"),
 							fluidRow(
-								tags$small(
-									"The map provides BDMPS [Biological Defined Minimum Population Scale] regions for each individual species. Each region represents a single flight-height distribution."
+								column(
+									3,
+									selectizeInput(
+										ns("species"),
+										label = "Species",
+										choices = NULL,
+										multiple = FALSE,
+										options = list(
+											hideSelected = FALSE,
+											remove_button = TRUE
+										)
+									)
+								),
+								column(
+									3,
+									selectizeInput(
+										ns("method"),
+										label = "Method",
+										choices = NULL,
+										multiple = TRUE
+									)
+								),
+								column(
+									3,
+									selectizeInput(
+										ns("season"),
+										label = "Season",
+										choices = c(
+											"Any" = "any",
+											"Both" = "both",
+											"Breeding" = "breeding",
+											"Non-breeding" = "nonbreeding"
+										),
+										multiple = FALSE
+									)
+								),
+								column(
+									3,
+									class = "d-flex align-items-center justify-content-center",
+									actionButton(
+										ns("advanced_filters"),
+										label = tagList(
+											bsicons::bs_icon("funnel"),
+											"Advanced Filters"
+										),
+										class = "btn btn-dark w-100"
+									) |>
+										bslib::popover(
+											# Add some additional filters
+											selectizeInput(
+												ns("crm_recommended"),
+												label = "Recommended for CRM?",
+												choices = c(
+													"Yes" = TRUE,
+													"No" = FALSE
+												),
+												multiple = TRUE
+											),
+											selectizeInput(
+												ns("region"),
+												label = "Region",
+												choices = NULL,
+												multiple = TRUE
+											),
+											placement = "top"
+										)
+								),
+								fluidRow(
+									tags$small(
+										"The map provides BDMPS [Biological Defined Minimum Population Scale] regions for each individual species. Each region represents a single flight-height distribution."
+									)
 								)
 							)
 						)
-					)
-				),
-				
+					),
+
 					# TEMP: DUMMY DATA WARNING
 					bslib::card(
 						bslib::card_header(
@@ -175,7 +175,7 @@ mod_data_select_ui <- function(id) {
 						class = "card bg-warning"
 						# max_height = "10vh"
 					)
-			),
+				),
 
 				# Right-hand side: show selected data and go to analysis button
 				tagList(

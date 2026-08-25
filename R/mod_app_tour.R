@@ -85,11 +85,11 @@ mod_app_tour_server <- function(id) {
       position = "auto",
       canClickTarget = FALSE
     )$step(
-      el = paste0("#", land_tab_ns("tutorial_selectdata")),
+      el = paste0("#", land_tab_ns("go_data")),
       title = "Ready to Start?",
       text = "Click this button to go to the Selection tab, where you can choose the Flight Height Distributions (FHDs) you want to explore. <br><br>This is the first step in using the app.",
       canClickTarget = FALSE,
-      position = "left",
+      position = "auto",
       tabId = "main-nav",
       tab = "nav-home"
     )$step(
