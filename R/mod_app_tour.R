@@ -69,10 +69,7 @@ mod_app_tour_server <- function(id) {
       text = "This short guided tour will walk you through the main steps of the app, from selecting your flight-height distributions to visualise, compare and download your results and session details.
 
       <br><br><small style='color: #999;'>
-      Tip 1: Use either the <strong>Next/Previous</strong> buttons or your <strong>arrow keys</strong> to to move backward and forward through the tour steps. </small>
-
-      <br><br><small style='color: #999;'>
-      Tip 2: Press <strong>Esc</strong> at any time exit the tour.
+      Tip: Press <strong>Esc</strong> at any time exit the tour.
       ",
       buttons = list(
         list(text = "Next", action = "next")
@@ -89,23 +86,23 @@ mod_app_tour_server <- function(id) {
       canClickTarget = FALSE
     )$step(
       el = paste0("#", land_tab_ns("tutorial_selectdata")),
-      title = "Ready to start?",
+      title = "Ready to Start?",
       text = "Click this button to go to the Selection tab, where you can choose the Flight Height Distributions (FHDs) you want to explore. <br><br>This is the first step in using the app.",
       canClickTarget = FALSE,
-      position = "left-start",
+      position = "left",
       tabId = "main-nav",
       tab = "nav-home"
     )$step(
       el = paste0("#", data_tab_ns("map_selection_card")),
-      title = "Selection tool",
+      title = "Selection Tool",
       text = "This interactive map allows you to select FHDs for visualisation. Each shaded region is a Flight Height Distribution for a given species, measuring method, season, etc.
       <br><br>Have a go! Click on a region to see its details and add it to your selection.",
-      position = "right-start",
+      position = "left-start",
       tabId = "main-nav",
       tab = "nav-data-select"
     )$step(
       el = paste0("#", data_tab_ns("selected_fhd_card")),
-      title = "Your current selection",
+      title = "Your Current Selection",
       text = "FHDs you've added from the map appear here. Click a row to highlight an FHD, then click the trash icon to remove it from your selection.
       <br><br> You can select up to 10 FHDs for analysis at a time.
       <br><br><small style='color: #999;'> Haven't selected an FHD yet? Go back to the previous step to select one from the map.</small>",
@@ -117,24 +114,25 @@ mod_app_tour_server <- function(id) {
       position = "right-start"
     )$step(
       el = paste0("#", data_tab_ns("upload_data")),
-      title = "Upload your own FHD",
+      title = "Upload Your Own FHD",
       text = "Optionally, upload your own flight-height distribution to include it alongside the built-in FHDs, for comparison.",
       position = "top",
       canClickTarget = FALSE
     )$step(
       el = paste0("#", data_tab_ns("go_analysis")),
-      title = "Explore your selection",
+      title = "Explore Selection",
       text = "When you're ready, click here to navigate to the Visualisation tab, where you can explore, compare and export your selected FHDs.",
       position = "left-start",
+      canClickTarget = FALSE,
       tabId = "main-nav",
-      tab = "nav-data-select"
+      tab = "nav-data-select",
+      onHide = "Shiny.setInputValue('tour_load_demo_fhd', Math.random(), {priority: 'event'});"
     )$step(
       el = paste0("#", analysis_tab_ns("card_selected_fhds")),
       title = "Selected FHDs",
       text = "The FHDs you selected are listed here.<br><br>Click <strong>Details</strong> to see an FHD's metadata, or <strong>Covariates</strong> to inspect it by specific covariate levels.",
       position = "right-start",
-      tabId = "main-nav",
-      tab = "nav-analysis"
+      buttons = list(list(text = "Next", action = "next"))
     )$step(
       el = paste0("#", analysis_tab_ns("card_prop_crh")),
       title = "Proportion at Collision Risk Height",
@@ -158,7 +156,7 @@ mod_app_tour_server <- function(id) {
       tab = "nav-analysis"
     )$step(
       el = "#main-nav",
-      title = "Navigation bar",
+      title = "Navigation Bar",
       text = "The navigation bar lets you move between the main sections of the app. You can also access the documentation, settings and app version from here.",
       position = "bottom",
       canClickTarget = FALSE
@@ -195,7 +193,7 @@ mod_app_tour_server <- function(id) {
     )$step(
       el = "#app-version-container",
       title = "App Version",
-      text = "The current version of ReSCUEApp is shown here. This is useful when reporting bugs or checking that you are using the latest release. Click the version number to view the app's release history and changelog.",
+      text = "The current version of ReSCUEApp is shown here. This is useful when reporting bugs or checking that you are using the latest release. Click the version number to view the app's release notes and history.",
       position = "bottom",
       canClickTarget = FALSE
     )$step(
@@ -204,9 +202,9 @@ mod_app_tour_server <- function(id) {
         "That's the full walkthrough. From here, you can:
       <br><br>&bull; Navigate to the <strong>Select Flight Height Distributions</strong> tab to tweak your selection.
       <br>&bull; Adjust <strong>Turbine Parameters</strong> or covariate selections to explore different scenarios.
-      <br>&bull; Use the info buttons ",
+      <br>&bull; Use the info buttons  ",
         as.character(bsicons::bs_icon("info-circle")),
-        " on each card for more detail.
+        "  on each section for more detail.
       <br>&bull; <strong>Download</strong> your results once you're happy with your selection.
       <br><br><small style='color: #999;'>You can restart this tour at any time from the 'Start Tutorial' button on the home page.</small>"
       ),
@@ -220,11 +218,7 @@ mod_app_tour_server <- function(id) {
 
     # initialize and start the guided tour when the button is clicked
     observeEvent(input$start_guide, {
-      # invoke_js(
-      #   "drive",
-      #   list(arg = TRUE)
-      # )
-      guide$init()$start()
+      guide$init(session = session)$start(session = session)
     })
 
     guide
