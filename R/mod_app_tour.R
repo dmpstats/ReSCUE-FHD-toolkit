@@ -57,7 +57,8 @@ mod_app_tour_server <- function(id) {
       exitOnEsc = TRUE,
       keyboardNavigation = TRUE,
       defaultStepOptions = list(
-        floatingUIOptions = list()
+        floatingUIOptions = list(),
+        modalOverlayOpeningPadding = 8
       ) #,
       #progress = TRUE
     )
@@ -192,10 +193,16 @@ mod_app_tour_server <- function(id) {
       position = "bottom",
       canClickTarget = FALSE
     )$step(
+      el = "#app-version-container",
+      title = "App Version",
+      text = "The current version of ReSCUEApp is shown here. This is useful when reporting bugs or checking that you are using the latest release. Click the version number to view the app's release history and changelog.",
+      position = "bottom",
+      canClickTarget = FALSE
+    )$step(
       title = "You're all set!",
       text = paste0(
         "That's the full walkthrough. From here, you can:
-      <br><br>&bull; Go straight to the <strong>Select Flight Height Distributions</strong> tab to tweak your selection.
+      <br><br>&bull; Navigate to the <strong>Select Flight Height Distributions</strong> tab to tweak your selection.
       <br>&bull; Adjust <strong>Turbine Parameters</strong> or covariate selections to explore different scenarios.
       <br>&bull; Use the info buttons ",
         as.character(bsicons::bs_icon("info-circle")),

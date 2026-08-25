@@ -21,7 +21,7 @@
 
 .shepherd-element {
   background-color: var(--bs-primary);
-  border: 2.5px solid #ffffff;
+  box-shadow: 0 0 0 2.5px #ffffff;
   border-radius: 8px;
 }
 
@@ -44,30 +44,78 @@
   opacity: 0.80 !important;
 }
 
-.shepherd-arrow:before {
-  /* display: none !important; */
+
+.shepherd-element.shepherd-centered .shepherd-arrow {
+  display: none !important;
+}
+
+/* Native Shepherd arrow - two-tone to mask the box-shadow gap */
+.shepherd-arrow::before {
   background-color: white !important;
+  content: "" !important;
+  transform: rotate(45deg) !important;
+  position: absolute !important;
+  width: 16px !important;
+  height: 16px !important;
+  top: 0 !important;
+  left: 0 !important;
+  z-index: -1 !important;
 }
 
-.shepherd-arrow:after {
-  background-color: #00293ef5 !important;
+/* Mask the inner face of the arrow with the popover background colour */
+.shepherd-element[data-popper-placement^='bottom'] .shepherd-arrow::before {
+  background: linear-gradient(135deg, white 50%, var(--bs-primary) 50%) !important;
 }
 
-/* ajdust popover space to target, for each relative placing */
+.shepherd-element[data-popper-placement^='top'] .shepherd-arrow::before {
+  background: linear-gradient(315deg, white 50%, var(--bs-primary) 50%) !important;
+}
+
+.shepherd-element[data-popper-placement^='right'] .shepherd-arrow::before {
+  background: linear-gradient(45deg, white 50%, var(--bs-primary) 50%) !important;
+}
+
+.shepherd-element[data-popper-placement^='left'] .shepherd-arrow::before {
+  background: linear-gradient(225deg, white 50%, var(--bs-primary) 50%) !important;
+}
+
+
+/* Correct arrow position for -start and -end placements */
+.shepherd-element[data-popper-placement='left-start'] .shepherd-arrow,
+.shepherd-element[data-popper-placement='right-start'] .shepherd-arrow {
+  top: 24px !important;
+}
+
+.shepherd-element[data-popper-placement='left-end'] .shepherd-arrow,
+.shepherd-element[data-popper-placement='right-end'] .shepherd-arrow {
+  bottom: 24px !important;
+  top: auto !important;
+}
+
+.shepherd-element[data-popper-placement='top-start'] .shepherd-arrow,
+.shepherd-element[data-popper-placement='bottom-start'] .shepherd-arrow {
+  left: 24px !important;
+}
+
+.shepherd-element[data-popper-placement='top-end'] .shepherd-arrow,
+.shepherd-element[data-popper-placement='bottom-end'] .shepherd-arrow {
+  right: 24px !important;
+  left: auto !important;
+}
 .shepherd-element[data-popper-placement^='top'] {
-  margin-bottom: 14px !important;
+  transform: translateY(-17px) !important;
 }
 
 .shepherd-element[data-popper-placement^='bottom'] {
-  margin-top: 14px !important;
+  margin-top: 17px !important;
 }
 
 .shepherd-element[data-popper-placement^='left'] {
-  transform: translateX(-14px) !important;
+  transform: translateX(-17px) !important;
 }
 
 .shepherd-element[data-popper-placement^='right'] {
-  transform: translateX(14px) !important;
+  transform: translateX(17px) !important;
 }
 
 /* Next/Previous buttons properties*/
@@ -120,4 +168,3 @@
 .logo-link:hover {
   opacity: 0.7;
 }
-
