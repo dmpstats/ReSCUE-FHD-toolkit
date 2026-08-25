@@ -53,7 +53,7 @@ app_ui <- function(request) {
 
 			bslib::nav_item(
 				tags$a(
-					href = "https://github.com",
+					href = "https://github.com/dmpstats/ReSCUE-FHD-toolkit",
 					target = "_blank",
 					bsicons::bs_icon("github", size = "2em") |>
 						bslib::tooltip(
@@ -251,7 +251,7 @@ app_ui <- function(request) {
 				bslib::nav_item(
 					# Add a link to the GitHub repo to report a bug
 					tags$a(
-						href = "https://github.com", # ADD CORRECT LINK TO ISSUE PAGE ONCE PUBLIC
+						href = "https://github.com/dmpstats/ReSCUE-FHD-toolkit/issues",
 						target = "_blank",
 						bsicons::bs_icon("bug-fill"),
 						"Report a Bug"

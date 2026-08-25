@@ -169,7 +169,7 @@ mod_data_select_ui <- function(id) {
 						),
 						tags$strong(
 							"
-							This is a beta-testing version of the ReSCUEApp. The flight-height distributions shown here are not real data, and are only for demonstration purposes. Please do not use these data for any real analysis.",
+							This is a prototype version of the ReSCUEApp. The flight-height distributions shown here are not real data, and are only for demonstration purposes. Please do not use these data for any real analysis.",
 							style = "font-size: 14px;"
 						),
 						class = "card bg-warning"
