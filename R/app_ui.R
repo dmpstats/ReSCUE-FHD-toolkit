@@ -123,9 +123,12 @@ app_ui <- function(request) {
 				align = "right",
 				icon = bsicons::bs_icon(
 					"book-fill",
-					size = "1.5em",
-					title = "Documents"
-				),
+					size = "1.5em"
+				) |>
+					bslib::tooltip(
+						placement = "bottom",
+						"Documentation"
+					),
 
 				# Tab 4: Data Sources ============================
 
@@ -284,7 +287,6 @@ golem_add_external_resources <- function() {
 
 	tags$head(
 		favicon(ext = "png"),
-		useConductor(),
 		useConductor(),
 		bundle_resources(
 			path = app_sys("app/www"),

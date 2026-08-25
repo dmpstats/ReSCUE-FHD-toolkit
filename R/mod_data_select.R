@@ -59,6 +59,7 @@ mod_data_select_ui <- function(id) {
 				class = "h-100",
 				tagList(
 				bslib::card(
+					id = ns("map_selection_card"),
 					class = "card map-card border-primary mb-3 bg-light",
 					height = "75vh",
 
@@ -77,7 +78,9 @@ mod_data_select_ui <- function(id) {
 						),
 						class = "p-0"
 					),
+
 					bslib::card_footer(
+						id = ns("map_filters"),
 						fluidRow(
 							column(
 								3,
@@ -246,6 +249,7 @@ mod_data_select_ui <- function(id) {
 					),
 
 					bslib::card(
+						id = ns("selected_fhd_card"),
 						bslib::card_header(
 							"Selected Flight-Height Distributions",
 							class = "text-bg-primary",
@@ -329,7 +333,9 @@ mod_data_select_server <- function(
 	nav_id = "main-nav",
 	parent_session,
 	metadata_tbl,
-	restore_payload = NULL
+	restore_payload = NULL,
+	tour_signal = NULL,
+	demo_fhd_id = NULL
 ) {
 	moduleServer(id, function(input, output, session) {
 		ns <- session$ns
@@ -350,6 +356,26 @@ mod_data_select_server <- function(
 
 		# ── Single source of truth: which fhd_ids are selected ──────────────────
 		selected_ids <- reactiveVal(character(0))
+
+		# ── Tour demo: auto-select a known FHD when the tour signals ─────────────
+		if (!is.null(tour_signal) && !is.null(demo_fhd_id)) {
+			tour_demo_fired <- reactiveVal(FALSE)
+			observeEvent(
+				tour_signal(),
+				{
+					if (tour_demo_fired()) {
+						return(invisible(NULL))
+					}
+					tour_demo_fired(TRUE)
+					if (!demo_fhd_id %in% selected_ids()) {
+						selected_ids(c(selected_ids(), demo_fhd_id))
+					}
+					# Trigger go_analysis logic directly (avoids JS timing race)
+					go_analysis_logic()
+				},
+				ignoreInit = TRUE
+			)
+		}
 
 		# ── Filtered data: shared by map and DT ─────────────────────────────────
 		# Empty selection for a filter = no constraint applied for that dimension.
@@ -699,8 +725,10 @@ mod_data_select_server <- function(
 
 		# ── Navigation ───────────────────────────────────────────────────────────
 		outputs <- reactiveValues()
-		observeEvent(input$go_analysis, {
-			# Download the FHDs for the selected datasets (not including user-uploads)
+
+		# define the logic of going to the analysis tab as a local function, to handle calls from both the "go_analysis" button and the tour demo.
+		# TODO: Consider moving this function to a separate helper script
+		go_analysis_logic <- function() {
 			download_fhds <- metadata_tbl |>
 				dplyr::filter(fhd_id %in% selected_ids()) |>
 				dplyr::pull(fhd_id)
@@ -724,6 +752,10 @@ mod_data_select_server <- function(
 				selected = "nav-analysis",
 				session = parent_session
 			)
+		}
+
+		observeEvent(input$go_analysis, {
+			go_analysis_logic()
 		})
 
 		# ==== User-upload module as a modal dialog ====

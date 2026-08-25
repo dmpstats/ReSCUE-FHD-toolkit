@@ -48,7 +48,9 @@ app_server <- function(input, output, session) {
 		nav_id = "main-nav",
 		parent_session = session,
 		metadata_tbl = metadata,
-		restore_payload = restore_payload
+		restore_payload = restore_payload,
+		tour_signal = reactive(input$tour_load_demo_fhd),
+		demo_fhd_id = metadata$fhd_id[[1]]
 	)
 
 	mod_data_analysis_server(
