@@ -41,8 +41,15 @@ add_fhd <- function(
       lc = quantile(prob, 0.025, na.rm = TRUE),
       uc = quantile(prob, 0.975, na.rm = TRUE),
       prob = mean(prob, na.rm = TRUE),
+      unique_colour = dplyr::first(colours),
       .groups = "drop"
     )
+
+  # Create a color mapping from group_col to hex codes
+  color_map <- structure(
+    plotdat_summed$unique_colour,
+    names = plotdat_summed$group_col
+  )
 
   plot <- plot |>
     plotly::add_ribbons(
@@ -50,8 +57,8 @@ add_fhd <- function(
       x = ~height,
       ymin = ~lc,
       ymax = ~uc,
-      color = ~ as.factor(group_col),
-      colors = "Set1",
+      fillcolor = ~unique_colour,
+      line = list(color = NA),
       # Share a legendgroup with the matching line trace (below) so that,
       # combined with `legend$groupclick = "togglegroup"` in fhd_baseplot(),
       # toggling the line's legend entry also hides/shows its ribbon —
@@ -75,10 +82,12 @@ add_fhd <- function(
       data = plotdat_summed,
       x = ~height,
       y = ~prob,
-      color = ~ as.factor(group_col),
-      colors = "Set1",
+      name = ~group_col,
       legendgroup = ~group_col,
-      line = list(width = 2),
+      line = list(
+        width = 2,
+        color = ~unique_colour
+      ),
       hoverinfo = "text",
       text = ~ paste(
         "fhd_id:",

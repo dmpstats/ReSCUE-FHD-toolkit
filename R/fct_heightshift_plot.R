@@ -21,7 +21,8 @@ plot_heightshift <- function(
   heightshift_data,
   metric = c("prop", "perc_change"),
   airgap,
-  rotor_radius
+  rotor_radius,
+  colour_scheme = NULL
 ) {
   metric <- match.arg(metric)
   type <- if (metric == "perc_change") "perc" else "prob"
@@ -46,7 +47,17 @@ plot_heightshift <- function(
 
   fhd_ids <- unique(df_long$fhd_id)
   n_fhds <- length(fhd_ids)
-  palette <- RColorBrewer::brewer.pal(max(3L, n_fhds), "Set1")[seq_len(n_fhds)]
+
+  if (is.null(colour_scheme)) {
+    palette <- RColorBrewer::brewer.pal(max(3L, n_fhds), "Set1")[seq_len(
+      n_fhds
+    )]
+  } else {
+    # Create a named vector: names are unique_fhd, values are hex colours
+    palette <- setNames(colour_scheme$colours, colour_scheme$unique_fhd)
+    # Reorder to match fhd_ids order and extract values
+    palette <- palette[fhd_ids]
+  }
 
   plt <- plotly::plot_ly()
 
@@ -92,8 +103,22 @@ plot_heightshift <- function(
     plotly::layout(
       xaxis = list(title = "Air Gap Shift (m)"),
       yaxis = list(title = ylab),
-      legend = list(title = list(text = "FHD ID")),
-      # shapes = list(
+      legend = list(
+        title = list(text = "FHD"),
+        # Draw the legend inside the top-right of the plotting area, rather
+        # than in the (wide) margin to the right of the plot.
+        x = 0.99,
+        y = 0.99,
+        xanchor = "right",
+        yanchor = "top",
+        bgcolor = "rgba(255, 255, 255, 0.7)",
+        bordercolor = "rgba(0, 0, 0, 0.2)",
+        borderwidth = 1,
+        # Clicking a legend entry toggles every trace sharing its
+        # legendgroup, so a line's ribbon (same group, showlegend = FALSE)
+        # hides/shows together with the line — without a duplicate entry.
+        groupclick = "togglegroup"
+      ),
       #   list(
       #     type = "line",
       #     x0 = 0,

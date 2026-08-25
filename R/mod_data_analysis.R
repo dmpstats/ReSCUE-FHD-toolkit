@@ -54,48 +54,104 @@ mod_data_analysis_ui <- function(id) {
 							),
 							bslib::nav_panel(
 								title = "Air Gap Sensitivity",
-								fluidRow(
-									shinyWidgets::radioGroupButtons(
-										inputId = ns("airgap_shift_metric"),
-										label = "Metric",
-										choices = c(
-											"% Change" = "perc_change",
-											"Proportion" = "prop"
-										),
-										width = "30%",
-										selected = "perc_change",
-										justified = FALSE,
-										size = "sm",
-										status = "default"
+								bslib::layout_columns(
+									max_height = "100px",
+									col_widths = c(6, 2, 2),
+									div(
+										class = "d-flex align-items-center h-100",
+										shinyWidgets::radioGroupButtons(
+											inputId = ns("airgap_shift_metric"),
+											label = "Metric",
+											choices = c(
+												"% Change" = "perc_change",
+												"Proportion" = "prop"
+											),
+											width = "100%",
+											selected = "perc_change",
+											justified = FALSE,
+											size = "sm",
+											status = "default"
+										)
 									),
-									shinyWidgets::radioGroupButtons(
-										inputId = ns("airgap_shift_incr"),
-										label = "Increments",
-										choices = c(
-											"1m" = "1m",
-											"5m" = "5m"
-										),
-										width = "30%",
-										selected = "5m",
-										justified = FALSE,
-										size = "sm",
-										status = "default"
+									div(
+										class = "d-flex align-items-center justify-content-center h-100",
+										shinyWidgets::radioGroupButtons(
+											inputId = ns("airgap_shift_incr"),
+											label = "Increments",
+											choices = c(
+												"1m" = "1m",
+												"5m" = "5m"
+											),
+											width = "100%",
+											selected = "5m",
+											justified = FALSE,
+											size = "sm",
+											status = "default"
+										)
 									),
-									shinyWidgets::radioGroupButtons(
-										ns("heightshift_output_type"),
-										label = "View Mode",
-										choiceNames = list(
-											bsicons::bs_icon("table"),
-											bsicons::bs_icon("graph-up")
-										),
-										choiceValues = list("table", "plot"),
-										selected = "table",
-										direction = "horizontal",
-										size = "sm",
-										justified = FALSE,
-										width = "20%"
+									div(
+										class = "d-flex align-items-center justify-content-center h-100",
+										shinyWidgets::radioGroupButtons(
+											ns("heightshift_output_type"),
+											label = "View Mode",
+											choiceNames = list(
+												bsicons::bs_icon("table"),
+												bsicons::bs_icon("graph-up")
+											),
+											choiceValues = list(
+												"table",
+												"plot"
+											),
+											selected = "table",
+											direction = "horizontal",
+											size = "sm",
+											justified = FALSE,
+											width = "100%"
+										)
 									)
 								),
+								# fluidRow(
+								# 	shinyWidgets::radioGroupButtons(
+								# 		inputId = ns("airgap_shift_metric"),
+								# 		label = "Metric",
+								# 		choices = c(
+								# 			"% Change" = "perc_change",
+								# 			"Proportion" = "prop"
+								# 		),
+								# 		width = "30%",
+								# 		selected = "perc_change",
+								# 		justified = FALSE,
+								# 		size = "sm",
+								# 		status = "default"
+								# 	),
+								# 	shinyWidgets::radioGroupButtons(
+								# 		inputId = ns("airgap_shift_incr"),
+								# 		label = "Increments",
+								# 		choices = c(
+								# 			"1m" = "1m",
+								# 			"5m" = "5m"
+								# 		),
+								# 		width = "30%",
+								# 		selected = "5m",
+								# 		justified = FALSE,
+								# 		size = "sm",
+								# 		status = "default"
+								# 	),
+								# 	shinyWidgets::radioGroupButtons(
+								# 		ns("heightshift_output_type"),
+								# 		label = "View Mode",
+								# 		choiceNames = list(
+								# 			bsicons::bs_icon("table"),
+								# 			bsicons::bs_icon("graph-up")
+								# 		),
+								# 		choiceValues = list("table", "plot"),
+								# 		selected = "table",
+								# 		direction = "horizontal",
+								# 		size = "sm",
+								# 		justified = FALSE,
+								# 		width = "20%"
+								# 	)
+								# ),
 								conditionalPanel(
 									condition = paste0(
 										"input['",
@@ -722,6 +778,17 @@ mod_data_analysis_server <- function(
 				selected = unique(out$unique_fhd)[1]
 			)
 
+			# We need to append a unique colour to each unique_fhd
+			unique_colours <- data.frame(
+				unique_fhd = unique(out$unique_fhd),
+				colours = rainbow(length(unique(out$unique_fhd)))
+			)
+			out <- out |>
+				dplyr::left_join(
+					unique_colours,
+					by = "unique_fhd"
+				)
+
 			out
 		})
 
@@ -872,12 +939,19 @@ mod_data_analysis_server <- function(
 		# ---- Step 5b: Heightshift plot ----
 		output$heightshift_plot <- plotly::renderPlotly({
 			req(heightshift_data())
+
+			# Get colour scheme from the other plot
+			colour_scheme <- plot_ready_data() |>
+				dplyr::distinct(unique_fhd, colours) |>
+				dplyr::arrange(unique_fhd)
+
 			req(nrow(heightshift_data()[["perc"]]) > 0)
 			plot_heightshift(
 				heightshift_data = heightshift_data(),
 				metric = input$airgap_shift_metric,
 				airgap = input$airgap,
-				rotor_radius = input$rotor_radius
+				rotor_radius = input$rotor_radius,
+				colour_scheme = colour_scheme
 			)
 		})
 
