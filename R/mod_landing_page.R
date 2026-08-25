@@ -203,28 +203,27 @@ mod_landing_page_ui <- function(id) {
 					),
 					bslib::layout_columns(
 						col_widths = c(4, 4, 4),
-									actionButton(
-											ns("link_guide"),
-											label = tagList(
-												bsicons::bs_icon("info-circle"),
-												"Guide"
-											),
-											class = "not-arrow-btn",
-											style = "width: 100%;"
-										),
-													mod_app_tour_ui(
-															ns("app_tour"),
-															style = "width: 100%;"
-														),
-																actionButton(
-																		ns("go_data"),
-																		label = tagList(
-																			bsicons::bs_icon("play-circle"),
-																			"Start"
-																		),
-																		class = "arrow-btn"
-																	)
-
+						actionButton(
+							ns("link_guide"),
+							label = tagList(
+								bsicons::bs_icon("info-circle"),
+								"Guide"
+							),
+							class = "not-arrow-btn",
+							style = "width: 100%;"
+						),
+						mod_app_tour_ui(
+							ns("app_tour"),
+							style = "width: 100%;"
+						),
+						actionButton(
+							ns("go_data"),
+							label = tagList(
+								bsicons::bs_icon("play-circle"),
+								"Start"
+							),
+							class = "arrow-btn"
+						)
 					),
 					# div(
 					# 	class = "d-flex flex-column align-items-center justify-content-center gap-4 my-3",

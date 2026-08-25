@@ -110,7 +110,7 @@ mod_app_tour_server <- function(id) {
     )$step(
       el = paste0("#", data_tab_ns("map_filters")),
       title = "Filter FHDs",
-      text = "Use these filters to narrow down the available FHDs based on your criteria. <br><br>For example, you can filter by species and season to find the FHDs that are most relevant to your analysis.",
+      text = "Use these selectors to narrow down the available FHDs based on your criteria. <br><br>For example, you can filter by species and season to find the FHDs that are most relevant to your analysis.",
       position = "right-start"
     )$step(
       el = paste0("#", data_tab_ns("upload_data")),
@@ -157,56 +157,52 @@ mod_app_tour_server <- function(id) {
     )$step(
       el = "#main-nav",
       title = "Navigation Bar",
-      text = "The navigation bar lets you move between the main sections of the app. You can also access the documentation, settings and app version from here.",
-      position = "bottom",
-      canClickTarget = FALSE
-    )$step(
-      el = "[data-value='nav-home']",
-      #title = "Home",
-      text = "This button gets you back to the starting point.",
-      position = "bottom",
-      canClickTarget = FALSE
-    )$step(
-      el = "[data-value='nav-data-select']",
-      #title = "FHD Selection",
-      text = "This one takes you back to the FHD selection section.",
-      position = "bottom",
-      canClickTarget = FALSE
-    )$step(
-      el = "[data-value='nav-analysis']",
-      #title = "Visualisation & Export",
-      text = "While clicking here sends you to the FHD visualisation and download section.",
-      position = "bottom",
-      canClickTarget = FALSE
-    )$step(
-      el = "li.nav-item.dropdown:has(.bi-book-fill)",
-      #title = "Documentation",
-      text = "The <strong>Documentation</strong> menu gives you access to <strong>Data Sources</strong>, which provides information about the FHD database and its provenance, the full <strong>User Guide</strong>, and the <strong>Metadata Builder</strong> tool.",
-      position = "bottom",
-      canClickTarget = FALSE
-    )$step(
-      el = "li.nav-item.dropdown:has(.bi-gear-fill)",
-      #title = "Settings",
-      text = "The <strong>Settings</strong> menu lets you report a bug or reset your session to start fresh.",
-      position = "bottom",
-      canClickTarget = FALSE
-    )$step(
-      el = "#app-version-container",
-      title = "App Version",
-      text = "The current version of ReSCUEApp is shown here. This is useful when reporting bugs or checking that you are using the latest release. Click the version number to view the app's release notes and history.",
+      text = paste0(
+        "The navigation bar lets you move between the main sections of the app:",
+        "<ul style='margin-top:0.6em; padding-left:1.2em; line-height:2;'>",
+        "<li>",
+        as.character(bsicons::bs_icon("house-fill")),
+        " <strong>Welcome</strong> &mdash; return to the home page.</li>",
+        "<li>",
+        as.character(bsicons::bs_icon("funnel-fill")),
+        " <strong>Data Selection</strong> &mdash; choose and filter FHDs.</li>",
+        "<li>",
+        as.character(bsicons::bs_icon("bar-chart-fill")),
+        " <strong>Visualisation &amp; Export</strong> &mdash; explore, compare and download selected FHDs.</li>",
+        "<li>",
+        as.character(bsicons::bs_icon("book-fill")),
+        " <strong>Documentation</strong> &mdash; access Data Sources, the User Guide, and the Metadata Builder.</li>",
+        "<li>",
+        as.character(bsicons::bs_icon("gear-fill")),
+        " <strong>Settings</strong> &mdash; report a bug or reset your session.</li>",
+        "<li>",
+        as.character(bsicons::bs_icon("github")),
+        " <strong>GitHub</strong> &mdash; view the source repository.</li>",
+        "<li>",
+        as.character(bsicons::bs_icon("tag-fill")),
+        " <strong>App version</strong> &mdash; click to view the release notes and changelog.</li>",
+        "</ul>"
+      ),
       position = "bottom",
       canClickTarget = FALSE
     )$step(
       title = "You're all set!",
       text = paste0(
         "That's the full walkthrough. From here, you can:
-      <br><br>&bull; Navigate to the <strong>Select Flight Height Distributions</strong> tab to tweak your selection.
-      <br>&bull; Adjust <strong>Turbine Parameters</strong> or covariate selections to explore different scenarios.
-      <br>&bull; Use the info buttons  ",
+        <ul style='margin-top:0.6em; padding-left:1.2em; line-height:2;'>",
+        "<li>",
+        " Navigate to the <strong>Select Flight Height Distributions</strong> tab to tweak your selection.",
+        "<li>",
+        "Adjust <strong>Turbine Parameters</strong> or covariate selections to explore different scenarios.",
+        "<li>",
+        "Use the info buttons ",
         as.character(bsicons::bs_icon("info-circle")),
-        "  on each section for more detail.
-      <br>&bull; <strong>Download</strong> your results once you're happy with your selection.
-      <br><br><small style='color: #999;'>You can restart this tour at any time from the 'Start Tutorial' button on the home page.</small>"
+        " on each section for more detail.",
+        "<li>",
+        "<strong>Download</strong> your results once you're happy with your selection.",
+        "</li>",
+        "</ul>",
+        "<br><br><small style='color: #999;'>You can restart this tour at any time from the 'Start Tutorial' button on the home page.</small>"
       ),
       tabId = "main-nav",
       tab = "nav-home",
