@@ -97,7 +97,7 @@ app_ui <- function(request) {
 				) |>
 					bslib::tooltip(
 						placement = "bottom",
-						"Data Selection"
+						"FHD Selection"
 					),
 				value = "nav-data-select",
 				mod_data_select_ui("data_select")
@@ -112,7 +112,7 @@ app_ui <- function(request) {
 				) |>
 					bslib::tooltip(
 						placement = "bottom",
-						"Analysis"
+						"Visualisation & Export"
 					),
 				value = "nav-analysis",
 				mod_data_analysis_ui("data_analysis")

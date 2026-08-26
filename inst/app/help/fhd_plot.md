@@ -18,9 +18,10 @@ The flight height distribution plot shows the probability distribution of bird f
 
 ### Customization
 
-You can customize what data is displayed by:
-- Adjusting covariate selections in the "Selected Data" panel
+You can customize what content is displayed by:
+- Adjusting covariate selections using the <img src="../www/covars_button.png" height="9%" width="9%" style = "vertical-align: center"/> button in each selected FHD, listed on the top-left panel.
 - Toggling the legend on or off using the switch in the card header
+
 
 ---
 

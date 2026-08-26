@@ -185,7 +185,7 @@ mod_data_analysis_ui <- function(id) {
 								actionButton(
 									ns("test"),
 									icon = bsicons::bs_icon("gear"),
-									label = "Turbines",
+									label = "Turbine Parameters",
 									class = "btn-success"
 								) |>
 									bslib::popover(
