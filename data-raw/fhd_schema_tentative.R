@@ -146,6 +146,13 @@ if (1) {
   )
 
   fhd_schema$metadata$AddChild(
+    "vertical_datum",
+    class = "<character>",
+    descr = "Vertical datum used for height measurements",
+    values = "'Mean Sea Level', 'Lowest Astronomical Tide', etc."
+  )
+
+  fhd_schema$metadata$AddChild(
     "month",
     class = "<integer>",
     descr = "For monthly scale",
@@ -243,7 +250,6 @@ print(fhd_schema, "class", "descr", "values")
 
 data.tree::ToDataFrameTree(fhd_schema, "class", "descr", "values") |>
   saveRDS("data-raw/fhd_schema_tentative.rds")
-
 
 # readRDS("data-dummy/metadata/Kittiwake_Wales_V_Bay.rds")
 # readRDS("data-dummy/draws/Kittiwake_Wales_V_Bay.rds")

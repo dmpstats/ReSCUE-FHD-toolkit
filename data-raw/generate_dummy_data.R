@@ -87,8 +87,9 @@ generate_dummy_data <- function(
     bdmps_region <- bd$BDMPS.regi[i]
     bd_polygon <- sf::st_geometry(bd)[i]
 
+
     # Create species_id from the actual species name
-    species_id <- paste0("species_", gsub(" ", "_", tolower(species)))
+    species_id <- gsub(" ", "_", tolower(species))
     name_common <- tools::toTitleCase(species)
 
     # Generate synthetic scientific name (plaintext, doesn't matter later)
@@ -106,6 +107,10 @@ generate_dummy_data <- function(
     method <- sample(c("LiDAR-DAS", "GPS", "Altimeter", "LRF", "Visual"), 1)
     spatial_scale <- sample(c("site-specific", "regional", "national"), 1)
     temporal_scale <- sample(c("monthly", "seasonal", "annual"), 1)
+    vertical_datum <- sample(
+      c("Mean Sea Level", "Lowest Astronomical Tide", "NAVD88"),
+      1
+    )
     month <- sample(1:12, 1)
     year <- sample(2000:2024, 1)
     seasons <- sample(
@@ -214,6 +219,7 @@ generate_dummy_data <- function(
       method = method,
       spatial_scale = spatial_scale,
       temporal_scale = temporal_scale,
+      vertical_datum = vertical_datum,
       month = month,
       season = paste(seasons, collapse = ", "),
       year = year,
