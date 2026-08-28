@@ -1198,6 +1198,7 @@ mod_data_analysis_server <- function(
 				"name_common",
 				"name_scientific",
 				"method",
+				"vertical_datum",
 				"spatial_scale",
 				"temporal_scale",
 				"season",
