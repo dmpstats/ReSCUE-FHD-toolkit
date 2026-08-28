@@ -48,7 +48,8 @@ Imports:
     sf,
     tidyr,
     abind,
-    RColorBrewer
+    RColorBrewer,
+    stringr
 Suggests:
     spelling,
     testthat (>= 3.0.0)
