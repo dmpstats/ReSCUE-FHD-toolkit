@@ -718,13 +718,14 @@ mod_data_analysis_server <- function(
 		plot_ready_data <- reactive({
 			req(processed_fhds())
 			req(length(processed_fhds()) > 0)
+
 			# The columns we can always expect are height, draw_id, probability, fhd_id.
 			# Any additional columns are covariates.
 			# Create a new column identifying each unique FHD, i.e. unique
 			# combination of fhd_id and covariate levels.
 			alldat <- dplyr::bind_rows(processed_fhds(), .id = "fhd_id")
 			expected_cols <- c("height", "draw_id", "probability", "fhd_id")
-			unexpected_cols <- setdiff(
+			covar_cols <- setdiff(
 				lapply(
 					processed_fhds(),
 					names
@@ -732,21 +733,42 @@ mod_data_analysis_server <- function(
 					unlist(),
 				expected_cols
 			)
+
+			# Generate unique ID for FHD, including covariate levels if present. This is used
+			# for plotting and table generation.
+			# NOTE: Not the sexiest chunk of code but it works. Might revisit in future for
+			# refactoring
 			uuid <- alldat |>
-				dplyr::select(dplyr::all_of(c("fhd_id", unexpected_cols))) |>
+				dplyr::select(dplyr::all_of(c("fhd_id", covar_cols))) |>
 				dplyr::distinct() |>
+				# 1st: combine covariate names and levels into a single string
+				dplyr::mutate(
+					across(
+						dplyr::all_of(covar_cols),
+						~ dplyr::case_when(
+							is.na(.x) ~ NA_character_,
+							TRUE ~ paste0(
+								gsub("_", " ", dplyr::cur_column()) |>
+									abbreviate(minlength = 4),
+								": ",
+								.x
+							)
+						),
+						.names = "{.col}_lbl"
+					)
+				) |>
+				# 2nd: group by fhd_id and create a unique identifier for each combination
 				dplyr::group_by(fhd_id) |>
 				dplyr::mutate(
-					unique_fhd = if (length(unexpected_cols) == 0 || dplyr::n() == 1L) {
-						# No covariates, or only one combination — use fhd_id directly
-						fhd_id
-					} else {
+					unique_fhd = dplyr::case_when(
+						length(covar_cols) == 0 ~ fhd_id,
+						all(is.na(dplyr::pick(dplyr::all_of(covar_cols)))) ~ fhd_id,
 						# Multiple splits of the same FHD — append covariate values in brackets
-						paste0(
+						TRUE ~ paste0(
 							fhd_id,
-							" [",
+							"\n[",
 							apply(
-								dplyr::pick(dplyr::all_of(unexpected_cols)),
+								dplyr::pick(dplyr::any_of(paste0(covar_cols, "_lbl"))),
 								1,
 								function(x) {
 									paste(na.omit(x), collapse = " \u00b7 ")
@@ -754,11 +776,13 @@ mod_data_analysis_server <- function(
 							),
 							"]"
 						)
-					}
+					)
 				) |>
-				dplyr::ungroup()
+				dplyr::ungroup() |>
+				dplyr::select(fhd_id, dplyr::all_of(covar_cols), unique_fhd)
+
 			out <- alldat |>
-				dplyr::left_join(uuid, by = c("fhd_id", unexpected_cols))
+				dplyr::left_join(uuid, by = c("fhd_id", covar_cols))
 
 			# If there are >10 unique FHDs, filter to only the first 10,
 			# and show a warning toast.
@@ -894,7 +918,7 @@ mod_data_analysis_server <- function(
 						caption_text
 					),
 					rownames = FALSE,
-					colnames = c("FHD ID" = "fhd_id"),
+					colnames = c("FHD" = "fhd_id"),
 					extensions = c("FixedHeader"),
 					options = list(
 						dom = "Bfrt",
@@ -989,14 +1013,7 @@ mod_data_analysis_server <- function(
 				draw_col = "draw_id",
 				risk_min = input$airgap,
 				risk_max = input$airgap + (2 * input$rotor_radius)
-			) #|>
-			# # Add a % to all cols except the first
-			# dplyr::mutate(
-			# 	dplyr::across(
-			# 		-1,
-			# 		~ paste0(.x, "%")
-			# 	)
-			# )
+			)
 
 			DT::datatable(
 				sumdat,
@@ -1098,7 +1115,7 @@ mod_data_analysis_server <- function(
 				plt <- add_fhd(
 					plot = plt,
 					fhd_data = fhd_subset,
-					id_col = "fhd_id",
+					id_col = "unique_fhd",
 					height_col = "height",
 					draw_col = "draw_id",
 					prob_col = "probability",
@@ -1107,7 +1124,8 @@ mod_data_analysis_server <- function(
 					} else {
 						NULL
 					},
-					index = if (length(plot_by_cov) > 0) fhd_index else NULL
+					index = if (length(plot_by_cov) > 0) fhd_index else NULL,
+					compact_legend = FALSE
 				)
 
 				plt <- plt |>

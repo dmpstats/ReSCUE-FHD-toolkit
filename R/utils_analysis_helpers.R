@@ -61,7 +61,7 @@ make_fhd_summary <- function(
         round(3)
     ) |>
     dplyr::rename(
-      "FHD ID" = fhd_id,
+      "FHD" = fhd_id,
       "Median" = q50_risk,
       "25 %tile" = q25_risk,
       "75 %tile" = q75_risk

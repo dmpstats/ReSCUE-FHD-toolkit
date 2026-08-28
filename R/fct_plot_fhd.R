@@ -1,12 +1,13 @@
 add_fhd <- function(
   plot,
   fhd_data,
-  id_col = "fhd_id",
+  id_col = "unique_fhd",
   height_col = "height",
   draw_col = "draw_id",
   prob_col = "probability",
   plot_by_cov = NULL,
-  index = NULL
+  index = NULL,
+  compact_legend = TRUE
 ) {
   plotdat <- fhd_data
   plotdat$f_id <- plotdat[[id_col]]
@@ -18,19 +19,26 @@ add_fhd <- function(
   if (is.null(plot_by_cov) | length(plot_by_cov) == 0) {
     plotdat$group_col <- fhd_data[[id_col]]
   } else {
-    plot_by_cov <- as.character(plot_by_cov)
+    # compact legends if requested, otherwise use the covariate values as-is for the legend labels
+    if (compact_legend) {
+      plot_by_cov <- as.character(plot_by_cov)
 
-    # Build compact legend labels: covariate level values joined with ".".
-    # Prefix with the FHD index so entries from different FHDs never collide
-    # in the plotly legend (e.g. "1.cold.low", "2.cold.low").
-    # NAs are omitted to avoid mismatches between FHDs with different covariates.
-    plotdat$group_col <- apply(
-      plotdat[, plot_by_cov, drop = FALSE],
-      1,
-      function(x) paste(na.omit(x), collapse = ".")
-    )
-    if (!is.null(index)) {
-      plotdat$group_col <- paste0(index, ".", plotdat$group_col)
+      # Build compact legend labels: covariate level values joined with ".".
+      # Prefix with the FHD index so entries from different FHDs never collide
+      # in the plotly legend (e.g. "1.cold.low", "2.cold.low").
+      # NAs are omitted to avoid mismatches between FHDs with different covariates.
+      plotdat$group_col <- apply(
+        plotdat[, plot_by_cov, drop = FALSE],
+        1,
+        function(x) paste(na.omit(x), collapse = ".")
+      )
+      if (!is.null(index)) {
+        plotdat$group_col <- paste0(index, ".", plotdat$group_col)
+      }
+    } else {
+      plotdat$group_col <- plotdat[[id_col]]
+      # # add linebreak to covars
+      # plotdat$group_col <- sub(" ", "\n", plotdat$group_col)
     }
   }
 
@@ -90,7 +98,7 @@ add_fhd <- function(
       ),
       hoverinfo = "text",
       text = ~ paste(
-        "fhd_id:",
+        "FHD:",
         f_id,
         # "<br>Group:",
         # group_col,
