@@ -918,7 +918,7 @@ mod_data_analysis_server <- function(
 						caption_text
 					),
 					rownames = FALSE,
-					colnames = c("FHD" = "fhd_id"),
+					colnames = c("FHD ID" = "fhd_id"),
 					extensions = c("FixedHeader"),
 					options = list(
 						dom = "Bfrt",

@@ -75,7 +75,7 @@ add_fhd <- function(
       opacity = 0.2,
       hoverinfo = "text",
       text = ~ paste(
-        "fhd_id:",
+        "FHD ID:",
         f_id,
         # "<br>Group:",
         # group_col,
@@ -98,7 +98,7 @@ add_fhd <- function(
       ),
       hoverinfo = "text",
       text = ~ paste(
-        "FHD:",
+        "FHD ID:",
         f_id,
         # "<br>Group:",
         # group_col,
@@ -182,11 +182,12 @@ fhd_baseplot <- function(
 ) {
   p1 <- plotly::plot_ly() |>
     plotly::layout(
-      title = "Flight Height Distributions",
+      #title = "Flight Height Distributions",
+      title = NA,
       xaxis = list(title = "Height"),
       yaxis = list(title = "Probability"),
       legend = list(
-        title = list(text = "FHD"),
+        title = list(text = "FHD ID"),
         # Draw the legend inside the top-right of the plotting area, rather
         # than in the (wide) margin to the right of the plot.
         x = 0.99,
