@@ -67,7 +67,10 @@ mod_data_select_ui <- function(id) {
 							"Flight-Height Distributions",
 							class = "text-bg-primary",
 							bslib::toolbar(
-								mod_help_button_ui(ns("select_data"), type = "toolbar")
+								mod_help_button_ui(
+									ns("select_data"),
+									type = "toolbar"
+								)
 							)
 						),
 						bslib::card_body(
@@ -393,14 +396,18 @@ mod_data_select_server <- function(
 				if (input$season == "both") {
 					data <- dplyr::filter(
 						data,
-						season %in% c("nonbreeding, breeding", "breeding, nonbreeding")
+						season %in%
+							c("nonbreeding, breeding", "breeding, nonbreeding")
 					)
 				} else {
 					data <- dplyr::filter(data, season == input$season)
 				}
 			}
 			if (length(input$crm_recommended) > 0) {
-				data <- dplyr::filter(data, crm_recommended %in% input$crm_recommended)
+				data <- dplyr::filter(
+					data,
+					crm_recommended %in% input$crm_recommended
+				)
 			}
 			if (length(input$region) > 0) {
 				data <- dplyr::filter(data, region %in% input$region)
@@ -499,7 +506,11 @@ mod_data_select_server <- function(
 
 			leaflet::leafletProxy("source_map", session) |>
 				leaflet::clearGroup("main_data") |>
-				add_fhd_polygons(data = data, selected_ids = selected_ids(), ns = ns)
+				add_fhd_polygons(
+					data = data,
+					selected_ids = selected_ids(),
+					ns = ns
+				)
 		})
 
 		observe({
@@ -570,7 +581,7 @@ mod_data_select_server <- function(
 					dplyr::all_of(
 						c(
 							"fhd_id",
-							"species_id",
+							"name_common",
 							"method",
 							"season"
 						)
@@ -578,7 +589,7 @@ mod_data_select_server <- function(
 				) |>
 				dplyr::rename(
 					"FHD ID" = fhd_id,
-					"Species" = species_id,
+					"Species" = name_common,
 					"Method" = method,
 					"Season" = season
 				)
@@ -604,7 +615,10 @@ mod_data_select_server <- function(
 				details <- metadata_tbl[metadata_tbl$fhd_id == fhd_id, ] |>
 					as.data.frame() |>
 					dplyr::mutate(
-						covariates = paste(names(covariates[[1]]), collapse = ", "),
+						covariates = paste(
+							names(covariates[[1]]),
+							collapse = ", "
+						),
 						covariates = ifelse(
 							covariates == "",
 							"No covariates",
