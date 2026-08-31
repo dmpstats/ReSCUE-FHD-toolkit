@@ -1,24 +1,64 @@
 #' heightshift
 #'
-#' @description A fct function for evaluating changing FHD risk-zones as the
-#'  height of the turbine is increased or decreased.
+#' @description Evaluate how FHD risk probabilities change across a range of turbine
+#' rotor heights. This function simulates shifting the turbine rotor vertically
+#' through the air column and quantifies the resulting changes in collision probability
+#' for each FHD, both as absolute probabilities and as percentage changes relative
+#' to the baseline turbine position.
 #'
-#' @param fhd_data A data frame containing the FHD risk-zone data for a given turbine height.
-#' @param height_col The column name for the turbine height values.
-#' @param prob_col The column name for the probability values.
-#' @param id_col The column name for the unique FHD identifiers.
-#' @param draw_id_col The column name for the draw identifiers.
-#' @param risk_min The minimum height of the turbine rotor (in meters).
-#' @param risk_max The maximum height of the turbine rotor (in meters).
-#' @param round A 2-length vector of integers specifying the number of decimal places to round the probability and percentage values to, respectively. If NULL, no rounding is performed.
+#' @details
+#' The function operates by:
+#' \enumerate{
+#'   \item Creating a series of hypothetical rotor positions within the data range,
+#'   each maintaining the same rotor diameter as the baseline configuration.
+#'   \item For each height shift, computing the probability of FHD risk by aggregating
+#'   collision data within the shifted rotor window.
+#'   \item Averaging collision probabilities across multiple draws (if present
+#'   in the data) to account for uncertainty in FHD encounter positions.
+#'   \item Calculating percentage changes relative to the baseline turbine height.
+#' }
 #'
+#' @param fhd_data A data frame containing FHD collision probability data, typically
+#' output from an FHD analysis workflow. Expected structure: one row per (FHD, height,
+#' draw) combination with associated probability values.
+#' @param height_col Character string specifying the column name containing turbine
+#' rotor heights (m). Default is `"height"`.
+#' @param prob_col Character string specifying the column name containing probability
+#' or cumulative probability values for FHD collisions. Default is `"prob"`.
+#' @param id_col Character string specifying the column name containing unique FHD
+#' identifiers. Default is `"fhd_id"`.
+#' @param draw_id_col Character string specifying the column name containing Monte Carlo
+#' draw identifiers. Used to stratify calculations across uncertainty samples.
+#' Default is `"draw_id"`.
+#' @param risk_min Numeric scalar specifying the minimum height of the baseline turbine
+#' rotor, AKA the airgap (m). Defines the lower boundary of the rotor disk.
+#' @param risk_max Numeric scalar specifying the maximum height of the baseline turbine
+#' rotor (m). Defines the upper boundary of the rotor disk. The rotor diameter
+#' is calculated as `risk_max - risk_min`.
+#' @param round A 2-element integer vector `c(prob_places, perc_places)` specifying
+#' decimal places for rounding the output. The first element rounds probability values,
+#' the second rounds percentage changes. If `NULL`, no rounding is applied.
+#' Default is `c(4, 2)`.
+#' @param restrict_bounds Logical. If `TRUE` (default), restricts height shifts to
+#' positions within ±40 m of the baseline `risk_min`, preventing unrealistic turbine
+#' placements. If `FALSE`, all shifts within the data range are considered.
+#' @param condensed_table Logical. If `FALSE` (default), height shifts are applied
+#' in 1-meter increments. If `TRUE`, shifts use 5-meter increments, producing a
+#' more compact output table.
 #'
-#' @return A matrix whereby each row represents a unique FHD identifier and each
-#'  column represents a unique turbine height. The values in the
-#' matrix represent the probability of FHD risk for each
-#' identifier at each height.
+#' @return A list with two elements:
+#' \describe{
+#' \item{\code{prob}}{A matrix of absolute FHD collision probabilities. Rows represent
+#'   FHD identifiers; columns represent height shifts (labeled with meter offsets from
+#'   baseline, e.g., `"+0m"`, `"+5m"`, `"-10m"`). The matrix includes
+#'   an `fhd_id` column prepended at index 1. An attribute `"true_fhd_col"`
+#'   marks the column index of the baseline turbine position.}
+#'   \item{\code{perc}}{A matrix of percentage changes in FHD collision probability
+#'   relative to the baseline configuration. Same structure as `prob`, with values
+#'   representing percent change (e.g., `+5` means 5% increase). Enables direct
+#'   comparison of FHD risk sensitivity across the rotor height range.}
+#' }
 #'
-#' @noRd
 heightshift <- function(
   fhd_data,
   height_col = "height",
@@ -40,22 +80,35 @@ heightshift <- function(
   )
 
   max_height <- max(fhd_data$height, na.rm = TRUE)
-  turbine_height <- risk_max - risk_min
+  rotor_diameter <- risk_max - risk_min
   step <- if (condensed_table) 5 else 1
 
-  heightshifts <- data.frame(
-    risk_min = seq(from = 0, to = max_height - turbine_height, by = step),
-    risk_max = seq(from = turbine_height, to = max_height, by = step)
+  # lowest positive height given step and airgap
+  lowest_height <- risk_min - (floor(risk_min / step) * step)
+
+  heightshifts <- tibble::tibble(
+    shifted_risk_min = seq(
+      lowest_height,
+      max_height - rotor_diameter,
+      by = step
+    ),
+    shifted_risk_max = seq(
+      lowest_height + rotor_diameter,
+      max_height,
+      by = step
+    )
   )
 
   # Restrict to shifts within ±40 m of the true turbine position
   if (restrict_bounds) {
-    heightshifts <- heightshifts[abs(heightshifts$risk_min - risk_min) <= 40, ]
+    heightshifts <- heightshifts[
+      abs(heightshifts$shifted_risk_min - risk_min) <= 40,
+    ]
     rownames(heightshifts) <- NULL
   }
 
   # Positional index of the true turbine setting in the (possibly restricted) table
-  true_fhd_id <- which(heightshifts$risk_min == risk_min)
+  true_fhd_id <- which(heightshifts$shifted_risk_min == risk_min)
 
   # Pre-split data by fhd_id so we only subset the data frame once per FHD
   data_split <- split(fhd_data, fhd_data$fhd_id)
@@ -63,8 +116,8 @@ heightshift <- function(
 
   # Vectorised computation: for each FHD build a draw × height matrix, then
   # for every height-shift window sum the relevant columns and average over draws.
-  hs_risk_min <- heightshifts$risk_min
-  hs_risk_max <- heightshifts$risk_max
+  hs_risk_min <- heightshifts$shifted_risk_min
+  hs_risk_max <- heightshifts$shifted_risk_max
   n_shifts <- nrow(heightshifts)
 
   fhd_prob_matrix <- vapply(
@@ -99,7 +152,7 @@ heightshift <- function(
   fhd_prob_matrix <- t(fhd_prob_matrix)
 
   # Label columns with the actual metre shift from the true turbine position
-  actual_shifts <- heightshifts$risk_min - risk_min
+  actual_shifts <- heightshifts$shifted_risk_min - risk_min
   col_labels <- paste0(ifelse(actual_shifts >= 0, "+", ""), actual_shifts, "m")
   dimnames(fhd_prob_matrix) <- list(fhd_ids, col_labels)
 
