@@ -259,7 +259,7 @@ app_ui <- function(request) {
 				),
 				bslib::nav_item(
 					shiny::actionLink(
-						"reset_session",
+						"reset_app",
 						label = tagList(
 							bsicons::bs_icon("arrow-counterclockwise"),
 							"Reset Session"
