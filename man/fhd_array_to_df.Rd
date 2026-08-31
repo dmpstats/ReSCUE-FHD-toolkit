@@ -7,20 +7,20 @@
 fhd_array_to_df(arr, height_col = NULL, draw_col = NULL, prob_col = NULL)
 }
 \arguments{
-\item{arr}{A 3D array produced by [fhd_df_to_array()], with dimensions
-`n_height x n_draws x n_covs_combinations`.}
+\item{arr}{A 3D array produced by \code{\link[=fhd_df_to_array]{fhd_df_to_array()}}, with dimensions
+\verb{n_height x n_draws x n_covs_combinations}.}
 
 \item{height_col, draw_col, prob_col}{Optional overrides for the height,
 draw ID and probability column names in the output dataframe. Default to
-the names used when `arr` was created via [fhd_df_to_array()].}
+the names used when \code{arr} was created via \code{\link[=fhd_df_to_array]{fhd_df_to_array()}}.}
 }
 \value{
 A long-format tibble with one row per height x draw x
-  covariate-level combination: `height_col`, `draw_col`, the original
-  covariate columns, and `prob_col`.
+covariate-level combination: \code{height_col}, \code{draw_col}, the original
+covariate columns, and \code{prob_col}.
 }
 \description{
-Inverse of [fhd_df_to_array()]. Relies on the `covs` and `col_names`
-attributes attached by [fhd_df_to_array()] to recover the original
+Inverse of \code{\link[=fhd_df_to_array]{fhd_df_to_array()}}. Relies on the \code{covs} and \code{col_names}
+attributes attached by \code{\link[=fhd_df_to_array]{fhd_df_to_array()}} to recover the original
 covariate columns and column names
 }

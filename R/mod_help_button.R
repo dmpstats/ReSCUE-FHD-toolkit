@@ -1,9 +1,13 @@
 #' help_button UI Function
 #'
 #' Renders a small info-circle icon button that, when clicked, displays a
-#' markdown help file in a modal dialog. Pair with [mod_help_button_server()].
+#' markdown help file in a modal dialog.
 #'
-#' @param id Shiny module namespace ID.
+#' @param id Shiny module namespace ID. Pairs with `mod_help_button_server()``.
+#' @param type Character scalar. The type of help button to render. Options are:
+#'   - `"button-only"`: Renders an icon-only button.
+#'   - `"button-text"`: Renders a button with both icon and text.
+#'   - `"toolbar"`: Renders a toolbar input button.
 #'
 #' @return A Shiny tag object containing an icon-only action button.
 #'
@@ -82,7 +86,7 @@ mod_help_button_ui <- function(
 #' markdown file from `inst/app/help/` in a modal dialog.
 #'
 #' @param id Shiny module namespace ID. Must match the `id` used in
-#'   [mod_help_button_ui()].
+#'   `mod_help_button_ui()`.
 #' @param help_file Character scalar. The filename stem (no path, no `.md`
 #'   extension) of a markdown file stored in `inst/app/help/`. For example,
 #'   `"data_upload"` maps to `inst/app/help/data_upload.md`.

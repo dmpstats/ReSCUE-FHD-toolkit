@@ -21,9 +21,9 @@ fhd_df_to_array(
 \item{prob_col}{Name of the probability (value) column.}
 }
 \value{
-A 3D array with dimensions `n_height x n_draws x n_covs_combinations`.
-  Dimnames are `height` (sorted height values), `draw_id` (sorted draw IDs),
-  and `covs` (covariate combinations, sorted and pasted together with "_").
+A 3D array with dimensions \verb{n_height x n_draws x n_covs_combinations}.
+Dimnames are \code{height} (sorted height values), \code{draw_id} (sorted draw IDs),
+and \code{covs} (covariate combinations, sorted and pasted together with "_").
 }
 \description{
 Reshape a long-format FHD dataframe into a 3D array

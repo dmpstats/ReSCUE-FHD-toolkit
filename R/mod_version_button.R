@@ -1,7 +1,7 @@
 #' version_button UI Function
 #'
 #' Renders a button displaying the app version that, when clicked, opens
-#' the NEWS.md file in a popover. Pair with [mod_version_button_server()].
+#' the NEWS.md file in a popover. Pair with `mod_version_button_server()`.
 #'
 #' @param id Shiny module namespace ID.
 #'
@@ -33,10 +33,10 @@ mod_version_button_ui <- function(id) {
 #' file in a popover.
 #'
 #' @param id Shiny module namespace ID. Must match the `id` used in
-#'   [mod_version_button_ui()].
+#'   `mod_version_button_ui()`.
 #'
 #' @examples
-#' # In app_server or a parent module server:
+#' # In app_server or a parent module server:#'
 #' mod_version_button_server("app_version")
 #'
 #' @noRd
