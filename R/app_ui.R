@@ -254,7 +254,8 @@ app_ui <- function(request) {
 						href = "https://github.com/dmpstats/ReSCUE-FHD-toolkit/issues",
 						target = "_blank",
 						bsicons::bs_icon("bug-fill"),
-						"Report a Bug"
+						"Report a Bug",
+						class = "nav-item-link"
 					)
 				),
 				bslib::nav_item(
@@ -263,7 +264,8 @@ app_ui <- function(request) {
 						label = tagList(
 							bsicons::bs_icon("arrow-counterclockwise"),
 							"Reset Session"
-						)
+						),
+						class = "nav-item-link"
 					)
 				)
 			)

@@ -15,6 +15,44 @@
   padding-bottom: 0;
 }
 
+/* nav_menu() dropdown items styling */
+.dropdown-menu .dropdown-item {
+  color: var(--bs-body-color);
+  font-size: 0.95rem;
+  padding: 0.5rem 1rem;
+  transition: all 0.2s ease;
+}
+
+.dropdown-menu .dropdown-item:hover {
+  color: var(--bs-success);
+  font-weight: 500;
+}
+
+.dropdown-menu .dropdown-item:active,
+.dropdown-menu .dropdown-item.active {
+  background-color: var(--bs-success);
+  color: var(--bs-primary);
+}
+
+/* Optional: style nav_menu() dividers */
+.dropdown-menu .dropdown-divider {
+  border-color: var(--bs-secondary);
+}
+
+
+.nav-item-link {
+  color: var(--bs-body-color);
+  font-size: 0.95rem;
+  padding: 0.5rem 1rem;
+  transition: all 0.2s ease;
+}
+
+.nav-item-link:hover {
+  color: var(--bs-success) !important;
+  font-weight: 500;
+}
+
+
 
 
 /* Conductor guide tour tooltip */
