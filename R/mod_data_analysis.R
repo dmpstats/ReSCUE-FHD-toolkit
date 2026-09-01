@@ -285,8 +285,8 @@ mod_data_analysis_ui <- function(id) {
 									ns("download_contents"),
 									"Select contents to download",
 									choices = c(
-										"SCRM Data" = "data",
-										"FHD Plot" = "plot",
+										"CRM Formatted FHD" = "data",
+										"Plot" = "plot",
 										"Metadata" = "metadata"
 									),
 									width = "100%",
@@ -762,13 +762,18 @@ mod_data_analysis_server <- function(
 				dplyr::mutate(
 					unique_fhd = dplyr::case_when(
 						length(covar_cols) == 0 ~ fhd_id,
-						all(is.na(dplyr::pick(dplyr::all_of(covar_cols)))) ~ fhd_id,
+						all(is.na(dplyr::pick(dplyr::all_of(
+							covar_cols
+						)))) ~ fhd_id,
 						# Multiple splits of the same FHD — append covariate values in brackets
 						TRUE ~ paste0(
 							fhd_id,
 							"\n[",
 							apply(
-								dplyr::pick(dplyr::any_of(paste0(covar_cols, "_lbl"))),
+								dplyr::pick(dplyr::any_of(paste0(
+									covar_cols,
+									"_lbl"
+								))),
 								1,
 								function(x) {
 									paste(na.omit(x), collapse = " \u00b7 ")
@@ -1174,12 +1179,11 @@ mod_data_analysis_server <- function(
 			) {
 				bslib::card(
 					tags$p(
-						"Warning: The selected FHD has covariate selections active. This makes it unsuitable for use in an SCRM analysis."
+						"Warning: FHD under active covariate filters. Use with caution in CRM tools as default assumptions may not account for this specificity.",
+						style = "font-size: 0.8rem; color: #c5c5c5; font-style: italic;"
 					),
-					tags$p(
-						"You may still download the outputs, but it should not be used in an SCRM analysis."
-					),
-					class = "card border-warning"
+					class = "card border-warning",
+					style = "margin-top: 0; padding: 0;"
 				)
 			} else {
 				NULL

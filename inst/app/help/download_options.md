@@ -1,27 +1,30 @@
 ## Download Options
 
-This section allows you to export your analysis results in various formats.
+Export your analysis results in various formats for use in external tools or reporting.
 
 ---
 
-### Features
+### What You Can Download
 
-- **Select FHD to download**: Choose which flight height distribution you want to download from the dropdown
-- **Download contents**: Select which components to include in your download:
-  - **FHD Data**: The processed flight height distribution dataset
-  - **FHD Plot**: A visualization of the selected FHD
-  - **Metadata**: Information about the dataset source and methodology
+**Select FHD**: Choose which flight height distribution to download from the dropdown.
 
----
-
-### Download Process
-
-1. Select the FHD you wish to download from the "Select FHD to download" dropdown
-2. Check the boxes for the content types you want to include
-3. Click the "Download" button to download your selected content
+**Download contents** (select one or more):
+- **CRM Formatted FHD**: Flight height distribution formatted for use in the [`sCRM`](https://dmpstats.shinyapps.io/sCRM/) and [`stochLAB`](https://marinescotlandscience.github.io/stochLAB/index.html) tools
+- **Plot**: Visual representation of the selected FHD
+- **Metadata**: Data sources and methodology used to estimate the FHD
 
 ---
 
-### Warnings
+### How to Download
 
-If the selected FHD has covariate selections active, a warning will appear. FHDs with active covariate filters are not suitable for use in Seabird Collision Risk Model (SCRM) analyses. You can still download the outputs, but they should not be used in SCRM applications.
+1. Select an FHD from the dropdown
+2. Check the box(es) next to the content you want to include
+3. Click **Download** to save your selection
+
+---
+
+### Important Note
+
+If the selected FHD has active covariate filters applied, a warning will appear. **Covariate-level FHDs are not recommended for standard use in `sCRM` or `stochLAB`.**
+
+Although the downloaded FHD can be used directly in these tools, exercise caution: the applications' default assumptions may not account for the added specificity of covariate-level estimates.
