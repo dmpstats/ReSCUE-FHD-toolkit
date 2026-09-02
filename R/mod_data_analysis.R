@@ -13,12 +13,12 @@ mod_data_analysis_ui <- function(id) {
 		bslib::page_fillable(
 			bslib::layout_columns(
 				col_widths = c(6, 6),
-
 				tagList(
 					# 12,
 					# First card: selected data
 					bslib::card(
 						id = ns("card_selected_fhds"),
+						height = "40vh",
 						# bslib::card_header(
 						# 	"Selected Data",
 						# 	class = "text-bg-primary"
@@ -32,178 +32,152 @@ mod_data_analysis_ui <- function(id) {
 								"To remove an FHD, go back to the Data Selection tab. You can also hide them on the plot by clicking on the legend."
 							)
 						),
-						# Ensure this card doesn't cover more than 40% of the page height
-						style = "height: 35vh; overflow-y: auto;",
+						style = "overflow-y: auto;",
 						class = "card border-primary mb-3 bg-light"
 					),
 					# Second card: analysis results
-					div(
-						id = ns("card_prop_crh"),
-						bslib::navset_card_underline(
-							title = tags$div(
-								class = "d-flex align-items-center gap-2",
-								bslib::tooltip(
-									"PCRH",
-									"Proportion at Collision Risk Height",
-								),
-								mod_help_button_ui(
-									ns("help_prop_crh"),
-									type = "button-only"
-								)
-							),
-							bslib::nav_spacer(),
-							bslib::nav_panel(
-								title = "Summaries",
-								DT::DTOutput(ns("fhd_summaries"))
-							),
-							bslib::nav_panel(
-								title = "Air Gap Sensitivity",
-								bslib::layout_columns(
-									max_height = "100px",
-									col_widths = c(6, 2, 2),
-									div(
-										class = "d-flex align-items-center h-100",
-										shinyWidgets::radioGroupButtons(
-											inputId = ns("airgap_shift_metric"),
-											label = "Metric",
-											choices = c(
-												"% Change" = "perc_change",
-												"Proportion" = "prop"
-											),
-											width = "100%",
-											selected = "perc_change",
-											justified = FALSE,
-											size = "sm",
-											status = "default"
-										)
+					# NOTE: Conductor requires navset_card_underline to be wrapped in a div in order
+					# to have the whole card highlighted when selected. The issue is that the bslib
+					# fillable properties are not passed into divs. Thus, we need to use
+					# `as_fill_carrier` to make the div take the fill specs from bslib
+					bslib::as_fill_carrier(
+						div(
+							id = ns("card_prop_crh"),
+							#style = "overflow-y: auto;",
+							bslib::navset_card_underline(
+								height = "60vh",
+								full_screen = TRUE,
+								title = tags$div(
+									class = "d-flex align-items-center gap-2",
+									bslib::tooltip(
+										"PCRH",
+										"Proportion at Collision Risk Height",
 									),
-									div(
-										class = "d-flex align-items-center justify-content-center h-100",
-										shinyWidgets::radioGroupButtons(
-											inputId = ns("airgap_shift_incr"),
-											label = "Increments",
-											choices = c(
-												"1m" = "1m",
-												"5m" = "5m"
-											),
-											width = "100%",
-											selected = "5m",
-											justified = FALSE,
-											size = "sm",
-											status = "default"
-										)
-									),
-									div(
-										class = "d-flex align-items-center justify-content-center h-100",
-										shinyWidgets::radioGroupButtons(
-											ns("heightshift_output_type"),
-											label = "View Mode",
-											choiceNames = list(
-												bsicons::bs_icon("table"),
-												bsicons::bs_icon("graph-up")
-											),
-											choiceValues = list(
-												"table",
-												"plot"
-											),
-											selected = "table",
-											direction = "horizontal",
-											size = "sm",
-											justified = FALSE,
-											width = "100%"
-										)
+									mod_help_button_ui(
+										ns("help_prop_crh"),
+										type = "button-only"
 									)
 								),
-								# fluidRow(
-								# 	shinyWidgets::radioGroupButtons(
-								# 		inputId = ns("airgap_shift_metric"),
-								# 		label = "Metric",
-								# 		choices = c(
-								# 			"% Change" = "perc_change",
-								# 			"Proportion" = "prop"
-								# 		),
-								# 		width = "30%",
-								# 		selected = "perc_change",
-								# 		justified = FALSE,
-								# 		size = "sm",
-								# 		status = "default"
-								# 	),
-								# 	shinyWidgets::radioGroupButtons(
-								# 		inputId = ns("airgap_shift_incr"),
-								# 		label = "Increments",
-								# 		choices = c(
-								# 			"1m" = "1m",
-								# 			"5m" = "5m"
-								# 		),
-								# 		width = "30%",
-								# 		selected = "5m",
-								# 		justified = FALSE,
-								# 		size = "sm",
-								# 		status = "default"
-								# 	),
-								# 	shinyWidgets::radioGroupButtons(
-								# 		ns("heightshift_output_type"),
-								# 		label = "View Mode",
-								# 		choiceNames = list(
-								# 			bsicons::bs_icon("table"),
-								# 			bsicons::bs_icon("graph-up")
-								# 		),
-								# 		choiceValues = list("table", "plot"),
-								# 		selected = "table",
-								# 		direction = "horizontal",
-								# 		size = "sm",
-								# 		justified = FALSE,
-								# 		width = "20%"
-								# 	)
-								# ),
-								conditionalPanel(
-									condition = paste0(
-										"input['",
-										ns("heightshift_output_type"),
-										"'] === 'table'"
-									),
-									div(
-										DT::DTOutput(ns("heightshift_table")),
-										style = "height: 25vh; overflow-y: auto; overflow-x: auto;"
-									)
+								bslib::nav_spacer(),
+								bslib::nav_panel(
+									title = "Summaries",
+									DT::DTOutput(ns("fhd_summaries"))
 								),
-								conditionalPanel(
-									condition = paste0(
-										"input['",
-										ns("heightshift_output_type"),
-										"'] === 'plot'"
-									),
-									style = "height: 100%; min-height: 25vh;",
-									plotly::plotlyOutput(
-										ns("heightshift_plot"),
-										height = "75%",
-										fill = TRUE
-									)
-								)
-							),
-							bslib::nav_item(
-								actionButton(
-									ns("test"),
-									icon = bsicons::bs_icon("gear"),
-									label = "Turbine Parameters",
-									class = "btn-success"
-								) |>
-									bslib::popover(
-										numericInput(
-											ns("airgap"),
-											strong("Air Gap (m)"),
-											value = 50,
-											min = 0
+								bslib::nav_panel(
+									title = "Air Gap Sensitivity",
+									bslib::layout_columns(
+										height = "80px",
+										min_height = "80px",
+										max_height = "80px",
+										col_widths = c(6, 2, 2),
+										div(
+											class = "d-flex align-items-center h-100",
+											shinyWidgets::radioGroupButtons(
+												inputId = ns("airgap_shift_metric"),
+												label = "Metric",
+												choices = c(
+													"% Change" = "perc_change",
+													"Proportion" = "prop"
+												),
+												width = "100%",
+												selected = "perc_change",
+												justified = FALSE,
+												size = "sm"
+											)
 										),
-										numericInput(
-											ns("rotor_radius"),
-											strong("Rotor Radius (m)"),
-											value = 10,
-											min = 0
+										div(
+											class = "d-flex align-items-center justify-content-center h-100",
+											shinyWidgets::radioGroupButtons(
+												inputId = ns("airgap_shift_incr"),
+												label = "Increments",
+												choices = c(
+													"1m" = "1m",
+													"5m" = "5m"
+												),
+												width = "100%",
+												selected = "5m",
+												justified = FALSE,
+												size = "sm"
+												#status = "radio-button-mde-class"
+											)
+										),
+										div(
+											class = "d-flex align-items-center justify-content-center h-100",
+											shinyWidgets::radioGroupButtons(
+												ns("heightshift_output_type"),
+												label = "View Mode",
+												choiceNames = list(
+													bsicons::bs_icon("table"),
+													bsicons::bs_icon("graph-up")
+												),
+												choiceValues = list(
+													"table",
+													"plot"
+												),
+												selected = "table",
+												direction = "horizontal",
+												size = "sm",
+												justified = FALSE,
+												width = "100%"
+											)
+										)
+									),
+									# fill_carrier needed to fill conditionalPanel space
+									bslib::as_fill_carrier(
+										conditionalPanel(
+											condition = paste0(
+												"input['",
+												ns("heightshift_output_type"),
+												"'] === 'table'"
+											),
+											DT::DTOutput(ns("heightshift_table"))
+										)
+									),
+									# fill_carrier needed to fill conditionalPanel space
+									bslib::as_fill_carrier(
+										conditionalPanel(
+											condition = paste0(
+												"input['",
+												ns("heightshift_output_type"),
+												"'] === 'plot'"
+											),
+											bslib::as_fill_carrier(
+												# div wrapper for rounding plot
+												div(
+													class = "rounded",
+													style = "overflow: hidden;height: 100%;",
+													plotly::plotlyOutput(
+														ns("heightshift_plot"),
+														fill = TRUE
+													)
+												)
+											)
 										)
 									)
-							),
-							full_screen = TRUE
+								),
+								bslib::nav_item(
+									actionButton(
+										ns("test"),
+										icon = bsicons::bs_icon("gear"),
+										label = "Turbine Parameters",
+										class = "btn-success"
+									) |>
+										bslib::popover(
+											numericInput(
+												ns("airgap"),
+												strong("Air Gap (m)"),
+												value = 50,
+												min = 0
+											),
+											numericInput(
+												ns("rotor_radius"),
+												strong("Rotor Radius (m)"),
+												value = 10,
+												min = 0
+											)
+										)
+								)
+							)
 						)
 					)
 				),
@@ -213,6 +187,7 @@ mod_data_analysis_ui <- function(id) {
 					# 12,
 					bslib::card(
 						id = ns("card_fhdplot"),
+						height = "65vh",
 						bslib::card_header(
 							tags$div(
 								class = "d-flex align-items-center gap-2",
@@ -252,6 +227,7 @@ mod_data_analysis_ui <- function(id) {
 					# Forth card will contain download options
 					bslib::card(
 						id = ns("card_download"),
+						height = "35vh",
 						bslib::card_header(
 							"Download Options",
 							class = "text-bg-primary",
@@ -278,8 +254,7 @@ mod_data_analysis_ui <- function(id) {
 										icon = bsicons::bs_icon("download"),
 										class = "btn-success",
 										width = "100%"
-									),
-									uiOutput(ns("covar_warning"))
+									)
 								),
 								shinyWidgets::prettyCheckboxGroup(
 									ns("download_contents"),
@@ -312,10 +287,10 @@ mod_data_analysis_ui <- function(id) {
 								# 	width = "100%",
 								# 	selected = c("data", "plot", "metadata")
 								# )
-							)
+							),
+							uiOutput(ns("covar_warning"))
 						),
-
-						class = "card border-primary mb-3 bg-light"
+						class = "card border-primary mb-0 bg-light"
 					)
 				)
 			),
@@ -925,6 +900,7 @@ mod_data_analysis_server <- function(
 					rownames = FALSE,
 					colnames = c("FHD ID" = "fhd_id"),
 					extensions = c("FixedHeader"),
+					fillContainer = TRUE,
 					options = list(
 						dom = "Bfrt",
 						# buttons = c("copy", "csv", "excel", "pdf", "print"),
@@ -933,6 +909,7 @@ mod_data_analysis_server <- function(
 						searching = FALSE,
 						lengthMenu = c(5, 10, 25, 50, 100),
 						scrollX = TRUE,
+						#scrollY = "25vh",
 						columnDefs = list(
 							list(
 								targets = 1:(num_cols - 1), # All columns except first (0-indexed)
@@ -1006,7 +983,7 @@ mod_data_analysis_server <- function(
 						searching = FALSE,
 						lengthMenu = c(5, 10, 25, 50, 100),
 						scrollX = TRUE,
-						scrollY = "30vh"
+						#scrollY = "30vh"
 					)
 				))
 			}
@@ -1044,14 +1021,15 @@ mod_data_analysis_server <- function(
 				),
 				rownames = FALSE,
 				extensions = c("FixedHeader"),
+				fillContainer = TRUE,
 				options = list(
 					dom = "Bfrt",
 					fixedHeader = TRUE,
 					pageLength = 10,
 					searching = FALSE,
 					lengthMenu = c(5, 10, 25, 50, 100),
-					scrollX = TRUE,
-					scrollY = "30vh"
+					scrollX = TRUE #,
+					#scrollY = "30vh"
 				),
 			) |>
 				DT::formatRound(columns = 2:ncol(sumdat), digits = 3)
@@ -1182,8 +1160,7 @@ mod_data_analysis_server <- function(
 						"Warning: FHD under active covariate filters. Use with caution in CRM tools as default assumptions may not account for this specificity.",
 						style = "font-size: 0.8rem; color: #c5c5c5; font-style: italic;"
 					),
-					class = "card border-warning",
-					style = "margin-top: 0; padding: 0;"
+					class = "card border-warning w-100 align-items-center d-flex justify-content-center",
 				)
 			} else {
 				NULL
