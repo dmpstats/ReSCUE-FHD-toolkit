@@ -1,7 +1,7 @@
 ## Proportion at Collision Risk Height (CRH)
 
 This section summarises how much of each Flight Height Distribution (FHD) falls
-within the **Collision Risk Height (CRH) envelope** - the vertical area swept by
+within the **Collision Risk Height CRH envelope** - the vertical area swept by
 a turbine's rotor.
 
 The CRH envelope is set via the **Turbine Parameters** button in the

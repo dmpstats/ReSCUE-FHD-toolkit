@@ -49,10 +49,7 @@ mod_data_analysis_ui <- function(id) {
 								full_screen = TRUE,
 								title = tags$div(
 									class = "d-flex align-items-center gap-2",
-									bslib::tooltip(
-										"PCRH",
-										"Proportion at Collision Risk Height",
-									),
+									"Proportion at CRH",
 									mod_help_button_ui(
 										ns("help_prop_crh"),
 										type = "button-only"
