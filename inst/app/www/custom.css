@@ -53,6 +53,77 @@
 }
 
 
+/* ═══════════════════════════════════════════════════════════════════
+   MDE-style inspired Radio Buttons
+   ═══════════════════════════════════════════════════════════════════
+
+   Note: shinyWidgets::radioGroupButtons() renders as <label> elements
+   with hidden <input type="radio" class="btn-check"> inputs.
+   Bootstrap applies .active class to the <label> when the radio is checked.
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* Unselected state */
+label.btn.btn-radiobtn-mde-class {
+  /* background-color: rgb(78, 103, 116) !important; */
+  background-color: rgb(158, 158, 158) !important;
+  color: rgb(61, 60, 60) !important;
+  border: 1px solid var(--bs-dark) !important;
+  border-radius: var(--bs-border-radius-lg);
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+/* Unselected hover state */
+label.btn.btn-radiobtn-mde-class:hover:not(.active) {
+  background-color: var(--bs-success) !important;
+  color: black !important;
+  border-color: var(--bs-dark)  !important;
+}
+
+
+/* Selected (active) state - target via hidden checked input */
+.btn-check:checked + label.btn-radiobtn-mde-class {
+  background-color: rgb(253, 253, 253) !important;
+  color: black !important;
+  border-color: var(--bs-dark) !important;
+  /* box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.15) !important; */
+}
+
+/* Selected hover state - shinyWidgets::radioGroupButtons() never actually
+   toggles the .active class on the label (that's a Bootstrap JS behaviour
+   this widget doesn't wire up), so ":not(.active)" above never excludes the
+   selected button. Override hover explicitly via the real state indicator
+   (the sibling ".btn-check:checked") so hovering a selected button keeps
+   its selected styling instead of flashing the unselected hover colour. */
+.btn-check:checked + label.btn-radiobtn-mde-class:hover {
+  background-color: rgb(253, 253, 253) !important;
+  color: black !important;
+  border-color: var(--bs-dark) !important;
+}
+
+/* Also target the .active class in case it's applied directly */
+label.btn.btn-radiobtn-mde-class.active {
+  background-color: rgb(253, 253, 253) !important;
+  color: black !important;
+  border-color: var(--bs-dark) !important;
+  /* box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.15) !important; */
+}
+
+/* Selected state with focus (keyboard navigation) */
+.btn-check:checked + label.btn-radiobtn-mde-class:focus {
+  outline: 2px solid var(--bs-success);
+  outline-offset: 2px;
+}
+
+/* Disabled state - when the hidden checkbox is disabled */
+.btn-check:disabled + label.btn.btn-radiobtn-mde-class {
+  background-color: var(--bs-light) !important;
+  color: var(--bs-secondary) !important;
+  border-color: var(--bs-secondary) !important;
+  opacity: 0.5;
+  pointer-events: none;
+  cursor: not-allowed;
+}
 
 
 /* Conductor guide tour tooltip */

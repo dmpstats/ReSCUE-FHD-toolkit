@@ -66,46 +66,63 @@ mod_data_analysis_ui <- function(id) {
 								bslib::nav_panel(
 									title = "Air Gap Sensitivity",
 									bslib::layout_columns(
-										height = "80px",
-										min_height = "80px",
-										max_height = "80px",
-										col_widths = c(6, 2, 2),
+										height = "60px",
+										min_height = "60px",
+										max_height = "60px",
+										col_widths = c(4, 4, 4),
 										div(
-											class = "d-flex align-items-center h-100",
+											class = "d-flex align-items-center justify-content-center h-100",
 											shinyWidgets::radioGroupButtons(
 												inputId = ns("airgap_shift_metric"),
-												label = "Metric",
+												#label = "Metric",
 												choices = c(
 													"% Change" = "perc_change",
 													"Proportion" = "prop"
 												),
-												width = "100%",
+												width = "75%",
 												selected = "perc_change",
-												justified = FALSE,
-												size = "sm"
-											)
+												justified = TRUE,
+												size = "sm",
+												status = "radiobtn-mde-class"
+											) |>
+												bslib::tooltip(
+													placement = "bottom",
+													"Type of Metric",
+													options = list(
+														delay = list(show = 1000, hide = 10),
+														trigger = "hover"
+													)
+												)
 										),
 										div(
 											class = "d-flex align-items-center justify-content-center h-100",
 											shinyWidgets::radioGroupButtons(
 												inputId = ns("airgap_shift_incr"),
-												label = "Increments",
+												#label = "Increments",
 												choices = c(
-													"1m" = "1m",
-													"5m" = "5m"
+													"5m" = "5m",
+													"1m" = "1m"
 												),
-												width = "100%",
+												width = "75%",
 												selected = "5m",
-												justified = FALSE,
-												size = "sm"
-												#status = "radio-button-mde-class"
-											)
+												justified = TRUE,
+												size = "sm",
+												status = "radiobtn-mde-class"
+											) |>
+												bslib::tooltip(
+													placement = "bottom",
+													"Shift Increments",
+													options = list(
+														delay = list(show = 1000, hide = 10),
+														trigger = "hover"
+													)
+												)
 										),
 										div(
 											class = "d-flex align-items-center justify-content-center h-100",
 											shinyWidgets::radioGroupButtons(
 												ns("heightshift_output_type"),
-												label = "View Mode",
+												#label = "View Mode",
 												choiceNames = list(
 													bsicons::bs_icon("table"),
 													bsicons::bs_icon("graph-up")
@@ -117,9 +134,18 @@ mod_data_analysis_ui <- function(id) {
 												selected = "table",
 												direction = "horizontal",
 												size = "sm",
-												justified = FALSE,
-												width = "100%"
-											)
+												justified = TRUE,
+												width = "75%",
+												status = "radiobtn-mde-class"
+											) |>
+												bslib::tooltip(
+													placement = "bottom",
+													"View Mode",
+													options = list(
+														delay = list(show = 1000, hide = 10),
+														trigger = "hover"
+													)
+												)
 										)
 									),
 									# fill_carrier needed to fill conditionalPanel space
@@ -145,7 +171,7 @@ mod_data_analysis_ui <- function(id) {
 												# div wrapper for rounding plot
 												div(
 													class = "rounded",
-													style = "overflow: hidden;height: 100%;",
+													style = "overflow: hidden; height: 100%;",
 													plotly::plotlyOutput(
 														ns("heightshift_plot"),
 														fill = TRUE
