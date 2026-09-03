@@ -954,15 +954,7 @@ mod_data_analysis_server <- function(
 				}
 
 				out
-			},
-			# Use the "compact" style to reduce padding
-			class = "compact stripe hover row-border",
-			# Colour values green if negative and red if positive
-			callback = DT::JS(
-				"function(settings, json) {",
-				"  $(this.api().table().header()).css({'background-color': '#f8f9fa', 'color': '#212529'});",
-				"}"
-			)
+			}
 		)
 
 		# ---- Step 5b: Heightshift plot ----
