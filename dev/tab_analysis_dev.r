@@ -50,12 +50,12 @@ tab_analysis_app <- function() {
 
   server <- function(input, output, session) {
     # generate data that is being passed over from data selection module
-    fhd_files <- list.files("data-dummy/metadata", full.names = TRUE)
+    fhd_meta_files <- list.files("data-dummy/metadata", full.names = TRUE)[1:2]
 
-    fhd_id <- basename(fhd_files) |>
+    fhd_id <- basename(fhd_meta_files) |>
       tools::file_path_sans_ext()
 
-    mtdt <- fhd_files |>
+    mtdt <- fhd_meta_files |>
       purrr::map(readRDS) |>
       purrr::map(function(x) {
         x$covariates <- list(x$covariates %||% NULL)
@@ -64,7 +64,11 @@ tab_analysis_app <- function() {
       purrr::map(tibble::as_tibble_row) |>
       purrr::list_rbind()
 
-    draws <- list.files("data-dummy/draws", full.names = TRUE) |>
+    draws <- list.files(
+      "data-dummy/draws",
+      pattern = paste(fhd_id, collapse = "|"),
+      full.names = TRUE
+    ) |>
       purrr::map(readRDS) |>
       setNames(fhd_id)
 
