@@ -484,10 +484,11 @@ mod_data_select_server <- function(
 					minZoom = 3
 				)
 			) |>
-				leaflet::addProviderTiles(
-					leaflet::providers$CartoDB.DarkMatter,
-					options = leaflet::providerTileOptions(
-						key = "cb1_2637_1_9c44517e8d620b92dae4b2e4"
+				leaflet::addTiles(
+					urlTemplate = "https://basemaps.cartocdn.com/rastertiles/dark_all/{z}/{x}/{y}.png?key=cb1_2637_1_9c44517e8d620b92dae4b2e4",
+					attribution = paste(
+						'&copy; <a href="https://carto.com/attributions">CARTO</a>,',
+						'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
 					)
 				) |>
 				leaflet::setView(lng = -3.5, lat = 56, zoom = 5)
