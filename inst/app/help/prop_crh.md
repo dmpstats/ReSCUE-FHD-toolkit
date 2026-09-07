@@ -31,15 +31,13 @@ interquartile ranges indicate greater uncertainty in the FHD estimate.
 
 ### Air Gap Sensitivity
 
-Shows how the proportion at CRH would change if the turbine were placed at
-different heights, stepping in ± fixed increments given the configured air gap.
+Visualize how the proportion at CRH changes when the turbine height shifts in fixed increments (±1 m or ±5 m) from the configured air gap.
 
-Use the controls to adjust the output:
+Available Controls:
+- **Type of Metric**:
+  - *% Change*: relative change in proportion at CRH from the baseline air gap
+  - *Proportion*: absolute proportion at CRH at each shifted position
+- **Shift Increments**: step size (1 m or 5 m)
+- **View Mode**: table or plot
 
-- **Metric** - *% Change*: relative change from the configured position;
-  *Proportion*: absolute proportion at CRH at each shifted position.
-- **Increments** - step size for the height shift (1 m or 5 m).
-- **View Mode** - toggle between table and plot views.
-
-In the *% Change* table, positive values (red) indicate more birds at risk when
-the turbine is raised; negative values (green) indicate fewer.
+In the *% Change* Table view, red (positive) values indicate more birds at risk with the height shift; green (negative) values indicate fewer.

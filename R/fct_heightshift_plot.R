@@ -90,11 +90,16 @@ plot_heightshift <- function(
           "<b>",
           fhd_id,
           "</b><br>",
-          "Shift: ",
+          "Air Gap Shift: ",
           shift_m,
           " m<br>",
-          "Value: ",
-          value
+          ifelse(
+            metric == "perc_change",
+            "Change in PCRH: ",
+            "PCRH: "
+          ),
+          value,
+          ifelse(metric == "perc_change", " %", "")
         )
       )
   }
