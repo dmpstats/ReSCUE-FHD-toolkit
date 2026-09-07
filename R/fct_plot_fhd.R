@@ -65,8 +65,10 @@ add_fhd <- function(
       x = ~height,
       ymin = ~lc,
       ymax = ~uc,
-      fillcolor = ~unique_colour,
-      line = list(color = ~unique_colour, opacity = 0, width = 0),
+      # Note: `I()` wrapper needed to take the hex codes as-is, rather than mapping them to a color scale
+      fillcolor = ~ I(unique_colour),
+      color = ~ I(unique_colour),
+      line = list(opacity = 0, width = 0),
       # Share a legendgroup with the matching line trace (below) so that,
       # combined with `legend$groupclick = "togglegroup"` in fhd_baseplot(),
       # toggling the line's legend entry also hides/shows its ribbon —
@@ -77,8 +79,6 @@ add_fhd <- function(
       text = ~ paste(
         "FHD ID:",
         f_id,
-        # "<br>Group:",
-        # group_col,
         "<br>Height:",
         height,
         "<br>Probability:",
@@ -92,10 +92,8 @@ add_fhd <- function(
       y = ~prob,
       name = ~group_col,
       legendgroup = ~group_col,
-      line = list(
-        width = 2,
-        color = ~unique_colour
-      ),
+      color = ~ I(unique_colour),
+      line = list(width = 2),
       hoverinfo = "text",
       text = ~ paste(
         "FHD ID:",
