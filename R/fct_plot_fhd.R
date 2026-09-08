@@ -1,6 +1,6 @@
 add_fhd <- function(
   plot,
-  fhd_data,
+  fhd_data, #
   id_col = "unique_fhd",
   height_col = "height",
   draw_col = "draw_id",
@@ -53,59 +53,93 @@ add_fhd <- function(
       .groups = "drop"
     )
 
-  # Create a color mapping from group_col to hex codes
-  color_map <- structure(
-    plotdat_summed$unique_colour,
-    names = plotdat_summed$group_col
-  )
+  # # Create a color mapping from group_col to hex codes
+  # color_map <- structure(
+  #   plotdat_summed$unique_colour,
+  #   names = plotdat_summed$group_col
+  # )
 
-  plot <- plot |>
-    plotly::add_ribbons(
-      data = plotdat_summed,
-      x = ~height,
-      ymin = ~lc,
-      ymax = ~uc,
-      # Note: `I()` wrapper needed to take the hex codes as-is, rather than mapping them to a color scale
-      fillcolor = ~ I(unique_colour),
-      color = ~ I(unique_colour),
-      line = list(opacity = 0, width = 0),
-      # Share a legendgroup with the matching line trace (below) so that,
-      # combined with `legend$groupclick = "togglegroup"` in fhd_baseplot(),
-      # toggling the line's legend entry also hides/shows its ribbon —
-      # without adding a second legend entry for the ribbon itself.
-      legendgroup = ~group_col,
-      opacity = 0.2,
-      hoverinfo = "text",
-      text = ~ paste(
-        "FHD ID:",
-        f_id,
-        "<br>Height:",
-        height,
-        "<br>Probability:",
-        round(prob, 4)
-      ),
-      showlegend = FALSE
-    ) |>
-    plotly::add_lines(
-      data = plotdat_summed,
-      x = ~height,
-      y = ~prob,
-      name = ~group_col,
-      legendgroup = ~group_col,
-      color = ~ I(unique_colour),
-      line = list(width = 2),
-      hoverinfo = "text",
-      text = ~ paste(
-        "FHD ID:",
-        f_id,
-        # "<br>Group:",
-        # group_col,
-        "<br>Height:",
-        height,
-        "<br>Probability:",
-        round(prob, 4)
+  # Add 95% CI ribbons and average probability line to base plot ------------
+  # Notes:
+  # - looping over unique group_col values required to keep correct colour assigment.
+  #   Previous approach of using a color mapping for whole dataset was not working as
+  #   expected when covars were activated (i.e. when group_col had more than one unique
+  #   value per fhd_id).
+  # - Using add_trace() for each line instead of prevously used add_ribbons() to allow
+  #   for line-specific hover text
+  for (grp in unique(plotdat_summed$group_col)) {
+    grp_dt <- dplyr::filter(plotdat_summed, group_col == grp)
+
+    plot <- plot |>
+      # add upper percentile
+      plotly::add_trace(
+        data = grp_dt,
+        x = ~height,
+        y = ~uc,
+        type = "scatter",
+        mode = "lines",
+        showlegend = FALSE,
+        legendgroup = ~group_col,
+        color = ~ I(unique_colour),
+        line = list(opacity = 0, width = 0),
+        hovertemplate = ~ paste0(
+          "FHD ID:",
+          f_id,
+          "<br>Height: ",
+          height,
+          "<br>Probability: ",
+          round(uc, 4),
+          # <extra> tag sets secondary box text in hoverinfo
+          "<extra>97.5 %tile</extra>"
+        )
+      ) |>
+      # add lower percentile
+      plotly::add_trace(
+        data = grp_dt,
+        x = ~height,
+        y = ~lc,
+        type = "scatter",
+        mode = "lines",
+        showlegend = FALSE,
+        legendgroup = ~group_col,
+        fill = 'tonexty',
+        color = ~ I(unique_colour),
+        fillcolor = ~ I(unique_colour),
+        opacity = 0.2,
+        line = list(opacity = 0, width = 0),
+        hovertemplate = ~ paste0(
+          "FHD ID:",
+          f_id,
+          "<br>Height: ",
+          height,
+          "<br>Probability: ",
+          round(lc, 4),
+          "<extra>2.5 %tile</extra>"
+        )
+      ) |>
+      # add average probability line
+      plotly::add_trace(
+        data = grp_dt,
+        x = ~height,
+        y = ~prob,
+        type = "scatter",
+        mode = "lines",
+        showlegend = TRUE,
+        legendgroup = ~group_col,
+        color = ~ I(unique_colour),
+        line = list(width = 2),
+        name = ~group_col,
+        hovertemplate = ~ paste0(
+          "FHD ID:",
+          f_id,
+          "<br>Height: ",
+          height,
+          "<br>Probability: ",
+          round(prob, 4),
+          "<extra>Average</extra>"
+        )
       )
-    )
+  }
 
   plot
 }

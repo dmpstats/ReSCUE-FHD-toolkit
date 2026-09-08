@@ -810,7 +810,13 @@ mod_data_analysis_server <- function(
 			# We need to append a unique colour to each unique_fhd
 			unique_colours <- data.frame(
 				unique_fhd = unique(out$unique_fhd),
-				colours = rainbow(length(unique(out$unique_fhd)))
+				colours = MetBrewer::met.brewer(
+					"Signac",
+					n = length(unique(out$unique_fhd)),
+					type = "continuous",
+					direction = 1
+				)
+				#colours = rainbow(length(unique(out$unique_fhd)))
 			)
 			out <- out |>
 				dplyr::left_join(

@@ -49,7 +49,8 @@ Imports:
     tidyr,
     abind,
     RColorBrewer,
-    stringr
+    stringr,
+    MetBrewer
 Suggests:
     spelling,
     testthat (>= 3.0.0)
