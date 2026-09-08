@@ -109,7 +109,7 @@ plot_heightshift <- function(
       xaxis = list(title = "Air Gap Shift (m)"),
       yaxis = list(title = ylab),
       legend = list(
-        title = list(text = "FHD"),
+        title = list(text = "FHD ID"),
         # Draw the legend inside the top-right of the plotting area, rather
         # than in the (wide) margin to the right of the plot.
         x = 0.99,
@@ -124,29 +124,7 @@ plot_heightshift <- function(
         # hides/shows together with the line — without a duplicate entry.
         groupclick = "togglegroup"
       ),
-      #   list(
-      #     type = "line",
-      #     x0 = 0,
-      #     x1 = 0,
-      #     y0 = 0,
-      #     y1 = 1,
-      #     yref = "paper",
-      #     line = list(color = "grey", dash = "dot", width = 1)
-      #   )
-      # ),
       annotations = list(
-        # list(
-        #   x = 0,
-        #   y = 1,
-        #   xref = "x",
-        #   yref = "paper",
-        #   text = paste0("current specification"),
-        #   showarrow = FALSE,
-        #   textangle = -90,
-        #   xanchor = "left",
-        #   yanchor = "top",
-        #   font = list(color = "grey", size = 10)
-        # ),
         list(
           x = 0.95,
           y = 1,
