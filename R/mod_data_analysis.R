@@ -211,6 +211,7 @@ mod_data_analysis_ui <- function(id) {
 					bslib::card(
 						id = ns("card_fhdplot"),
 						height = "65vh",
+						full_screen = TRUE,
 						bslib::card_header(
 							tags$div(
 								class = "d-flex align-items-center gap-2",
@@ -244,7 +245,7 @@ mod_data_analysis_ui <- function(id) {
 							plotly::plotlyOutput(ns("fhd_plot")),
 							uiOutput(ns("debug"))
 						),
-						class = "card border-primary mb-3 card-body-white"
+						class = "card border-primary mb-2 card-body-white"
 					),
 
 					# Forth card will contain download options

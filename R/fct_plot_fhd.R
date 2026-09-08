@@ -67,6 +67,9 @@ add_fhd <- function(
   #   value per fhd_id).
   # - Using add_trace() for each line instead of prevously used add_ribbons() to allow
   #   for line-specific hover text
+  # - legendgroup shared among all traces so that,combined with `legend$groupclick =
+  #  "togglegroup"` in fhd_baseplot(), toggling the line's legend entry also hides/shows
+  #   its ribbon — without adding a second legend entry for the ribbon itself.
   for (grp in unique(plotdat_summed$group_col)) {
     grp_dt <- dplyr::filter(plotdat_summed, group_col == grp)
 
@@ -83,9 +86,10 @@ add_fhd <- function(
         color = ~ I(unique_colour),
         line = list(opacity = 0, width = 0),
         hovertemplate = ~ paste0(
-          "FHD ID:",
+          "<b>",
           f_id,
-          "<br>Height: ",
+          "</b><br>",
+          "Height: ",
           height,
           "<br>Probability: ",
           round(uc, 4),
@@ -105,12 +109,12 @@ add_fhd <- function(
         fill = 'tonexty',
         color = ~ I(unique_colour),
         fillcolor = ~ I(unique_colour),
-        opacity = 0.2,
         line = list(opacity = 0, width = 0),
         hovertemplate = ~ paste0(
-          "FHD ID:",
+          "<b>",
           f_id,
-          "<br>Height: ",
+          "</b><br>",
+          "Height: ",
           height,
           "<br>Probability: ",
           round(lc, 4),
@@ -130,9 +134,10 @@ add_fhd <- function(
         line = list(width = 2),
         name = ~group_col,
         hovertemplate = ~ paste0(
-          "FHD ID:",
+          "<b>",
           f_id,
-          "<br>Height: ",
+          "</b><br>",
+          "Height: ",
           height,
           "<br>Probability: ",
           round(prob, 4),
@@ -144,9 +149,13 @@ add_fhd <- function(
   plot
 }
 
+
+# -----------------------------------------------------------
+
 #' Build a faceted FHD plot using plotly subplots
 #'
-#' Each unique value of \code{unique_id_col} gets its own subplot panel.
+#' Each unique value of \code{id_col} gets its own subplot panel, with the FHD lines and
+#' ribbons drawn for each unique value of \code{unique_id_col}.
 #'
 #' @param plot_data Data frame containing all FHD draws.
 #' @param id_col Column used as the FHD identifier for \code{add_fhd}.
@@ -170,15 +179,20 @@ fhd_facet_plot <- function(
   show_legend = TRUE
 ) {
   unique_ids <- unique(plot_data[[unique_id_col]])
+  fhd_ids <- unique(plot_data[[id_col]])
 
-  plots <- lapply(unique_ids, function(uid) {
-    subset <- plot_data[plot_data[[unique_id_col]] == uid, ]
+  plots <- lapply(fhd_ids, function(id) {
+    subset <- plot_data[plot_data[[id_col]] == id, ]
     max_prob <- max(subset[[prob_col]], na.rm = TRUE)
-    p <- fhd_baseplot(risk_min = risk_min, risk_max = risk_max)
+    p <- fhd_baseplot(
+      risk_min = risk_min,
+      risk_max = risk_max
+    )
+
     p <- add_fhd(
       plot = p,
       fhd_data = subset,
-      id_col = id_col,
+      id_col = unique_id_col,
       height_col = height_col,
       draw_col = draw_col,
       prob_col = prob_col
@@ -187,7 +201,7 @@ fhd_facet_plot <- function(
     # Y-axis capped to actual data range to avoid empty space from the risk rectangle.
     p |>
       plotly::layout(
-        title = list(text = uid, font = list(size = 10)),
+        #title = list(text = id, font = list(size = 10)),
         yaxis = list(range = c(0, max_prob * 1.1)),
         showlegend = show_legend
       )
@@ -197,6 +211,7 @@ fhd_facet_plot <- function(
   ncols <- min(n, 2L)
   nrows <- ceiling(n / ncols)
 
+  #browser()
   plotly::subplot(
     plots,
     nrows = nrows,
@@ -208,6 +223,7 @@ fhd_facet_plot <- function(
   )
 }
 
+# -----------------------------------------------------------
 fhd_baseplot <- function(
   risk_min = 50,
   risk_max = 100
@@ -249,8 +265,25 @@ fhd_baseplot <- function(
         type = 'scatter',
         mode = 'lines',
         fill = 'none',
-        line = list(color = 'red', dash = 'dot'),
-        name = 'Risk Zone'
+        line = list(color = 'red', dash = 'dot', width = 1),
+        name = 'Risk Zone',
+        legendgroup = 'risk-zone',
+        showlegend = FALSE
+      ) |>
+      # add "Risk Zone" annotation in the middle of the rectangle
+      plotly::add_annotations(
+        text = "Risk Zone",
+        x = risk_min,
+        xref = "x",
+        yanchor = "top",
+        yref = "paper",
+        y = 0.96,
+        textangle = -90,
+        showarrow = FALSE,
+        bgcolor = "white",
+        font = list(color = "red", size = 11),
+        xref = "x",
+        yref = "y"
       )
   }
 
