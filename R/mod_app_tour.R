@@ -111,7 +111,8 @@ mod_app_tour_server <- function(id) {
       el = paste0("#", data_tab_ns("map_filters")),
       title = "Filter FHDs",
       text = "Use these selectors to narrow down the available FHDs based on your criteria. <br><br>For example, you can filter by species and season to find the FHDs that are most relevant to your analysis.",
-      position = "right-start"
+      position = "right-start",
+      canClickTarget = FALSE
     )$step(
       el = paste0("#", data_tab_ns("upload_data")),
       title = "Upload Your Own FHD",
