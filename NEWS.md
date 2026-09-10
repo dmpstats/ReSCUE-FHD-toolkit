@@ -1,6 +1,30 @@
-# ReSCUEApp News
+## ReSCUEApp Releases
 
-## ReSCUEApp 0.9.1 (Prototype Release)
+### v0.9.2 (Prototype version)
+
+**Release Date:** September 2026
+
+Minor patch focused on UI refinement and bug fixes to improve usability and visual clarity.
+
+#### Key Improvements
+
+- **FHD Plot Refinements:**
+    - including improved facet layouts - one plot per primary FHD alongside covariate-level distributions;
+    - cleaner legends and hover tooltips for averages and 95% intervals;
+    - card expanding option to reduce visual clutter;
+- **Air Gap Sensitivity Tool:** better contrast in radio control buttons, tables now fill available space more efficiently
+- **Better Species Display:** The data selection card now displays full species names instead of ID codes for clearer identification
+- **Updated Documentation:** In-app help text and user support documentation have been updated for greater clarity
+
+#### Bug Fixes & Polish
+- **Session Management:** Fixed session reset functionality (#19)
+- **Selection Map:** Fixed API warning (#21)
+- **FHD plots:** corrected colour mismatches when covariates are active (#23).
+- **PCRH air-gap sensitivity:** Fixed bug where 5 m increment settings could leave plots/tables blank under certain airgap values (#20)
+- **Dropdown Positioning:** Resolved issues with selectize input dropdowns escaping container boundaries (#22)
+
+
+### v0.9.1 (Prototype Release)
 
 **Release Date:** August 2026
 
@@ -12,7 +36,7 @@ Some small modifications have been made in preparation for the user-testing phas
 
 The changes in this version are entirely visual, intended to streamline the user experience and provide clarifications.
 
-## ReSCUEApp 0.9.0 (First Release)
+### v0.9.0 (First Release)
 
 **Release Date**: August 2026
 
@@ -20,17 +44,17 @@ This is the first release of ReSCUEApp, providing a user-friendly interface to s
 
 This release is intended for beta-testing arranged by the ReSCUE project. This version does not yet contain 'live' data - all datasets are randomly-simulated dummy datasets to demonstrate functionality.
 
-### Key Features
+#### Key Features
 
 - **Flight-Height Data Selector:** Though all data is currently dummy data, a selection interface is provided that will later provide user access to ReSCUE Project data
 - **FHD Exploration and Comparison Tools:** The Visualisation tab offers tools for the analysis and comparison of FHD data, including an airgap sensitivity tool to explore potential mitigation scenarios.
 - **Download Options:** Users can download the selected FHDs in a format compatible with the Collision Risk Model tool [sCRM](https://dmpstats.shinyapps.io/sCRM/).
 
-### Project Information
+#### Project Information
 
 ReSCUEApp is part of the **Reducing Seabird Collisions Using Evidence (ReSCUE)** initiative, funded by The Crown Estate's Offshore Wind Evidence and Change (OWEC) Programme. It provides a user-friendly interface to flight-height data and tools developed to improve the assessment and mitigation of seabird collision risks with offshore wind turbines.
 
-### Contributors
+#### Contributors
 
 - **Bruno Caneco** (Developer, DMP Statistics)
 - **Callum Clarke** (Developer, DMP Statistics)
@@ -39,7 +63,7 @@ ReSCUEApp is part of the **Reducing Seabird Collisions Using Evidence (ReSCUE)**
 - **Tim Kasoar** (Contributor, NIRAS)
 - **Eddie Cole** (ReSCUE Project Lead, Natural England)
 
-### Project Partners
+#### Project Partners
 
 - OWEC (The Crown Estate's Offshore Wind Evidence and Change Programme)
 - DMP Statistics
