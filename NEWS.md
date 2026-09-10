@@ -1,23 +1,23 @@
 ## ReSCUEApp Releases
-
 ---------------------------------
-### v0.9.2 (Prototype version)
+
+## v0.9.2 (Prototype version)
 
 **Release Date:** September 2026
 
-Minor patch focused on UI refinement and bug fixes to improve usability and visual clarity.
+Minor patch focused on UI refinement to improve usability and visual clarity and bug fixes.
 
-#### Key Improvements
+#### Main Improvements
 
 - **FHD Plot Refinements:**
-    - including improved facet layouts - one plot per primary FHD alongside covariate-level distributions;
+    - improved facet layouts - one plot per primary FHD alongside covariate-level distributions;
     - cleaner legends and hover tooltips for averages and 95% intervals;
     - card expanding option to reduce visual clutter;
 - **Air Gap Sensitivity Tool:** better contrast in radio control buttons, tables now fill available space more efficiently
-- **Better Species Display:** The data selection card now displays full species names instead of ID codes for clearer identification
-- **Updated Documentation:** In-app help text and user support documentation have been updated for greater clarity
+- **Species Display:** The data selection card now displays full species names instead of ID codes
+- **Updated Documentation:** In-app help text and user support documentation edited for greater clarity
 
-#### Bug Fixes & Polish
+#### Bug Fixes
 - **Session Management:** Fixed session reset functionality (#19)
 - **Selection Map:** Fixed API warning (#21)
 - **FHD plots:** corrected colour mismatches when covariates are active (#23).
@@ -26,7 +26,7 @@ Minor patch focused on UI refinement and bug fixes to improve usability and visu
 
 
 ---------------------------------
-### v0.9.1 (Prototype Release)
+## v0.9.1 (Prototype Release)
 
 **Release Date:** August 2026
 
@@ -39,7 +39,7 @@ Some small modifications have been made in preparation for the user-testing phas
 The changes in this version are entirely visual, intended to streamline the user experience and provide clarifications.
 
 ---------------------------------
-### v0.9.0 (First Release)
+## v0.9.0 (First Release)
 
 **Release Date**: August 2026
 
