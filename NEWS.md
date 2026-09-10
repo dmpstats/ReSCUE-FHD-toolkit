@@ -10,19 +10,19 @@ Minor patch focused on UI refinement to improve usability and visual clarity and
 #### Main Improvements
 
 - **FHD Plot Refinements:**
-    - improved facet layouts - one plot per primary FHD alongside covariate-level distributions;
+    - improved facet layouts - one plot per primary FHD, showing covariate-level distributions if activated;
     - cleaner legends and hover tooltips for averages and 95% intervals;
-    - card expanding option to reduce visual clutter;
-- **Air Gap Sensitivity Tool:** better contrast in radio control buttons, tables now fill available space more efficiently
-- **Species Display:** The data selection card now displays full species names instead of ID codes
-- **Updated Documentation:** In-app help text and user support documentation edited for greater clarity
+    - card expanding option to reduce visual clutter.
+- **Air Gap Sensitivity Tool:** better contrast in radio control buttons; tables now fill available space more efficiently.
+- **Species Display:** data selection card displays full species names instead of ID codes.
+- **Updated Documentation:** In-app help text and user support documentation edited for greater clarity.
 
 #### Bug Fixes
-- **Session Management:** Fixed session reset functionality (#19)
-- **Selection Map:** Fixed API warning (#21)
+- **Session Management:** Fixed session reset functionality (#19).
+- **Selection Map:** Fixed API warning (#21).
 - **FHD plots:** corrected colour mismatches when covariates are active (#23).
-- **PCRH air-gap sensitivity:** Fixed bug where 5 m increment settings could leave plots/tables blank under certain airgap values (#20)
-- **Dropdown Positioning:** Resolved issues with selectize input dropdowns escaping container boundaries (#22)
+- **PCRH air-gap sensitivity:** Fixed bug where 5 m increment settings could leave plots/tables blank under certain airgap values (#20).
+- **Dropdown Positioning:** Resolved issues with selectize input dropdowns escaping container boundaries (#22).
 
 
 ---------------------------------
