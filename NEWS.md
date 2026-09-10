@@ -1,5 +1,6 @@
 ## ReSCUEApp Releases
 
+---------------------------------
 ### v0.9.2 (Prototype version)
 
 **Release Date:** September 2026
@@ -24,6 +25,7 @@ Minor patch focused on UI refinement and bug fixes to improve usability and visu
 - **Dropdown Positioning:** Resolved issues with selectize input dropdowns escaping container boundaries (#22)
 
 
+---------------------------------
 ### v0.9.1 (Prototype Release)
 
 **Release Date:** August 2026
@@ -36,6 +38,7 @@ Some small modifications have been made in preparation for the user-testing phas
 
 The changes in this version are entirely visual, intended to streamline the user experience and provide clarifications.
 
+---------------------------------
 ### v0.9.0 (First Release)
 
 **Release Date**: August 2026

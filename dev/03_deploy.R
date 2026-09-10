@@ -62,7 +62,8 @@ rsconnect::deployApp(
 		"data-dummy/",
 		"NAMESPACE",
 		"DESCRIPTION",
-		"app.R"
+		"app.R",
+		"NEWS.md"
 	),
 	appId = rsconnect::deployments(".")$appID,
 	lint = FALSE,
@@ -83,7 +84,8 @@ rsconnect::deployApp(
 		"data-dummy/",
 		"NAMESPACE",
 		"DESCRIPTION",
-		"app.R"
+		"app.R",
+		"NEWS.md"
 	),
 	appId = rsconnect::deployments(".")$appID,
 	lint = FALSE,
