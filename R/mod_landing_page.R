@@ -103,7 +103,10 @@ mod_landing_page_ui <- function(id) {
 							),
 							showcase = tags$a(
 								href = "mailto:Eddie.Cole@naturalengland.org.uk",
-								bsicons::bs_icon("envelope-fill", class = "text-secondary")
+								bsicons::bs_icon(
+									"envelope-fill",
+									class = "text-secondary"
+								)
 							)
 						),
 						bslib::value_box(
@@ -116,7 +119,10 @@ mod_landing_page_ui <- function(id) {
 							),
 							showcase = tags$a(
 								href = "mailto:bruno@dmpstats.co.uk",
-								bsicons::bs_icon("envelope-fill", class = "text-secondary")
+								bsicons::bs_icon(
+									"envelope-fill",
+									class = "text-secondary"
+								)
 							)
 						),
 						bslib::value_box(
@@ -129,7 +135,10 @@ mod_landing_page_ui <- function(id) {
 							),
 							showcase = tags$a(
 								href = "mailto:callum@dmpstats.co.uk",
-								bsicons::bs_icon("envelope-fill", class = "text-secondary")
+								bsicons::bs_icon(
+									"envelope-fill",
+									class = "text-secondary"
+								)
 							)
 						),
 						class = "bg-light"
@@ -140,27 +149,20 @@ mod_landing_page_ui <- function(id) {
 				# ),
 				column(
 					12,
-					# OWEC logo in its own card
+					# OWEC logo in its own card, which also includes the ReSCUE logo
 					bslib::card(
 						bslib::card_body(
 							class = "d-flex justify-content-center align-items-center",
-							logolink("owec", height = 35)
+							logolink("owec_tce_rescue", height = 43)
 						),
-						height = "22vh",
-						class = "card border-primary mb-3 bg-secondary"
+						height = "23vh",
+						class = "card border-primary mb-3 bg-secondary",
+						# Disable scrolling
+						style = "overflow-x: hidden; overflow-y: hidden;"
 					),
 					bslib::layout_columns(
-						col_widths = c(4, 4, 4),
+						col_widths = c(6, 6),
 						# height = "22vh",
-						bslib::card(
-							bslib::card_body(
-								class = "d-flex justify-content-center align-items-center",
-								logolink("dmp")
-							),
-							# Disable scrolling
-							style = "overflow-x: hidden; overflow-y: hidden;",
-							class = "card border-primary bg-secondary"
-						),
 						bslib::card(
 							bslib::card_body(
 								class = "d-flex justify-content-center align-items-center",
@@ -171,10 +173,10 @@ mod_landing_page_ui <- function(id) {
 						bslib::card(
 							bslib::card_body(
 								class = "d-flex justify-content-center align-items-center",
-								logolink("blackbawks")
+								logolink("bto", height = 6)
 							),
 							class = "card border-primary bg-secondary"
-						)
+						),
 					),
 					bslib::layout_columns(
 						# height = "22vh",
@@ -182,15 +184,17 @@ mod_landing_page_ui <- function(id) {
 						bslib::card(
 							bslib::card_body(
 								class = "d-flex justify-content-center align-items-center",
-								logolink("rescue")
+								logolink("blackbawks")
 							),
 							class = "card border-primary bg-secondary"
 						),
 						bslib::card(
 							bslib::card_body(
 								class = "d-flex justify-content-center align-items-center",
-								logolink("bto", height = 6)
+								logolink("dmp")
 							),
+							# Disable scrolling
+							style = "overflow-x: hidden; overflow-y: hidden;",
 							class = "card border-primary bg-secondary"
 						),
 						bslib::card(

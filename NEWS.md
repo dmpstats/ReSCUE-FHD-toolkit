@@ -71,9 +71,9 @@ ReSCUEApp is part of the **Reducing Seabird Collisions Using Evidence (ReSCUE)**
 #### Project Partners
 
 - OWEC (The Crown Estate's Offshore Wind Evidence and Change Programme)
-- DMP Statistics
-- Natural England
-- BlackHawks
 - ReSCUE Project Team
+- Natural England
 - British Trust for Ornithology (BTO)
+- BlackHawks
+- DMP Statistics
 - NIRAS

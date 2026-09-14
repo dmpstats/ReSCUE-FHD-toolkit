@@ -8,10 +8,19 @@
 logolink <- function(company, tooltip = TRUE, height = 10) {
   if (
     !(company %in%
-      c("dmp", "bto", "ne", "blackbawks", "niras", "owec", "rescue"))
+      c(
+        "dmp",
+        "bto",
+        "ne",
+        "blackbawks",
+        "niras",
+        "owec",
+        "rescue",
+        "owec_tce_rescue"
+      ))
   ) {
     stop(
-      "Invalid company name. Please use one of the following: 'dmp', 'bto', 'ne', 'blackbawks', 'niras', 'owec', 'rescue', or modify logolink() for the new company."
+      "Invalid company name. Please use one of the following: 'dmp', 'bto', 'ne', 'blackbawks', 'niras', 'owec', 'rescue', 'owec_tce_rescue', or modify logolink() for the new company."
     )
   }
   link <- switch(
@@ -23,6 +32,7 @@ logolink <- function(company, tooltip = TRUE, height = 10) {
     "niras" = "https://www.niras.com/",
     "owec" = "https://www.thecrownestate.co.uk/our-business/marine/offshore-wind-evidence-and-change-programme",
     "rescue" = "https://naturalengland.blog.gov.uk/2024/10/24/to-the-rescue-understanding-flight-heights-for-seabird-conservation-and-offshore-wind-expansion/",
+    "owec_tce_rescue" = "https://www.thecrownestate.co.uk/our-business/marine/offshore-wind-evidence-and-change-programme",
     "Invalid"
   )
   logo_path <- paste0("www/logos/", company, ".png")
@@ -54,22 +64,25 @@ logolink <- function(company, tooltip = TRUE, height = 10) {
             "<strong>DMP Statistical Solutions</strong> <br>ReSCUEApp Developers"
           ),
           "bto" = HTML(
-            "<strong>British Trust for Ornithology</strong><br>ReSCUETools Developers"
+            "<strong>British Trust for Ornithology</strong><br>ReSCUE Lead Project Partner"
           ),
           "ne" = HTML(
             "<strong>Natural England</strong><br>ReSCUE Project Lead"
           ),
           "blackbawks" = HTML(
-            "<strong>Black Bawks Data Science</strong><br>ReSCUE Project Manager"
+            "<strong>Black Bawks Data Science</strong><br>ReSCUEApp Project Management"
           ),
           "niras" = HTML(
-            "<strong>NIRAS</strong><br>ReSCUE Development Consultants"
+            "<strong>NIRAS</strong><br>ReSCUEApp Development Consultants"
           ),
           "owec" = HTML(
             "<strong>OWEC / Crown Estate</strong><br>Project Funding Agency"
           ),
           "rescue" = HTML(
             "<strong>ReSCUE Project</strong><br>Project Website"
+          ),
+          "owec_tce_rescue" = HTML(
+            "<strong>OWEC / Crown Estate</strong><br>Project Funding Agency"
           ),
           "Invalid"
         ),
