@@ -121,9 +121,11 @@ app_ui <- function(request) {
 			bslib::nav_menu(
 				title = NULL,
 				align = "right",
-				icon = bsicons::bs_icon(
-					"book-fill",
-					size = "1.5em"
+				icon = fontawesome::fa(
+					#"file-lines",
+					"folder-closed",
+					height = "1.4em",
+					prefer_type = "solid"
 				) |>
 					bslib::tooltip(
 						placement = "bottom",
@@ -134,14 +136,12 @@ app_ui <- function(request) {
 
 				bslib::nav_panel(
 					title = "Data Sources",
-					icon = bsicons::bs_icon(
-						"database-fill",
-						size = "1.5em"
-					) |>
-						bslib::tooltip(
-							placement = "bottom",
-							"Data Sources"
-						),
+					icon = fontawesome::fa(
+						"database",
+						height = "1.3em",
+						margin_right = "0.3em",
+						fill_opacity = 0.8
+					),
 					bslib::page_fillable(
 						# A .md with the sources will go here
 						bslib::card(
@@ -218,14 +218,12 @@ app_ui <- function(request) {
 				bslib::nav_panel(
 					title = "Metadata Builder",
 					value = "nav-metadata-builder",
-					icon = bsicons::bs_icon(
-						"hammer",
-						size = "1.5em"
-					) |>
-						bslib::tooltip(
-							placement = "bottom",
-							"Metadata Builder"
-						),
+					icon = fontawesome::fa(
+						"screwdriver-wrench",
+						height = "1.3em",
+						margin_right = "0.3em",
+						fill_opacity = 0.8
+					),
 					mod_metadata_builder_ui("metadata_builder")
 				)
 			),
@@ -276,7 +274,7 @@ app_ui <- function(request) {
 					tags$a(
 						href = "https://github.com/dmpstats/ReSCUE-FHD-toolkit/issues",
 						target = "_blank",
-						bsicons::bs_icon("bug-fill"),
+						bsicons::bs_icon("bug-fill", size = "1.3em"),
 						"Report a Bug",
 						class = "nav-item-link"
 					)
@@ -285,7 +283,10 @@ app_ui <- function(request) {
 					shiny::actionLink(
 						"reset_app",
 						label = tagList(
-							bsicons::bs_icon("arrow-counterclockwise"),
+							bsicons::bs_icon(
+								"arrow-counterclockwise",
+								size = "1.3em"
+							),
 							"Reset Session"
 						),
 						class = "nav-item-link"

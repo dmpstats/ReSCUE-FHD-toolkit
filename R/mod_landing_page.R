@@ -210,7 +210,11 @@ mod_landing_page_ui <- function(id) {
 						actionButton(
 							ns("link_guide"),
 							label = tagList(
-								bsicons::bs_icon("info-circle"),
+								fontawesome::fa(
+									"book-open",
+									height = "1.1em",
+									margin_right = "0.3em"
+								),
 								"Guide"
 							),
 							class = "not-arrow-btn",
@@ -232,7 +236,12 @@ mod_landing_page_ui <- function(id) {
 						actionButton(
 							ns("go_data"),
 							label = tagList(
-								bsicons::bs_icon("play-circle"),
+								fontawesome::fa(
+									"circle-play",
+									height = "1.1em",
+									margin_right = "0.3em",
+									prefer_type = "regular"
+								),
 								"Start"
 							),
 							class = "arrow-btn"
