@@ -216,8 +216,17 @@ mod_landing_page_ui <- function(id) {
 							class = "not-arrow-btn",
 							style = "width: 100%;"
 						),
-						mod_app_tour_ui(
-							ns("app_tour"),
+						actionButton(
+							ns("start_tour"),
+							label = tagList(
+								fontawesome::fa(
+									"route",
+									height = "1.1em",
+									margin_right = "0.3em"
+								),
+								"Tutorial"
+							),
+							class = "not-arrow-btn",
 							style = "width: 100%;"
 						),
 						actionButton(
@@ -286,7 +295,8 @@ mod_landing_page_ui <- function(id) {
 mod_landing_page_server <- function(
 	id,
 	nav_id = "main-nav",
-	parent_session
+	parent_session,
+	app_tour = NULL
 ) {
 	moduleServer(id, function(input, output, session) {
 		# Helpfile submodules -----
@@ -307,18 +317,18 @@ mod_landing_page_server <- function(
 		# React to user guide button --------------
 		observeEvent(
 			input$link_guide,
-			{
-				# Navigate to the user guide tab
-				bslib::nav_select(
-					id = nav_id,
-					selected = "nav-user-guide",
-					session = parent_session
-				)
-			}
+			# Navigate to the user guide tab
+			bslib::nav_select(
+				id = nav_id,
+				selected = "nav-user-guide",
+				session = parent_session
+			)
 		)
 
-		# Tour guide module  -------------------
-		## Storing conductor object to tweak options or add response events later
-		guide <- mod_app_tour_server("app_tour")
+		# Launch App Tour Guide -------------------
+		observeEvent(
+			input$start_tour,
+			app_tour$start()
+		)
 	})
 }

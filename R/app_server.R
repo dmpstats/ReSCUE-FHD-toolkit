@@ -35,12 +35,15 @@ app_server <- function(input, output, session) {
 		purrr::list_rbind() |>
 		sf::st_as_sf()
 
-	# Modules -----------------
+	# App Tour Guide: Initialise --------
+	app_tour <- init_app_tour()
 
+	# Modules -----------------
 	mod_landing_page_server(
 		"landing_page",
 		nav_id = "main-nav",
-		parent_session = session
+		parent_session = session,
+		app_tour = app_tour
 	)
 
 	data_select_output <- mod_data_select_server(
@@ -158,4 +161,10 @@ app_server <- function(input, output, session) {
 
 	# Helper functions
 	mod_version_button_server("app_version")
+
+	# App Tour Guide: Launch from user guide -----------------
+	observeEvent(
+		input$start_tour,
+		app_tour$start()
+	)
 }

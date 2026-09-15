@@ -50,7 +50,8 @@ Imports:
     abind,
     RColorBrewer,
     stringr,
-    MetBrewer
+    MetBrewer,
+    fontawesome
 Suggests:
     spelling,
     testthat (>= 3.0.0)

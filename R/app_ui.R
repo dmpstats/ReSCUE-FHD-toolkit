@@ -158,26 +158,49 @@ app_ui <- function(request) {
 				bslib::nav_panel(
 					title = "User Guide",
 					value = "nav-user-guide",
-					icon = bsicons::bs_icon(
-						"book-fill",
-						size = "1.5em"
-					) |>
-						bslib::tooltip(
-							placement = "bottom",
-							"User Guide"
-						),
-					bslib::page_fixed(
-						# bslib::layout_columns(
-						# col_widths = c(10, 2),
+					icon = fontawesome::fa(
+						"book-open",
+						height = "1.3em",
+						margin_right = "0.3em",
+						fill_opacity = 0.8
+					),
+					bslib::page_fillable(
 						bslib::card(
 							bslib::card_body(
-								shiny::includeMarkdown(app_sys(
-									"app",
-									"md",
-									"userguide.md"
-								))
+								shiny::includeMarkdown(
+									app_sys(
+										"app",
+										"md",
+										"userguide.md"
+									)
+								)
 							),
-							class = "card border-primary bg-light",
+							bslib::card_footer(
+								class = "bg-primary",
+								bslib::toolbar(
+									# bslib::toolbar_input_button(
+									# 	id = "go_data",
+									# 	label = "Start",
+									# 	icon = fontawesome::fa("play-circle"),
+									# 	show_label = TRUE,
+									# 	tooltip = "Go to FHD Selection",
+									# 	class = "btn btn-success fw-bold",
+									# 	#style = "font-size: 1.25rem; padding: 0.75rem 1.5rem;"
+									# ),
+									# bslib::toolbar_divider(width = "7px"),
+									bslib::toolbar_input_button(
+										id = "start_tour",
+										label = "Tutorial",
+										icon = fontawesome::fa("route"),
+										show_label = TRUE,
+										tooltip = "Start in-App Tour",
+										class = "btn btn-success fw-bold",
+										style = "font-size: 1.25rem; padding: 0.75rem 1.5rem;"
+									),
+									align = "right"
+								)
+							),
+							class = "card border-primary bg-light"
 						),
 						# Sidebar with logos
 						# bslib::card(
@@ -289,7 +312,8 @@ golem_add_external_resources <- function() {
 
 	tags$head(
 		favicon(ext = "png"),
-		useConductor(),
+		conductor::useConductor(),
+		shinyjs::useShinyjs(),
 		bundle_resources(
 			path = app_sys("app/www"),
 			app_title = "ReSCUEApp"
@@ -368,6 +392,22 @@ golem_add_external_resources <- function() {
         opacity: 1;
       }
     "
+		)),
+		# Selecting a tab inside a nav_menu() leaves the parent dropdown open.
+		# Shiny activates tabs with jQuery's .tab('show'), and bslib's bs3compat
+		# shim fires 'shown.bs.tab' as a jQuery event, so this must be bound with
+		# jQuery -- a native addEventListener would never fire. We strip the
+		# 'show' classes directly because bootstrap.Dropdown.getInstance() returns
+		# null for menus the user has not clicked yet.
+		tags$script(HTML(
+			"
+			$(document).on('shown.bs.tab', function(e) {
+				$('.navbar .dropdown-menu.show').removeClass('show');
+				$('.navbar .nav-item.dropdown.show').removeClass('show');
+				$('.navbar .dropdown-toggle[aria-expanded=\"true\"]')
+					.attr('aria-expanded', 'false');
+			});
+			"
 		))
 	)
 }
