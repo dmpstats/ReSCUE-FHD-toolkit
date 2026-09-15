@@ -35,5 +35,6 @@ probability respectively.}
 A plotly subplot figure.
 }
 \description{
-Each unique value of \code{unique_id_col} gets its own subplot panel.
+Each unique value of \code{id_col} gets its own subplot panel, with the FHD lines and
+ribbons drawn for each unique value of \code{unique_id_col}.
 }
