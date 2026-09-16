@@ -189,13 +189,13 @@ mod_data_analysis_ui <- function(id) {
 											numericInput(
 												ns("airgap"),
 												strong("Air Gap (m)"),
-												value = 50,
+												value = 22,
 												min = 0
 											),
 											numericInput(
 												ns("rotor_radius"),
 												strong("Rotor Radius (m)"),
-												value = 10,
+												value = 50,
 												min = 0
 											)
 										)
