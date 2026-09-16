@@ -12,7 +12,7 @@ init_app_tour <- function(session = getDefaultReactiveDomain()) {
   analysis_tab_ns <- NS("data_analysis")
 
   # construt guide
-  guide <- Conductor$new(
+  guide <- conductor::Conductor$new(
     exitOnEsc = TRUE,
     keyboardNavigation = TRUE,
     defaultStepOptions = list(
@@ -132,7 +132,7 @@ init_app_tour <- function(session = getDefaultReactiveDomain()) {
       as.character(bsicons::bs_icon("bar-chart-fill")),
       " <strong>Visualisation &amp; Export</strong> &mdash; explore, compare and download selected FHDs.</li>",
       "<li>",
-      as.character(bsicons::bs_icon("book-fill")),
+      as.character(fontawesome::fa("folder-closed")),
       " <strong>Documentation</strong> &mdash; access Data Sources, the User Guide, and the Metadata Builder.</li>",
       "<li>",
       as.character(bsicons::bs_icon("gear-fill")),

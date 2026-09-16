@@ -155,7 +155,7 @@ mod_landing_page_ui <- function(id) {
 							class = "d-flex justify-content-center align-items-center",
 							logolink("owec_tce_rescue", height = 43)
 						),
-						height = "23vh",
+						height = "20vh",
 						class = "card border-primary mb-3 bg-secondary",
 						# Disable scrolling
 						style = "overflow-x: hidden; overflow-y: hidden;"
@@ -179,7 +179,7 @@ mod_landing_page_ui <- function(id) {
 						),
 					),
 					bslib::layout_columns(
-						# height = "22vh",
+						#height = "20vh",
 						col_widths = c(4, 4, 4),
 						bslib::card(
 							bslib::card_body(

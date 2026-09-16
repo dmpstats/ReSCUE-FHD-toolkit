@@ -178,30 +178,23 @@ app_ui <- function(request) {
 							bslib::card_footer(
 								class = "bg-primary",
 								bslib::toolbar(
-									# bslib::toolbar_input_button(
-									# 	id = "go_data",
-									# 	label = "Start",
-									# 	icon = fontawesome::fa("play-circle"),
-									# 	show_label = TRUE,
-									# 	tooltip = "Go to FHD Selection",
-									# 	class = "btn btn-success fw-bold",
-									# 	#style = "font-size: 1.25rem; padding: 0.75rem 1.5rem;"
-									# ),
-									# bslib::toolbar_divider(width = "7px"),
 									bslib::toolbar_input_button(
 										id = "start_tour",
 										label = "Tutorial",
 										icon = fontawesome::fa("route"),
 										show_label = TRUE,
 										tooltip = "Start in-App Tour",
-										class = "btn btn-success fw-bold",
-										style = "font-size: 1.25rem; padding: 0.75rem 1.5rem;"
+										class = "btn btn-secondary fw-bold",
+										style = "font-size: 1.25rem; padding: 0.75rem 1.5rem; border-radius: 8px;"
 									),
-									align = "right"
-								)
+									align = "left"
+								) |>
+									htmltools::tagAppendAttributes(
+										style = "justify-content: center;"
+									)
 							),
 							class = "card border-primary bg-light"
-						),
+						)
 						# Sidebar with logos
 						# bslib::card(
 						# 	class = "d-flex flex-column align-items-center gap-3 h-100",
