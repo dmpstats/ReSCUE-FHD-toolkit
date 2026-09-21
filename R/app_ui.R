@@ -164,6 +164,8 @@ app_ui <- function(request) {
 						margin_right = "0.3em",
 						fill_opacity = 0.8
 					),
+					# use page_fillable() to make card fill the available viewport's vertical
+					# space, ensuring the Tutorial button is always visible at bottom of the page
 					bslib::page_fillable(
 						bslib::card(
 							bslib::card_body(
@@ -180,10 +182,10 @@ app_ui <- function(request) {
 								bslib::toolbar(
 									bslib::toolbar_input_button(
 										id = "start_tour",
-										label = "Tutorial",
+										label = "In-App Tutorial",
 										icon = fontawesome::fa("route"),
 										show_label = TRUE,
-										tooltip = "Start in-App Tour",
+										tooltip = "Start Tour",
 										class = "btn btn-secondary fw-bold",
 										style = "font-size: 1.25rem; padding: 0.75rem 1.5rem; border-radius: 8px;"
 									),

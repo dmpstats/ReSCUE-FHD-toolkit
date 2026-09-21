@@ -10,17 +10,19 @@ heightshift(
   prob_col = "prob",
   id_col = "fhd_id",
   draw_id_col = "draw_id",
-  risk_min = 50,
-  risk_max = 100,
+  risk_min = 50L,
+  risk_max = 100L,
+  max_shift = 40L,
+  step_size = 1L,
   round = c(4, 2),
-  restrict_bounds = TRUE,
-  condensed_table = FALSE
+  crh_windows = FALSE
 )
 }
 \arguments{
 \item{fhd_data}{A data frame containing FHD collision probability data, typically
 output from an FHD analysis workflow. Expected structure: one row per (FHD, height,
-draw) combination with associated probability values.}
+draw) combination with associated probability values. Height values must be in meters,
+representing the centre of 1m bands.}
 
 \item{height_col}{Character string specifying the column name containing turbine
 rotor heights (m). Default is \code{"height"}.}
@@ -42,45 +44,60 @@ rotor, AKA the airgap (m). Defines the lower boundary of the rotor disk.}
 rotor (m). Defines the upper boundary of the rotor disk. The rotor diameter
 is calculated as \code{risk_max - risk_min}.}
 
+\item{max_shift}{Numeric scalar specifying the maximum upward shift (m) applied to
+the baseline rotor window. Downward shifts extend to the lowest window whose lower
+bound remains >= 0. Default is \code{40L}.}
+
+\item{step_size}{Numeric scalar specifying the increment (m) between successive
+height shifts. Default is \code{1L}.}
+
 \item{round}{A 2-element integer vector \code{c(prob_places, perc_places)} specifying
 decimal places for rounding the output. The first element rounds probability values,
 the second rounds percentage changes. If \code{NULL}, no rounding is applied.
 Default is \code{c(4, 2)}.}
 
-\item{restrict_bounds}{Logical. If \code{TRUE} (default), restricts height shifts to
-positions within ±40 m of the baseline \code{risk_min}, preventing unrealistic turbine
-placements. If \code{FALSE}, all shifts within the data range are considered.}
-
-\item{condensed_table}{Logical. If \code{FALSE} (default), height shifts are applied
-in 1-meter increments. If \code{TRUE}, shifts use 5-meter increments, producing a
-more compact output table.}
+\item{crh_windows}{Logical. If \code{TRUE}, the returned list includes an additional
+\code{heightshifts} element describing the lower/upper bounds and metre offset of each
+shifted CRH window. Default is \code{FALSE}.}
 }
 \value{
-A list with two elements:
+A list with two elements (plus an optional third):
 \describe{
 \item{\code{prob}}{A matrix of absolute FHD collision probabilities. Rows represent
 FHD identifiers; columns represent height shifts (labeled with meter offsets from
 baseline, e.g., \code{"+0m"}, \code{"+5m"}, \code{"-10m"}). The matrix includes
-an \code{fhd_id} column prepended at index 1. An attribute \code{"true_fhd_col"}
-marks the column index of the baseline turbine position.}
+an \code{fhd_id} column prepended at index 1. An attribute \code{"bsl_crh_idx"}
+marks the column index of the baseline turbine position (offset by 1 for the
+\code{fhd_id} column).}
 \item{\code{perc}}{A matrix of percentage changes in FHD collision probability
 relative to the baseline configuration. Same structure as \code{prob}, with values
-representing percent change (e.g., \code{+5} means 5\% increase). Enables direct
-comparison of FHD risk sensitivity across the rotor height range.}
+representing percent change (e.g., \code{+5} means 5\% increase). If the baseline
+window falls outside the FHD extent, this matrix is filled with \code{NA}s.}
+\item{\code{heightshifts}}{Only present when \code{crh_windows = TRUE}. A tibble with
+the lower bound (\code{lw_lim}), upper bound (\code{up_lim}), and metre offset (\code{shift})
+of each shifted CRH window.}
 }
 }
 \description{
-Evaluate how FHD risk probabilities change across a range of turbine
-rotor heights. This function simulates shifting the turbine rotor vertically
-through the air column and quantifies the resulting changes in collision probability
-for each FHD, both as absolute probabilities and as percentage changes relative
-to the baseline turbine position.
+Evaluate collision risk probabilities across a range of turbine
+rotor heights for each FHD. This function simulates shifting the turbine rotor
+vertically through the air column and quantifies the resulting changes in collision
+probability for each FHD, both as absolute probabilities and as percentage changes
+relative to the baseline turbine position.
 }
 \details{
+IMPORTANT: function assumes \code{fhd_data} contains 1m-band rotor heights, with values
+representing the centre of the height band (i.e. 0.5, 1.5, 2.5, ..., in meters). There
+is no formal check for this, as it's an internal function that needs to be quick to
+run, so ensure your input data is structured correctly.
+
 The function operates by:
 \enumerate{
-\item Creating a series of hypothetical rotor positions within the data range,
-each maintaining the same rotor diameter as the baseline configuration.
+\item Creating a series of hypothetical rotor positions (CRH windows) within the
+data range, each maintaining the same rotor diameter (\code{risk_max - risk_min}) as
+the baseline configuration. Shifts extend up to \code{max_shift} metres above the
+baseline and down to the lowest window whose lower bound is >= 0, in increments
+of \code{step_size}.
 \item For each height shift, computing the probability of FHD risk by aggregating
 collision data within the shifted rotor window.
 \item Averaging collision probabilities across multiple draws (if present

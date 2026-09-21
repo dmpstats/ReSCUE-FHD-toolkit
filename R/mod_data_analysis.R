@@ -73,11 +73,11 @@ mod_data_analysis_ui <- function(id) {
 												inputId = ns("airgap_shift_metric"),
 												#label = "Metric",
 												choices = c(
-													"% Change" = "perc_change",
-													"Proportion" = "prop"
+													"Proportion" = "prop",
+													"% Change" = "perc_change"
 												),
 												width = "75%",
-												selected = "perc_change",
+												selected = "prop",
 												justified = TRUE,
 												size = "sm",
 												status = "radiobtn-mde-class"
@@ -155,6 +155,17 @@ mod_data_analysis_ui <- function(id) {
 											),
 											DT::DTOutput(ns("heightshift_table"))
 										)
+									),
+									# Footnote rendered OUTSIDE the DT fill region entirely,
+									# so DT's scrollX body can't drag it horizontally. Its own
+									# conditionalPanel keeps it hidden in plot view.
+									conditionalPanel(
+										condition = paste0(
+											"input['",
+											ns("heightshift_output_type"),
+											"'] === 'table'"
+										),
+										uiOutput(ns("heightshift_footnote"))
 									),
 									# fill_carrier needed to fill conditionalPanel space
 									bslib::as_fill_carrier(
@@ -871,7 +882,7 @@ mod_data_analysis_server <- function(
 				risk_min = input$airgap,
 				risk_max = input$airgap + 2 * input$rotor_radius,
 				round = c(4, 2),
-				condensed_table = input$airgap_shift_incr == "5m"
+				step_size = if (input$airgap_shift_incr == "5m") 5 else 1
 			)
 		})
 
@@ -886,9 +897,14 @@ mod_data_analysis_server <- function(
 				req(heightshift_data())
 				req(nrow(heightshift_data()[[type]]) > 0)
 
+				# Percentage change table: handle =/- colour coding and non-finite values (render
+				# as dash)
 				percjs <- if (input$airgap_shift_metric == "perc_change") {
 					"function(data, type, row) {
-						if(type === 'display' && data !== null) {
+						if(type === 'display') {
+							if (data === null || data === 'NaN' || data === 'Inf' || data === '-Inf') {
+								return '<div style=\"text-align: center;\">-</div>';
+							}
 							var num = parseFloat(data);
 							if(!isNaN(num)) {
 								var prefix = num > 0 ? '+' : '';
@@ -898,7 +914,12 @@ mod_data_analysis_server <- function(
 						return data;
 					}"
 				} else {
-					NULL
+					"function(data, type, row) {
+						if(type === 'display' && (data === null || data === 'NaN' || data === 'Inf' || data === '-Inf')) {
+							return '<div style=\"text-align: center;\">-</div>';
+						}
+						return data;
+					}"
 				}
 
 				num_cols <- ncol(heightshift_data()[[type]])
@@ -963,6 +984,26 @@ mod_data_analysis_server <- function(
 				out
 			}
 		)
+
+		# Footnote explaining the dash, shown below the table only for the
+		# percentage-change metric when the table contains non-finite values
+		# (undefined % change where the baseline probability is zero).
+		output$heightshift_footnote <- renderUI({
+			req(heightshift_data())
+			if (input$airgap_shift_metric != "perc_change") {
+				return(NULL)
+			}
+			tbl_body <- heightshift_data()[["perc"]][, -1, drop = FALSE]
+			if (!any(tbl_body %in% c("NaN", "Inf", "-Inf"))) {
+				return(NULL)
+			}
+			htmltools::tags$div(
+				class = "heightshift-footnote",
+				htmltools::HTML(
+					"Dash (\u2013) indicates undefined %-age change, as baseline PCRH is zero"
+				)
+			)
+		})
 
 		# ---- Step 5b: Heightshift plot ----
 		output$heightshift_plot <- plotly::renderPlotly({

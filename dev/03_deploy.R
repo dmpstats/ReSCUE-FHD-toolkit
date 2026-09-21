@@ -71,7 +71,7 @@ rsconnect::deployApp(
 )
 
 
-# PUBLIC VERSION, for production deployment
+# PRODUCTION VERSION, for "public" deployment
 rsconnect::deployApp(
 	appName = desc::desc_get_field("Package"),
 	appTitle = desc::desc_get_field("Package"),
