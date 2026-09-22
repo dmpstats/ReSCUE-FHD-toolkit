@@ -34,6 +34,7 @@ mod_user_upload_ui <- function(id) {
             actionButton(
               ns("download_schema"),
               "Download CSV Schema",
+              disabled = TRUE, # Disable the button until the schema is available
               class = "btn-success",
               icon = bsicons::bs_icon("download"),
               style = "width: 140px; height: 140px; border-radius: 8px; padding: 10px; line-height: 1.2;"
@@ -106,7 +107,12 @@ mod_user_upload_ui <- function(id) {
       textInput(
         ns("site_name"),
         "Site Name",
-        placeholder = "Enter site name"
+        placeholder = "e.g. Fowlsheugh"
+      ),
+      textInput(
+        ns("region"),
+        "Region",
+        placeholder = "e.g. SE England"
       )
     ),
     p("* Required fields"),
@@ -192,13 +198,16 @@ mod_user_upload_server <- function(
           # Create a new metadata entry
           new_entry <- data.frame(
             fhd_id = input$fhd_id,
-            species_id = input$species,
+            name_common = input$species,
+            species_id = gsub(" ", "_", input$species),
             method = input$method,
             season = input$season,
             file_path = input$fhd_file$datapath,
             lon = input$lon,
             lat = input$lat,
             site = input$site_name,
+            region = input$region,
+            input_type = "user-upload",
             stringsAsFactors = FALSE
           )
 
@@ -255,7 +264,8 @@ mod_user_upload_server <- function(
         req(length(metadata()) > 0)
         DT::datatable(
           metadata() |>
-            dplyr::bind_rows(),
+            dplyr::bind_rows() |>
+            dplyr::select(-c(file_path, input_type)),
           options = list(pageLength = 5, scrollX = TRUE),
           rownames = FALSE
         )
