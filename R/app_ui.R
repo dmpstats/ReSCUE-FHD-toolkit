@@ -169,13 +169,17 @@ app_ui <- function(request) {
 					bslib::page_fillable(
 						bslib::card(
 							bslib::card_body(
-								shiny::includeMarkdown(
-									app_sys(
-										"app",
-										"md",
-										"userguide.md"
-									)
+								tags$iframe(
+									src = "html/ReSCUE_Toolkit_User_Guide_V1.0.html",
+									style = "width: 100%; height: 100%; border: none;"
 								)
+								# shiny::includeMarkdown(
+								# 	app_sys(
+								# 		"app",
+								# 		"md",
+								# 		"userguide.md",
+								# 	)
+								# )
 							),
 							bslib::card_footer(
 								class = "bg-primary",
@@ -207,7 +211,6 @@ app_ui <- function(request) {
 						# 	logolink("niras", height = 9)
 						# )
 					)
-					# )
 				),
 
 				bslib::nav_panel(
@@ -304,6 +307,11 @@ golem_add_external_resources <- function() {
 	add_resource_path(
 		"www",
 		app_sys("app/www")
+	)
+
+	add_resource_path(
+		"html",
+		app_sys("app/html")
 	)
 
 	tags$head(

@@ -304,3 +304,10 @@ label.btn.btn-radiobtn-mde-class.active {
   overflow: hidden;
   flex: 0 0 auto;
 }
+
+/* Start Tour button - switch to success color on hover */
+#start_tour:hover {
+  background-color: var(--bs-success) !important;
+  border-color: var(--bs-success) !important;
+  color: var(--bs-primary) !important;
+}
