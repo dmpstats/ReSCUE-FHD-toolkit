@@ -21,8 +21,8 @@ heightshift(
 \arguments{
 \item{fhd_data}{A data frame containing FHD collision probability data, typically
 output from an FHD analysis workflow. Expected structure: one row per (FHD, height,
-draw) combination with associated probability values. Height values must be in meters,
-representing the centre of 1m bands.}
+draw) combination with associated probability values. Height values must represent the
+centre of 1m bands.}
 
 \item{height_col}{Character string specifying the column name containing turbine
 rotor heights (m). Default is \code{"height"}.}
@@ -80,7 +80,7 @@ of each shifted CRH window.}
 }
 \description{
 Evaluate collision risk probabilities across a range of turbine
-rotor heights for each FHD. This function simulates shifting the turbine rotor
+rotor heights for each FHD. This function simulates shifting the baseline turbine rotor
 vertically through the air column and quantifies the resulting changes in collision
 probability for each FHD, both as absolute probabilities and as percentage changes
 relative to the baseline turbine position.
@@ -93,12 +93,12 @@ run, so ensure your input data is structured correctly.
 
 The function operates by:
 \enumerate{
-\item Creating a series of hypothetical rotor positions (CRH windows) within the
-data range, each maintaining the same rotor diameter (\code{risk_max - risk_min}) as
-the baseline configuration. Shifts extend up to \code{max_shift} metres above the
-baseline and down to the lowest window whose lower bound is >= 0, in increments
-of \code{step_size}.
-\item For each height shift, computing the probability of FHD risk by aggregating
+\item Creating a series of hypothetical rotor positions (CRH windows) within a
+selected shift limit (\code{max_shift}), each maintaining the same rotor diameter
+(\code{risk_max - risk_min}) as the baseline configuration. Shifts extend up to
+\code{max_shift} metres above the baseline and down to the lowest window whose lower
+bound is >= 0, in increments of \code{step_size}.
+\item For each shift, computing the probability of FHD risk by aggregating
 collision data within the shifted rotor window.
 \item Averaging collision probabilities across multiple draws (if present
 in the data) to account for uncertainty in FHD encounter positions.
