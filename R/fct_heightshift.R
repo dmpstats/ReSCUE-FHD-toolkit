@@ -173,7 +173,7 @@ heightshift <- function(
   fhd_perc_matrix <- sweep(
     fhd_prob_matrix,
     1,
-    fhd_prob_matrix[, true_fhd_id],
+    fhd_prob_matrix[, bsl_crh_idx],
     FUN = function(x, y) (x - y) / y * 100
   )
 
