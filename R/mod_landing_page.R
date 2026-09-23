@@ -215,7 +215,7 @@ mod_landing_page_ui <- function(id) {
 									height = "1.1em",
 									margin_right = "0.3em"
 								),
-								"Guide"
+								"User Guide"
 							),
 							class = "not-arrow-btn",
 							style = "width: 100%;"
@@ -228,7 +228,7 @@ mod_landing_page_ui <- function(id) {
 									height = "1.1em",
 									margin_right = "0.3em"
 								),
-								"Tutorial"
+								"Tour"
 							),
 							class = "not-arrow-btn",
 							style = "width: 100%;"
