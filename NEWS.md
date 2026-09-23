@@ -1,9 +1,21 @@
-# ReSCUEApp (development version)
-
 ## ReSCUEApp Releases
+
+### v0.9.3 (Prototype Version)
+
+**Release Date:** September 2026
+
+#### Main Improvements
+- **User Guide:** Guide v1.0 embedded directly via iframe; tour/tutorial button added to page, allowing users to launch app walkthrough from within the guide as well as the landing page.
+- **Landing Page:** logos, icons and buttons repositioned and resized for a cleaner layout; Button labels "Guide" and "Tutorial" renamed to, respectively, "User Guide" and "Tour", to clarify context.
+- **Data Upload:** added region input and improved handling of species name/ID on user-uploaded data.
+- **Turbine Parameters:** default values updated per Natural England request.
+
+#### Bug Fixes
+- **PCRH Air-Gap Sensitivity:** fixed incorrect calculations when the CRH window extends beyond the FHD extent; undefined percentage changes now shown as dashes instead of blank cells.
+
 ---------------------------------
 
-## v0.9.2 (Prototype version)
+### v0.9.2 (Prototype version)
 
 **Release Date:** September 2026
 
@@ -28,7 +40,7 @@ Minor patch focused on UI refinement to improve usability and visual clarity and
 
 
 ---------------------------------
-## v0.9.1 (Prototype Release)
+### v0.9.1 (Prototype Release)
 
 **Release Date:** August 2026
 
@@ -41,7 +53,7 @@ Some small modifications have been made in preparation for the user-testing phas
 The changes in this version are entirely visual, intended to streamline the user experience and provide clarifications.
 
 ---------------------------------
-## v0.9.0 (First Release)
+### v0.9.0 (First Release)
 
 **Release Date**: August 2026
 

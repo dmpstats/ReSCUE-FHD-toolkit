@@ -189,49 +189,6 @@ app_ui <- function(request) {
 							# top = "60px",
 							fixed = TRUE
 						)
-						# 	bslib::card(
-						# 		bslib::card_body(
-						# 			tags$iframe(
-						# 				src = "html/ReSCUE_Toolkit_User_Guide_V1.0.html",
-						# 				style = "width: 100%; height: 100%; border: none;"
-						# 			)
-						# 			# shiny::includeMarkdown(
-						# 			# 	app_sys(
-						# 			# 		"app",
-						# 			# 		"md",
-						# 			# 		"userguide.md",
-						# 			# 	)
-						# 			# )
-						# 		),
-						# 		bslib::card_footer(
-						# 			class = "bg-primary",
-						# 			bslib::toolbar(
-						# 				bslib::toolbar_input_button(
-						# 					id = "start_tour",
-						# 					label = "In-App Tutorial",
-						# 					icon = fontawesome::fa("route"),
-						# 					show_label = TRUE,
-						# 					tooltip = "Start Tour",
-						# 					class = "btn btn-secondary fw-bold",
-						# 					style = "font-size: 1.25rem; padding: 0.75rem 1.5rem; border-radius: 8px;"
-						# 				),
-						# 				align = "left"
-						# 			) |>
-						# 				htmltools::tagAppendAttributes(
-						# 					style = "justify-content: center;"
-						# 				)
-						# 		),
-						# 		class = "card border-primary bg-light"
-						# 	)
-						# 	# Sidebar with logos
-						# 	# bslib::card(
-						# 	# 	class = "d-flex flex-column align-items-center gap-3 h-100",
-						# 	# 	logolink("dmp", height = 9),
-						# 	# 	logolink("ne", height = 9),
-						# 	# 	logolink("bto", height = 9),
-						# 	# 	logolink("blackbawks", height = 9),
-						# 	# 	logolink("niras", height = 9)
-						# 	# )
 					)
 				),
 
