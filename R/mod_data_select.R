@@ -130,7 +130,8 @@ mod_data_select_ui <- function(id) {
 											bsicons::bs_icon("funnel"),
 											"Advanced Filters"
 										),
-										class = "btn btn-dark w-100"
+										class = "btn btn-dark w-100",
+										style = "border: 2px solid white; margin-top: 1rem;"
 									) |>
 										bslib::popover(
 											# Add some additional filters
