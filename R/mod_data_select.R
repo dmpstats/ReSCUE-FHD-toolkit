@@ -131,7 +131,7 @@ mod_data_select_ui <- function(id) {
 											"Advanced Filters"
 										),
 										class = "btn btn-dark w-100",
-										style = "border: 2px solid white; margin-top: 1rem;"
+										style = "border: 2px solid white; margin-top: 0.9rem;"
 									) |>
 										bslib::popover(
 											# Add some additional filters
@@ -173,7 +173,7 @@ mod_data_select_ui <- function(id) {
 						),
 						tags$strong(
 							"
-							This is a prototype version of the ReSCUEApp. The FHDs shown here are not real data, and are only for demonstration purposes.",
+							This is a prototype version of the ReSCUEApp. The FHDs shown here are not real data, and are only for demonstration.",
 							style = "font-size: 14px;"
 						),
 						class = "card bg-warning"

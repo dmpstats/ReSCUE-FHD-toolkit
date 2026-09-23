@@ -164,7 +164,7 @@ init_app_tour <- function(session = getDefaultReactiveDomain()) {
       "<strong>Download</strong> your results once you're happy with your selection.",
       "</li>",
       "</ul>",
-      "<br><br><small style='color: #999;'>You can restart this tour at any time from the 'Start Tutorial' button on the home page.</small>"
+      "<br><br><small style='color: #999;'>You can restart this tour at any time from the 'Tour' button on the home page.</small>"
     ),
     tabId = "main-nav",
     tab = "nav-home",
