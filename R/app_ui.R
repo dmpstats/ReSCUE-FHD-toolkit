@@ -39,8 +39,8 @@ app_ui <- function(request) {
 			) |>
 				bslib::bs_add_variables(
 					"border-radius" = "1rem",
-					# Set the tooltip colour to Success
-					"tooltip-bg" = "var(--bs-success)"
+					# Set the tooltip colour to white
+					"tooltip-bg" = "white"
 				),
 			# padding = c("1.5rem", "1.5rem", "100px", "1.5rem"),
 			navbar_options = bslib::navbar_options(
@@ -211,8 +211,7 @@ app_ui <- function(request) {
 				title = NULL,
 				icon = bsicons::bs_icon(
 					"gear-fill",
-					size = "1.5em",
-					title = "Settings"
+					size = "1.5em"
 				) |>
 					bslib::tooltip(
 						placement = "bottom",

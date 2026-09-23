@@ -1,6 +1,8 @@
 ## ReSCUEApp Releases
 
-### v0.9.3 (Prototype Version)
+---------------------------------
+
+### v0.9.3 (Prototype version)
 
 **Release Date:** September 2026
 
