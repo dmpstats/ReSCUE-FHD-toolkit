@@ -167,49 +167,71 @@ app_ui <- function(request) {
 					# use page_fillable() to make card fill the available viewport's vertical
 					# space, ensuring the Tutorial button is always visible at bottom of the page
 					bslib::page_fillable(
-						bslib::card(
-							bslib::card_body(
-								tags$iframe(
-									src = "html/ReSCUE_Toolkit_User_Guide_V1.0.html",
-									style = "width: 100%; height: 100%; border: none;"
-								)
-								# shiny::includeMarkdown(
-								# 	app_sys(
-								# 		"app",
-								# 		"md",
-								# 		"userguide.md",
-								# 	)
-								# )
-							),
-							bslib::card_footer(
-								class = "bg-primary",
-								bslib::toolbar(
-									bslib::toolbar_input_button(
-										id = "start_tour",
-										label = "In-App Tutorial",
-										icon = fontawesome::fa("route"),
-										show_label = TRUE,
-										tooltip = "Start Tour",
-										class = "btn btn-secondary fw-bold",
-										style = "font-size: 1.25rem; padding: 0.75rem 1.5rem; border-radius: 8px;"
-									),
-									align = "left"
-								) |>
-									htmltools::tagAppendAttributes(
-										style = "justify-content: center;"
-									)
-							),
-							class = "card border-primary bg-light"
+						tags$iframe(
+							src = "html/ReSCUE_Toolkit_User_Guide_V1.0.html",
+							style = "width: 100%; flex: 1 1 auto; border: none"
+						),
+						shiny::absolutePanel(
+							actionButton(
+								"start_tour",
+								label = tagList(
+									fontawesome::fa("route")
+								),
+								class = "circle-btn"
+							) |>
+								bslib::tooltip(
+									placement = "bottom",
+									"Start In-App Tour"
+								),
+							right = "30px",
+							bottom = "30px",
+							# right = "50px",
+							# top = "60px",
+							fixed = TRUE
 						)
-						# Sidebar with logos
-						# bslib::card(
-						# 	class = "d-flex flex-column align-items-center gap-3 h-100",
-						# 	logolink("dmp", height = 9),
-						# 	logolink("ne", height = 9),
-						# 	logolink("bto", height = 9),
-						# 	logolink("blackbawks", height = 9),
-						# 	logolink("niras", height = 9)
-						# )
+						# 	bslib::card(
+						# 		bslib::card_body(
+						# 			tags$iframe(
+						# 				src = "html/ReSCUE_Toolkit_User_Guide_V1.0.html",
+						# 				style = "width: 100%; height: 100%; border: none;"
+						# 			)
+						# 			# shiny::includeMarkdown(
+						# 			# 	app_sys(
+						# 			# 		"app",
+						# 			# 		"md",
+						# 			# 		"userguide.md",
+						# 			# 	)
+						# 			# )
+						# 		),
+						# 		bslib::card_footer(
+						# 			class = "bg-primary",
+						# 			bslib::toolbar(
+						# 				bslib::toolbar_input_button(
+						# 					id = "start_tour",
+						# 					label = "In-App Tutorial",
+						# 					icon = fontawesome::fa("route"),
+						# 					show_label = TRUE,
+						# 					tooltip = "Start Tour",
+						# 					class = "btn btn-secondary fw-bold",
+						# 					style = "font-size: 1.25rem; padding: 0.75rem 1.5rem; border-radius: 8px;"
+						# 				),
+						# 				align = "left"
+						# 			) |>
+						# 				htmltools::tagAppendAttributes(
+						# 					style = "justify-content: center;"
+						# 				)
+						# 		),
+						# 		class = "card border-primary bg-light"
+						# 	)
+						# 	# Sidebar with logos
+						# 	# bslib::card(
+						# 	# 	class = "d-flex flex-column align-items-center gap-3 h-100",
+						# 	# 	logolink("dmp", height = 9),
+						# 	# 	logolink("ne", height = 9),
+						# 	# 	logolink("bto", height = 9),
+						# 	# 	logolink("blackbawks", height = 9),
+						# 	# 	logolink("niras", height = 9)
+						# 	# )
 					)
 				),
 
@@ -341,20 +363,19 @@ golem_add_external_resources <- function() {
       }
 			.not-arrow-btn {
 				background: var(--bs-dark); color: var(--bs-light); font-weight: bold;
-				border: none; padding: 12px 30px 12px 20px; font-size: 1.1rem;
-				overflow: visible;
+				border: 2px solid white; padding: 12px 30px 12px 20px; font-size: 1.1rem; overflow: visible;
 				cursor: pointer; margin: 4px;
 			}
       .arrow-btn {
         background: var(--bs-success); color: var(--bs-white); font-weight: bold;
-        border: none; padding: 12px 30px 12px 20px; font-size: 1.1rem;
+        border: 2px solid var(--bs-success); padding: 12px 30px 12px 20px; font-size: 1.1rem;
         clip-path: polygon(0 0, 85% 0, 100% 50%, 85% 100%, 0 100%);
         overflow: visible;
         cursor: pointer; margin: 4px;
       }
 			.left-arrow-btn {
 			  background: var(--bs-success); color: var(--bs-white); font-weight: bold;
-				border: none; padding: 12px 20px 12px 30px; font-size: 1.1rem;
+				border: 2px solid var(--bs-success); padding: 12px 20px 12px 30px; font-size: 1.1rem;
 				clip-path: polygon(100% 0, 15% 0, 0 50%, 15% 100%, 100% 100%);
 			  overflow: visible;
 			  cursor: pointer; margin: 4px;

@@ -129,8 +129,11 @@ label.btn.btn-radiobtn-mde-class.active {
   cursor: not-allowed;
 }
 
+/* ═══════════════════════════════════════════════════════════════════
+   Conductor guide tour tooltip
+   ═══════════════════════════════════════════════════════════════════
 
-/* Conductor guide tour tooltip */
+*/
 
 .shepherd-element {
   background-color: var(--bs-primary);
@@ -305,9 +308,22 @@ label.btn.btn-radiobtn-mde-class.active {
   flex: 0 0 auto;
 }
 
-/* Start Tour button - switch to success color on hover */
-#start_tour:hover {
+
+/* ═══════════════════════════════════════════════════════════════════
+   Circle button
+   ═══════════════════════════════════════════════════════════════════
+*/
+
+.circle-btn {
+  padding: 11px 16px 11px 14px;
+  border: 2px solid ;
+  border-color: white;
+  border-radius: 30px;
+  transition: all 0.2s ease;
+}
+
+.circle-btn:hover {
   background-color: var(--bs-success) !important;
-  border-color: var(--bs-success) !important;
+  border-color: white !important;
   color: var(--bs-primary) !important;
 }
